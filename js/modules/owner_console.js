@@ -11,6 +11,14 @@ export const OwnerConsoleModule = {
     const allUsers = { ...State.users };
     const userList = [];
 
+    const formatTimeSpent = (mins) => {
+      if (!mins) return '0 mins';
+      if (mins < 60) return `${Math.round(mins)} mins`;
+      const hrs = Math.floor(mins / 60);
+      const remainingMins = Math.round(mins % 60);
+      return remainingMins > 0 ? `${hrs}h ${remainingMins}m` : `${hrs}h`;
+    };
+
     // Construct enriched user list with real study stats from localStorage
     for (const email in allUsers) {
       const u = allUsers[email];
@@ -19,6 +27,7 @@ export const OwnerConsoleModule = {
       let points = 100;
       let streak = 0;
       let completedCount = 0;
+      let totalMinutes = 0;
 
       // Extract stats from local storage for each user prefix
       try {
@@ -27,6 +36,7 @@ export const OwnerConsoleModule = {
           const stats = JSON.parse(rawStats);
           points = stats.points || 100;
           streak = stats.streak || 0;
+          totalMinutes = stats.totalMinutes || 0;
         }
 
         const rawChapters = localStorage.getItem(`cajs_completed_chapters_${email}`);
@@ -49,7 +59,8 @@ export const OwnerConsoleModule = {
         registeredAt: u.registeredAt || new Date().toISOString(),
         points,
         streak,
-        completedCount
+        completedCount,
+        totalMinutes
       });
     }
 
@@ -185,7 +196,7 @@ export const OwnerConsoleModule = {
                 <th style="padding: 16px 20px;">Contact Details</th>
                 <th style="padding: 16px 20px;">Secure Password</th>
                 <th style="padding: 16px 20px; text-align: center;">Study Points</th>
-                <th style="padding: 16px 20px; text-align: center;">Chapters / Streak</th>
+                <th style="padding: 16px 20px; text-align: center;">Chapters / Streak / Time</th>
                 <th style="padding: 16px 20px;">Registered Date</th>
                 <th style="padding: 16px 20px; text-align: right;">Manage Actions</th>
               </tr>
@@ -252,11 +263,12 @@ export const OwnerConsoleModule = {
                       <strong style="color: var(--pastel-blue-dark); font-size: 14px;">⚡ ${u.points}</strong>
                     </td>
 
-                    <!-- Chapters Completed / Streak -->
+                    <!-- Chapters Completed / Streak / Time -->
                     <td style="padding: 16px 20px; text-align: center;">
                       <div style="display: flex; flex-direction: column; font-size: 12px; gap: 3px; align-items: center;">
                         <span style="font-weight: 600; color: var(--pastel-purple-dark);">📖 ${u.completedCount} chapters</span>
                         <span style="color: var(--pastel-peach-dark); font-weight: 700;">🔥 ${u.streak} Days streak</span>
+                        <span style="color: var(--pastel-blue-dark); font-weight: 600;">⏱️ ${formatTimeSpent(u.totalMinutes)} study</span>
                       </div>
                     </td>
 
@@ -267,13 +279,13 @@ export const OwnerConsoleModule = {
 
                     <!-- Actions -->
                     <td style="padding: 16px 20px; text-align: right;">
-                      <div style="display: inline-flex; gap: 8px;">
+                      <div style="display: inline-flex; gap: 8px; align-items: center;">
                         <button class="btn btn-success" style="padding: 6px 12px; font-size: 11px; border-radius: 8px;" onclick="window.cajsAdminRewardPoints('${u.email}')">
                           ⚡ +500 Pts
                         </button>
-                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px; border-radius: 8px;" onclick="window.cajsAdminEditLevel('${u.email}', '${u.examLevel}')">
-                          ⚙️ Level
-                        </button>
+                        <span style="padding: 6px 12px; font-size: 11px; border-radius: 8px; background: var(--pastel-blue); color: var(--pastel-blue-dark); font-weight: 700; display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-display);" title="Total Study Time">
+                          ⏱️ ${formatTimeSpent(u.totalMinutes)}
+                        </span>
                         <button class="btn btn-danger" style="padding: 6px 12px; font-size: 11px; border-radius: 8px; ${isOwner ? 'opacity: 0.3; cursor: not-allowed;' : ''}" ${isOwner ? 'disabled' : ''} onclick="window.cajsAdminDeleteUser('${u.email}')">
                           ❌ Delete
                         </button>
