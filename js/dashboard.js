@@ -493,6 +493,12 @@ const onboardingSteps = [
     desc: "Supercharge your productivity! Set session goals, study alongside customizable focus timers, and listen to immersive, premium ambient soundscapes (like Rainy Library, Lofi Cafe, and Deep Focus).",
     badge: "STUDY HALL",
     tab: "pomodoro"
+  },
+  {
+    title: "✍️ Profile & Student Feedback",
+    desc: "Customize your profile avatar, view your official dynamic Student ID card, and share your suggestions, feature requests, or bug reports with us at any time directly in the panel!",
+    badge: "PROFILE & FEEDBACK",
+    tab: "profile"
   }
 ];
 
@@ -534,6 +540,12 @@ window.cajsStartOnboardingTour = (force = false) => {
       }
       .cajs-tour-highlight .nav-icon-emoji {
         transform: scale(1.3) !important;
+      }
+      .user-widget.cajs-tour-highlight {
+        background: rgba(255, 255, 255, 0.96) !important;
+        box-shadow: 0 0 0 3.5px #ff2d55, 0 10px 30px rgba(255, 45, 85, 0.3) !important;
+        transform: scale(1.04) translateX(10px) !important;
+        border-radius: 16px;
       }
     `;
     document.head.appendChild(style);
@@ -578,15 +590,26 @@ window.cajsStartOnboardingTour = (force = false) => {
     document.querySelectorAll('.nav-menu .nav-item').forEach(item => {
       item.classList.remove('cajs-tour-highlight');
     });
+    const userWidget = document.querySelector('.user-widget');
+    if (userWidget) userWidget.classList.remove('cajs-tour-highlight');
 
     // Switch corresponding sidebar tab in background to show where the feature is used
     if (step.tab) {
-      const navItem = document.querySelector(`.nav-menu .nav-item[data-tab="${step.tab}"]`);
-      if (navItem) {
-        navItem.click();
-        // Highlight active nav item programmatically
-        if (currentStep > 0) {
-          navItem.classList.add('cajs-tour-highlight');
+      if (step.tab === 'profile') {
+        if (window.cajsGoToProfile) {
+          window.cajsGoToProfile();
+        }
+        if (userWidget && currentStep > 0) {
+          userWidget.classList.add('cajs-tour-highlight');
+        }
+      } else {
+        const navItem = document.querySelector(`.nav-menu .nav-item[data-tab="${step.tab}"]`);
+        if (navItem) {
+          navItem.click();
+          // Highlight active nav item programmatically
+          if (currentStep > 0) {
+            navItem.classList.add('cajs-tour-highlight');
+          }
         }
       }
     }
@@ -623,16 +646,21 @@ window.cajsStartOnboardingTour = (force = false) => {
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 14px;">
-          <button class="btn btn-secondary" id="ob-skip-btn" style="padding: 8px 14px; font-size: 11.5px; border-radius: 10px; border-color: transparent; background: transparent; color: var(--text-muted); cursor: pointer;">
-            Skip Tour
-          </button>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="btn btn-secondary" id="ob-skip-btn" style="padding: 8px 10px; font-size: 11.5px; border-radius: 10px; border-color: transparent; background: transparent; color: var(--text-muted); cursor: pointer;">
+              Skip
+            </button>
+            <button class="btn btn-secondary" id="ob-feedback-btn" style="padding: 8px 10px; font-size: 11.5px; border-radius: 10px; border-color: transparent; background: transparent; color: var(--pastel-purple-dark); cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+              ✍️ Feedback
+            </button>
+          </div>
           
-          <div style="display: flex; gap: 8px;">
-            <button class="btn btn-secondary" id="ob-back-btn" style="padding: 8px 16px; font-size: 11.5px; border-radius: 10px; cursor: pointer; ${isFirst ? 'opacity: 0.4; cursor: not-allowed;' : ''}" ${isFirst ? 'disabled' : ''}>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn btn-secondary" id="ob-back-btn" style="padding: 8px 14px; font-size: 11.5px; border-radius: 10px; cursor: pointer; ${isFirst ? 'opacity: 0.4; cursor: not-allowed;' : ''}" ${isFirst ? 'disabled' : ''}>
               Back
             </button>
-            <button class="btn btn-primary" id="ob-next-btn" style="padding: 8px 20px; font-size: 11.5px; border-radius: 10px; cursor: pointer;">
-              ${isLast ? 'Finish Tour 🎉' : 'Next Step ➡️'}
+            <button class="btn btn-primary" id="ob-next-btn" style="padding: 8px 18px; font-size: 11.5px; border-radius: 10px; cursor: pointer;">
+              ${isLast ? 'Finish 🎉' : 'Next ➡️'}
             </button>
           </div>
         </div>
@@ -640,7 +668,9 @@ window.cajsStartOnboardingTour = (force = false) => {
     `;
 
     // Position Card Wrapper and Arrow Mark dynamically based on target sidebar nav item coordinates
-    const navItem = document.querySelector(`.nav-menu .nav-item[data-tab="${step.tab}"]`);
+    const navItem = step.tab === 'profile'
+      ? document.querySelector('.user-widget')
+      : document.querySelector(`.nav-menu .nav-item[data-tab="${step.tab}"]`);
     const arrowEl = modalEl.querySelector('#ob-arrow');
 
     if (currentStep === 0 || !navItem) {
@@ -675,7 +705,7 @@ window.cajsStartOnboardingTour = (force = false) => {
         const sidebarRight = rect.right || 240;
         const itemCenterY = rect.top + (rect.height / 2);
         
-        const cardHeight = 280; // approximate height
+        const cardHeight = 360; // accurate height to keep buttons visible within viewport
         const cardTop = Math.max(20, Math.min(window.innerHeight - cardHeight - 20, itemCenterY - (cardHeight / 2)));
         const cardLeft = sidebarRight + 55; // Account for 10px translation in highlight mode
 
@@ -703,8 +733,19 @@ window.cajsStartOnboardingTour = (force = false) => {
       document.querySelectorAll('.nav-menu .nav-item').forEach(item => {
         item.classList.remove('cajs-tour-highlight');
       });
+      const userWidget = document.querySelector('.user-widget');
+      if (userWidget) userWidget.classList.remove('cajs-tour-highlight');
       modalEl.remove();
     });
+
+    const feedbackBtn = cardWrapper.querySelector('#ob-feedback-btn');
+    if (feedbackBtn) {
+      feedbackBtn.addEventListener('click', () => {
+        if (window.cajsOpenFeedbackModal) {
+          window.cajsOpenFeedbackModal();
+        }
+      });
+    }
 
     cardWrapper.querySelector('#ob-back-btn').addEventListener('click', () => {
       if (currentStep > 0) {
@@ -719,6 +760,8 @@ window.cajsStartOnboardingTour = (force = false) => {
         document.querySelectorAll('.nav-menu .nav-item').forEach(item => {
           item.classList.remove('cajs-tour-highlight');
         });
+        const userWidget = document.querySelector('.user-widget');
+        if (userWidget) userWidget.classList.remove('cajs-tour-highlight');
         window.cajsShowAlert("✨ Onboarding Completed", "You are now fully briefed and ready to conquer your CA exams! Click on any module in the sidebar to get started.", "success");
         modalEl.remove();
       } else {
