@@ -223,6 +223,19 @@ export const State = {
     return matchedUser;
   },
 
+  resetPassword(email, newPassword) {
+    const matchedUser = this.users[email];
+    if (!matchedUser) {
+      throw new Error("No user found with this Email ID.");
+    }
+    matchedUser.password = newPassword;
+    localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
+    if (this.user && this.user.email === email) {
+      this.user.password = newPassword;
+    }
+    return matchedUser;
+  },
+
   logoutUser() {
     this.user = null;
     this.completedChapters = {};

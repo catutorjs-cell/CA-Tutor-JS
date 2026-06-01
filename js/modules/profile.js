@@ -6,6 +6,10 @@ export const ProfileModule = {
   isOtpVerified: false,
   otpCountdown: 0,
   otpInterval: null,
+  passGeneratedOtp: null,
+  isPassOtpVerified: false,
+  passOtpCountdown: 0,
+  passOtpInterval: null,
   activeNetworkTab: 'following',
 
   render(container) {
@@ -239,8 +243,31 @@ export const ProfileModule = {
             </h3>
 
             <div class="form-group">
-              <label class="form-label" for="prof-current-pass">Current Password (Required for updates)</label>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+                <label class="form-label" style="margin-bottom:0;" for="prof-current-pass">Current Password (Required for updates)</label>
+                <a href="#" id="btn-prof-forgot-pass-otp" style="font-size:11px; font-weight:600; color:var(--pastel-purple-dark); text-decoration:none;">Reset via Email OTP</a>
+              </div>
               <input class="form-input" type="password" id="prof-current-pass" value="${user.password}" required placeholder="••••••••">
+            </div>
+
+            <!-- Profile Password OTP Reset Section (Hidden by default, shown if Reset via Email OTP clicked) -->
+            <div id="prof-pass-otp-section" style="display: none; background: rgba(0,0,0,0.02); border: 1px dashed var(--pastel-purple-dark); padding: 16px; border-radius: 16px; margin: 15px 0; animation: fadeIn 0.3s ease-out;">
+              <span style="font-size: 12px; font-weight: 700; color: var(--pastel-purple-dark); display: block; margin-bottom: 8px;">
+                🔐 Password Reset OTP Verification Required
+              </span>
+              <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">
+                Verify your identity using the OTP code sent to your registered email <strong>${user.email.charAt(0)}***@${user.email.split('@')[1]}</strong>.
+              </p>
+              <div style="display: flex; gap: 12px; align-items: end;">
+                <div class="form-group" style="margin-bottom: 0; flex-grow: 1;">
+                  <label class="form-label" for="prof-pass-otp">Enter 6-Digit OTP</label>
+                  <input class="form-input" type="text" id="prof-pass-otp" placeholder="6-digit Code" maxlength="6" disabled>
+                </div>
+                <button type="button" class="btn btn-secondary" id="btn-prof-pass-send-otp" style="padding: 11px 18px; font-size: 12px; height: 43px; white-space: nowrap;">
+                  Send OTP
+                </button>
+              </div>
+              <span id="prof-pass-otp-feedback" style="font-size: 11px; margin-top: 4px; display: block;"></span>
             </div>
 
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px;">
@@ -275,6 +302,20 @@ export const ProfileModule = {
               Save Profile Changes
             </button>
           </form>
+
+          <hr style="border: 0; border-top: 1px solid rgba(0,0,0,0.05); margin: 25px 0;">
+
+          <div class="danger-zone" style="background: rgba(239, 68, 68, 0.04); border: 1px dashed rgba(239, 68, 68, 0.2); padding: 20px; border-radius: 18px; text-align: left; animation: fadeIn 0.3s ease-out;">
+            <h4 style="font-size: 14px; font-weight: 700; color: var(--pastel-rose-dark); margin: 0 0 6px 0; display:flex; align-items:center; gap:6px;">
+              <span>⚠️</span> Danger Zone
+            </h4>
+            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin: 0 0 15px 0;">
+              Deleting your account will permanently purge all your study history, pomodoro milestones, syllabus progress, revision calendars, and active student session. This action is irreversible.
+            </p>
+            <button type="button" class="btn btn-danger" id="btn-prof-delete-account" style="width: 100%; padding: 12px; font-size: 13px; font-weight: 700; border-radius: 12px; background: var(--pastel-rose-dark); border-color: var(--pastel-rose-dark); color: white; cursor: pointer; transition: var(--transition-smooth);">
+              Delete My Student Account
+            </button>
+          </div>
         </div>
 
         <!-- Right Column: Profile Summary & Stats Preview -->
@@ -403,6 +444,11 @@ export const ProfileModule = {
     clearInterval(this.otpInterval);
     this.otpInterval = null;
     this.otpCountdown = 0;
+    this.passGeneratedOtp = null;
+    this.isPassOtpVerified = false;
+    clearInterval(this.passOtpInterval);
+    this.passOtpInterval = null;
+    this.passOtpCountdown = 0;
   },
 
   bindEvents(container) {
@@ -416,6 +462,12 @@ export const ProfileModule = {
     const otpSection = container.querySelector('#prof-otp-section');
     const inputOtp = container.querySelector('#prof-otp');
     const btnSendOtp = container.querySelector('#btn-prof-send-otp');
+    
+    const btnProfForgotPassOtp = container.querySelector('#btn-prof-forgot-pass-otp');
+    const passOtpSection = container.querySelector('#prof-pass-otp-section');
+    const inputPassOtp = container.querySelector('#prof-pass-otp');
+    const btnProfPassSendOtp = container.querySelector('#btn-prof-pass-send-otp');
+    const passOtpFeedback = container.querySelector('#prof-pass-otp-feedback');
     const otpFeedback = container.querySelector('#prof-otp-feedback');
 
     const inputCurrentPass = container.querySelector('#prof-current-pass');
@@ -642,6 +694,160 @@ export const ProfileModule = {
       }
     });
 
+    // --- Profile Password Reset via Email OTP Flow ---
+    if (btnProfForgotPassOtp) {
+      btnProfForgotPassOtp.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Toggle/Show password reset OTP section
+        const isHidden = passOtpSection.style.display === 'none';
+        passOtpSection.style.display = isHidden ? 'block' : 'none';
+        
+        if (isHidden) {
+          if (!this.passGeneratedOtp && !this.isPassOtpVerified) {
+            btnProfPassSendOtp.disabled = false;
+          }
+        } else {
+          // Reset OTP section state
+          this.passGeneratedOtp = null;
+          this.isPassOtpVerified = false;
+          clearInterval(this.passOtpInterval);
+          btnProfPassSendOtp.textContent = 'Send OTP';
+          btnProfPassSendOtp.disabled = false;
+          btnProfPassSendOtp.className = 'btn btn-secondary';
+          inputPassOtp.value = '';
+          inputPassOtp.disabled = true;
+          inputPassOtp.style.borderColor = '';
+          inputPassOtp.style.boxShadow = '';
+          passOtpFeedback.textContent = '';
+          
+          // Clear current password prefill bypass
+          inputCurrentPass.value = user.password;
+        }
+      });
+    }
+
+    if (btnProfPassSendOtp) {
+      btnProfPassSendOtp.addEventListener('click', () => {
+        const emailVal = user.email;
+
+        // Generate 6-digit OTP code
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        this.passGeneratedOtp = otp;
+
+        const now = new Date();
+        const expiry = new Date(now.getTime() + 15 * 60 * 1000);
+        const formattedExpiryTime = expiry.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        // Trigger visual simulator toast showing OTP transmission
+        const container = document.getElementById('sms-container');
+        container.innerHTML = `
+          <div class="sms-simulation-toast" style="min-width: 320px; background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border: var(--glass-border); border-radius: 18px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); display: flex; gap: 12px; align-items: start; animation: slideInRight 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);">
+            <div class="sms-avatar" style="width: 38px; height: 38px; border-radius: 50%; background: var(--pastel-purple); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--pastel-purple-dark); font-size:14px; flex-shrink:0;">✉️</div>
+            <div class="sms-content" style="display:flex; flex-direction:column; gap:4px; font-size:12px; text-align: left;">
+              <span class="sms-header" style="font-weight:700; color:var(--text-main);">🛡️ Profile Password Reset</span>
+              <span class="sms-body" style="color:var(--text-muted); line-height:1.4;">
+                Verification code sent to email 📧 <strong>${emailVal.charAt(0)}***@${emailVal.split('@')[1]}</strong>.<br>
+                🔑 OTP Code: <strong style="color:var(--pastel-purple-dark); font-size:14px;">${otp}</strong>
+              </span>
+            </div>
+          </div>
+        `;
+
+        // Send the email via EmailJS
+        if (typeof emailjs !== 'undefined') {
+          emailjs.send(
+            'service_snsqw0k',
+            'template_yuw2suo',
+            {
+              passcode: otp,
+              time: formattedExpiryTime,
+              otp: otp,
+              otp_code: otp,
+              otpCode: otp,
+              code: otp,
+              to_email: emailVal,
+              user_email: emailVal,
+              email: emailVal,
+              to_name: emailVal.split('@')[0],
+              name: emailVal.split('@')[0],
+              message: `Your CA TUTOR JS profile password reset verification code is ${otp}.`
+            }
+          ).then((response) => {
+            console.log('Profile password reset email sent successfully via EmailJS!', response.status, response.text);
+          }).catch((error) => {
+            console.error('EmailJS Profile OTP Send Failed:', error);
+            alert(`Failed to send OTP email: ${error.text || error.message || error}. Falling back to developer simulation mode. Check browser console.`);
+            console.log(`[Developer Fallback] Profile Password Reset OTP is: ${otp}`);
+          });
+        } else {
+          console.warn("EmailJS SDK not found. Falling back to simulated verification.");
+          console.log(`[Developer Fallback] Profile Password Reset OTP is: ${otp}`);
+        }
+
+        setTimeout(() => {
+          const toast = container.querySelector('.sms-simulation-toast');
+          if (toast) toast.remove();
+        }, 8000);
+
+        // Enable OTP Input
+        inputPassOtp.disabled = false;
+        inputPassOtp.placeholder = "Enter 6-digit OTP";
+        inputPassOtp.focus();
+
+        // Start 60s countdown for resend
+        btnProfPassSendOtp.disabled = true;
+        this.passOtpCountdown = 60;
+
+        clearInterval(this.passOtpInterval);
+        this.passOtpInterval = setInterval(() => {
+          this.passOtpCountdown--;
+          if (this.passOtpCountdown <= 0) {
+            btnProfPassSendOtp.textContent = 'Resend OTP';
+            btnProfPassSendOtp.disabled = false;
+            clearInterval(this.passOtpInterval);
+          } else {
+            btnProfPassSendOtp.textContent = `Resend in ${this.passOtpCountdown}s`;
+          }
+        }, 1000);
+      });
+    }
+
+    if (inputPassOtp) {
+      inputPassOtp.addEventListener('input', () => {
+        const otpVal = inputPassOtp.value.trim();
+        if (otpVal.length === 6) {
+          if (otpVal === this.passGeneratedOtp) {
+            this.isPassOtpVerified = true;
+            inputPassOtp.style.borderColor = 'var(--pastel-green-dark)';
+            inputPassOtp.style.boxShadow = '0 0 0 3px var(--pastel-green)';
+            inputPassOtp.disabled = true;
+
+            btnProfPassSendOtp.textContent = 'Verified!';
+            btnProfPassSendOtp.disabled = true;
+            btnProfPassSendOtp.className = 'btn btn-success';
+
+            // Fill current password block automatically to bypass password check safely
+            inputCurrentPass.value = user.password;
+
+            passOtpFeedback.textContent = "Identity verified successfully. Current password verified and auto-filled.";
+            passOtpFeedback.style.color = "var(--pastel-green-dark)";
+
+            clearInterval(this.passOtpInterval);
+          } else {
+            inputPassOtp.style.borderColor = 'var(--pastel-rose-dark)';
+            inputPassOtp.style.boxShadow = '0 0 0 3px var(--pastel-rose)';
+            passOtpFeedback.textContent = "Incorrect verification code. Please try again.";
+            passOtpFeedback.style.color = "var(--pastel-rose-dark)";
+          }
+        } else {
+          inputPassOtp.style.borderColor = '';
+          inputPassOtp.style.boxShadow = '';
+          passOtpFeedback.textContent = '';
+        }
+      });
+    }
+
     // New Password indicators
     inputNewPass.addEventListener('input', () => {
       const val = inputNewPass.value;
@@ -826,6 +1032,49 @@ export const ProfileModule = {
       });
     }
 
+    // --- Account Deletion Flow ---
+    const btnDeleteAccount = container.querySelector('#btn-prof-delete-account');
+    if (btnDeleteAccount) {
+      btnDeleteAccount.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        // 1. Owner account protection
+        if (user.email === 'owner@cajs.com' || user.role === 'owner') {
+          window.cajsShowAlert("Operation Blocked", "As the primary Platform Owner, you cannot delete this account. Safety locks are active.", "error");
+          return;
+        }
+
+        // 2. Custom Double-Confirm Popup Dialog
+        window.cajsShowConfirm(
+          "⚠️ Permanent Deletion",
+          "Are you absolutely sure you want to permanently delete your CA TUTOR JS student profile? This will permanently purge all study hours, checklists, revision calendars, and statistics. This action is irreversible.",
+          () => {
+            try {
+              // Delete user data from state & localStorage
+              State.adminDeleteUser(user.email);
+              State.logoutUser();
+
+              // Redirect back to landing page
+              document.getElementById('app-shell').style.display = 'none';
+              const landing = document.getElementById('landing-page');
+              if (landing) landing.style.display = 'flex';
+
+              const authPanel = document.getElementById('auth-panel');
+              if (authPanel) authPanel.classList.remove('open');
+
+              // Clear login fields
+              document.getElementById('login-email').value = '';
+              document.getElementById('login-password').value = '';
+
+              window.cajsShowAlert("Profile Purged", "Your student profile and all related study statistics have been successfully deleted from the platform.", "success");
+            } catch (err) {
+              window.cajsShowAlert("Error Deleting", "An error occurred during account deletion: " + err.message, "error");
+            }
+          }
+        );
+      });
+    }
+
     // Global toggle follow back helper
     window.cajsProfileFollowToggle = (friendId) => {
       try {
@@ -868,8 +1117,8 @@ export const ProfileModule = {
         <div class="sms-content" style="display:flex; flex-direction:column; gap:4px; font-size:12px; text-align: left;">
           <span class="sms-header" style="font-weight:700; color:var(--text-main);">🛡️ Profile Security Verification</span>
           <span class="sms-body" style="color:var(--text-muted); line-height:1.4;">
-            OTP verification code sent successfully to 📱 <strong>+91 ******${phone.slice(-4)}</strong> & 📧 <strong>${email.charAt(0)}***@${email.split('@')[1]}</strong>.<br>
-            Please check your device's SMS inbox and email folders.
+            OTP verification code sent to 📱 <strong>+91 ******${phone.slice(-4)}</strong> & 📧 <strong>${email.charAt(0)}***@${email.split('@')[1]}</strong>.<br>
+            🔑 OTP Code: <strong style="color:var(--pastel-purple-dark); font-size:14px;">${otp}</strong>
           </span>
         </div>
       </div>
