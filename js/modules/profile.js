@@ -422,6 +422,19 @@ export const ProfileModule = {
           <!-- Study Network Card -->
           ${networkCardHtml}
 
+          <!-- Feedback & Suggestions Card -->
+          <div class="glass-card" style="padding: 20px; border: var(--glass-border); box-shadow: 0 8px 32px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 8px; animation: fadeIn 0.3s ease-out; background: linear-gradient(135deg, rgba(217,179,255,0.05), rgba(179,212,240,0.05));">
+            <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 4px; color: var(--pastel-purple-dark); display:flex; align-items:center; gap:6px;">
+              <span>📝</span> Help Us Improve!
+            </h4>
+            <p style="font-size: 12px; color: var(--text-main); line-height: 1.5; margin: 0 0 8px 0;">
+              Your feedback helps us make CA TUTOR JS better. Share your suggestions, bugs, or feature requests with us!
+            </p>
+            <button id="btn-open-feedback-modal" class="btn" style="width: 100%; font-size: 12px; padding: 11px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; border-radius: 10px; border: none; font-weight: 700; background: linear-gradient(135deg, #7c3aed, #3b82f6); color: white; transition: all 0.3s ease; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.25);">
+              <span>✍️</span> Give Us Feedback
+            </button>
+          </div>
+
           <!-- Quick Tip Card -->
           <div class="glass-card" style="padding: 20px; background: linear-gradient(135deg, rgba(217,179,255,0.1), rgba(179,212,240,0.1));">
             <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--pastel-purple-dark); display:flex; align-items:center; gap:6px;">
@@ -452,6 +465,56 @@ export const ProfileModule = {
   },
 
   bindEvents(container) {
+    // Bind Open Feedback Modal button
+    const btnOpenFeedback = container.querySelector('#btn-open-feedback-modal');
+    if (btnOpenFeedback) {
+      btnOpenFeedback.addEventListener('click', () => {
+        const modalId = 'cajs-feedback-modal';
+        let modal = document.getElementById(modalId);
+        if (modal) modal.remove();
+
+        modal = document.createElement('div');
+        modal.id = modalId;
+        modal.style.cssText = `
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: rgba(0,0,0,0.4); backdrop-filter: blur(14px);
+          display: flex; align-items: center; justify-content: center;
+          z-index: 10001; animation: fadeIn 0.25s ease-out;
+        `;
+        modal.innerHTML = `
+          <div class="glass-card" style="width: 90%; max-width: 550px; padding: 24px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); animation: scaleUp 0.3s cubic-bezier(0.34,1.56,0.64,1); background: rgba(255,255,255,0.92); border: 1px solid rgba(255,255,255,0.4); display: flex; flex-direction: column; gap: 14px; box-sizing: border-box;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.06); padding-bottom: 12px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg,#7c3aed,#3b82f6); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">📝</div>
+                <div style="text-align: left;">
+                  <h3 style="font-size: 16px; font-weight: 700; margin: 0; font-family: var(--font-display);">Share Your Feedback</h3>
+                  <p style="font-size: 11px; color: var(--text-muted); margin: 2px 0 0;">Help us make CA TUTOR JS even better</p>
+                </div>
+              </div>
+              <button id="feedback-modal-close" style="background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-muted); font-weight: bold;">&times;</button>
+            </div>
+            <div style="width: 100%; height: 420px; border-radius: 12px; overflow: hidden; border: 1.5px solid rgba(0,0,0,0.06); background: white;">
+              <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScrZ_QX06Khu_Shl3H33Wih4q4_5-05EIwV-nvIsaL0TZNoLQ/viewform?embedded=true" width="100%" height="100%" frameborder="0" marginheight="0" marginwidth="0" style="border: none; width: 100%; height: 100%;">Loading feedback form…</iframe>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button id="feedback-modal-cancel" class="btn btn-secondary" style="flex: 1; font-size: 12px; padding: 10px; cursor: pointer; border-radius: 10px; font-weight: 600;">Close</button>
+              <a href="https://docs.google.com/forms/d/e/1FAIpQLScrZ_QX06Khu_Shl3H33Wih4q4_5-05EIwV-nvIsaL0TZNoLQ/viewform" target="_blank" class="btn btn-primary" style="flex: 1.5; font-size: 12px; padding: 10px; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 10px; font-weight: 600;">
+                <span>↗️</span> Open in New Tab
+              </a>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+
+        const closeModal = () => modal.remove();
+        modal.querySelector('#feedback-modal-close').addEventListener('click', closeModal);
+        modal.querySelector('#feedback-modal-cancel').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) closeModal();
+        });
+      });
+    }
+
     const user = State.user;
     const form = container.querySelector('#profile-editor-form');
     const inputPhone = container.querySelector('#prof-phone');

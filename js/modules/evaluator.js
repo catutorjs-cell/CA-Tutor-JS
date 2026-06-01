@@ -8,7 +8,7 @@ const GEMINI_STORAGE_KEY = 'cajs_gemini_api_key';
 
 // If you want all your users to share a master key (so they are not prompted),
 // paste your Gemini API key inside the quotes below:
-const DEFAULT_GEMINI_API_KEY = 'AIzaSyCIUkVYZPW_3GHj21OqZklXpqwFKYgzxqw';
+const DEFAULT_GEMINI_API_KEY = 'AQ.Ab8RN6JkiTQZ75EmMJqTL6gLI2xo4PEY2XTE3NO__FUnUxmiYA';
 
 export const Evaluator = {
 
@@ -380,56 +380,81 @@ ${saText ? `## Suggested Answer Content (for reference):\n${saText}\n` : ''}
       ]
     }];
 
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    const models = [
+      'gemini-2.5-flash',
+      'gemini-3.5-flash',
+      'gemini-2.5-flash-lite',
+      'gemini-3.1-flash-lite'
+    ];
+    let lastError = null;
 
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: contents,
-        generationConfig: {
-          temperature: 0.3,
-          maxOutputTokens: 8192,
-          responseMimeType: "application/json"
+    for (const model of models) {
+      try {
+        if (onProgress) onProgress(`AI is evaluating your answers using ${model}...`);
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: contents,
+            generationConfig: {
+              temperature: 0.3,
+              maxOutputTokens: 8192,
+              responseMimeType: "application/json"
+            }
+          })
+        });
+
+        if (!response.ok) {
+          const errBody = await response.text();
+          if (response.status === 400 || response.status === 403) {
+            // Invalid API key — clear it so user is prompted again
+            localStorage.removeItem(GEMINI_STORAGE_KEY);
+            throw new Error('Invalid or expired API key. Please try again with a valid Gemini API key.');
+          }
+          console.warn(`Gemini API error for model ${model}:`, errBody);
+          lastError = new Error(`Gemini API error (${response.status}): ${errBody}`);
+          continue;
         }
-      })
-    });
 
-    if (!response.ok) {
-      const errBody = await response.text();
-      if (response.status === 400 || response.status === 403) {
-        // Invalid API key — clear it so user is prompted again
-        localStorage.removeItem(GEMINI_STORAGE_KEY);
-        throw new Error('Invalid or expired API key. Please try again with a valid Gemini API key.');
+        const data = await response.json();
+
+        // Extract text from Gemini response
+        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+        // Parse JSON — handle possible markdown fences
+        let jsonStr = rawText.trim();
+        if (jsonStr.startsWith('```')) {
+          jsonStr = jsonStr.replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '');
+        }
+
+        let evaluation;
+        try {
+          evaluation = JSON.parse(jsonStr);
+        } catch (parseErr) {
+          console.error(`Failed to parse Gemini response for model ${model}:`, rawText);
+          lastError = new Error('AI returned an invalid response format. Please try again.');
+          continue;
+        }
+
+        // Validate structure
+        if (!evaluation.evaluations || !Array.isArray(evaluation.evaluations)) {
+          lastError = new Error('AI response missing evaluations array.');
+          continue;
+        }
+
+        return evaluation;
+      } catch (err) {
+        if (err.message.includes('Invalid or expired API key')) {
+          throw err;
+        }
+        console.error(`Model ${model} failed:`, err);
+        lastError = err;
       }
-      throw new Error(`Gemini API error (${response.status}): ${errBody}`);
     }
 
-    const data = await response.json();
-
-    // Extract text from Gemini response
-    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-    // Parse JSON — handle possible markdown fences
-    let jsonStr = rawText.trim();
-    if (jsonStr.startsWith('```')) {
-      jsonStr = jsonStr.replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '');
-    }
-
-    let evaluation;
-    try {
-      evaluation = JSON.parse(jsonStr);
-    } catch (parseErr) {
-      console.error('Failed to parse Gemini response:', rawText);
-      throw new Error('AI returned an invalid response format. Please try again.');
-    }
-
-    // Validate structure
-    if (!evaluation.evaluations || !Array.isArray(evaluation.evaluations)) {
-      throw new Error('AI response missing evaluations array.');
-    }
-
-    return evaluation;
+    throw lastError || new Error('All AI models failed to evaluate the paper. Please try again.');
   },
 
   // ──────────────────────────────────────────────

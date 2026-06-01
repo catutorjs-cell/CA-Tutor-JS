@@ -631,7 +631,7 @@ ${foundQ.notes ? `* **Explanation:** ${foundQ.notes}` : ''}`;
   // ── Gemini API fallback — called when local DB has no answer ──
   async askGemini(queryText) {
     const GEMINI_KEY_STORAGE = 'cajs_gemini_api_key';
-    const DEFAULT_KEY = 'AIzaSyCIUkVYZPW_3GHj21OqZklXpqwFKYgzxqw';
+    const DEFAULT_KEY = 'AQ.Ab8RN6JkiTQZ75EmMJqTL6gLI2xo4PEY2XTE3NO__FUnUxmiYA';
 
     // 1. Get saved key or prompt user
     let apiKey = DEFAULT_KEY || localStorage.getItem(GEMINI_KEY_STORAGE) || '';
@@ -685,7 +685,12 @@ ${foundQ.notes ? `* **Explanation:** ${foundQ.notes}` : ''}`;
     const prompt = `You are an expert CA (Chartered Accountancy) study mentor for ICAI ${State.user ? State.user.examLevel : ''} level students in India. Answer the following question clearly and concisely, using proper accounting/law/tax terminology. Format your answer with headings, bullet points, and examples where relevant.\n\nQuestion: ${queryText}`;
 
     // Use available flash models
-    const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+    const models = [
+      'gemini-2.5-flash',
+      'gemini-3.5-flash',
+      'gemini-2.5-flash-lite',
+      'gemini-3.1-flash-lite'
+    ];
 
     for (const model of models) {
       try {
