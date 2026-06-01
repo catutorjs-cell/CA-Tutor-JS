@@ -629,12 +629,31 @@ ${foundQ.notes ? `* **Explanation:** ${foundQ.notes}` : ''}`;
   },
 
   // ── Gemini API fallback — called when local DB has no answer ──
+  async loadEnvApiKey() {
+    try {
+      const response = await fetch('/.env');
+      if (response.ok) {
+        const text = await response.text();
+        const match = text.match(/GEMINI_API_KEY\s*=\s*(.+)/);
+        if (match && match[1]) {
+          return match[1].trim();
+        }
+      }
+    } catch (e) {
+      console.warn("Could not load API key from .env file:", e);
+    }
+    return '';
+  },
+
   async askGemini(queryText) {
     const GEMINI_KEY_STORAGE = 'cajs_gemini_api_key';
-    const DEFAULT_KEY = 'AQ.Ab8RN6JkiTQZ75EmMJqTL6gLI2xo4PEY2XTE3NO__FUnUxmiYA';
+    const DEFAULT_KEY = '';
 
     // 1. Get saved key or prompt user
-    let apiKey = DEFAULT_KEY || localStorage.getItem(GEMINI_KEY_STORAGE) || '';
+    let apiKey = await this.loadEnvApiKey();
+    if (!apiKey) {
+      apiKey = DEFAULT_KEY || localStorage.getItem(GEMINI_KEY_STORAGE) || '';
+    }
     if (!apiKey) {
       apiKey = await new Promise((resolve) => {
         const modalId = 'cajs-gemini-key-modal-dd';

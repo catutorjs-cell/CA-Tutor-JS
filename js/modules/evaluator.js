@@ -8,7 +8,7 @@ const GEMINI_STORAGE_KEY = 'cajs_gemini_api_key';
 
 // If you want all your users to share a master key (so they are not prompted),
 // paste your Gemini API key inside the quotes below:
-const DEFAULT_GEMINI_API_KEY = 'AQ.Ab8RN6JkiTQZ75EmMJqTL6gLI2xo4PEY2XTE3NO__FUnUxmiYA';
+const DEFAULT_GEMINI_API_KEY = '';
 
 export const Evaluator = {
 
@@ -16,10 +16,33 @@ export const Evaluator = {
   // 1. API KEY MANAGEMENT
   // ──────────────────────────────────────────────
 
-  getApiKey() {
+  async loadEnvApiKey() {
+    try {
+      const response = await fetch('/.env');
+      if (response.ok) {
+        const text = await response.text();
+        const match = text.match(/GEMINI_API_KEY\s*=\s*(.+)/);
+        if (match && match[1]) {
+          return match[1].trim();
+        }
+      }
+    } catch (e) {
+      console.warn("Could not load API key from .env file:", e);
+    }
+    return '';
+  },
+
+  async getApiKey() {
+    // 1. Try to load from .env
+    const envKey = await this.loadEnvApiKey();
+    if (envKey) return envKey;
+
+    // 2. Try hardcoded default
     if (DEFAULT_GEMINI_API_KEY && DEFAULT_GEMINI_API_KEY.trim() !== '') {
       return DEFAULT_GEMINI_API_KEY.trim();
     }
+
+    // 3. Try localStorage
     return localStorage.getItem(GEMINI_STORAGE_KEY) || '';
   },
 
@@ -28,8 +51,8 @@ export const Evaluator = {
   },
 
   showApiKeyModal() {
-    return new Promise((resolve) => {
-      const existing = this.getApiKey();
+    return new Promise(async (resolve) => {
+      const existing = await this.getApiKey();
       if (existing) { resolve(existing); return; }
 
       const modalId = 'cajs-gemini-key-modal';
