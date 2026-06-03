@@ -1,22 +1,28 @@
-{
-  "name": "CA TUTOR JS",
-  "short_name": "CA-JS",
-  "description": "Premium Study Companion for Chartered Accountancy Students",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#F7F5F2",
-  "theme_color": "#a855f7",
-  "icons": [
-    {
-      "src": "./assets/logo.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "./assets/logo.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Homepage / Landing Page -->
+  <url>
+    <loc>https://ca-tutor-js-self.vercel.app/</loc>
+    <lastmod>2026-06-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- OTP / Auth Page -->
+  <url>
+    <loc>https://ca-tutor-js-self.vercel.app/otp.html</loc>
+    <lastmod>2026-06-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Interactive Prototype -->
+  <url>
+    <loc>https://ca-tutor-js-self.vercel.app/frontend/interactive_prototype.html</loc>
+    <lastmod>2026-06-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+</urlset>
