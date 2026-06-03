@@ -5,9 +5,23 @@ export const OwnerConsoleModule = {
   searchQuery: '',
   levelFilter: 'all',
   sortBy: 'date-desc', // date-desc, date-asc, name-asc, points-desc
+  datePreset: 'all', // all, today, yesterday, 7days, 30days, custom
+  startDateFilter: '', // YYYY-MM-DD
+  endDateFilter: '', // YYYY-MM-DD
+  hasShownWelcomePopup: false,
   revealedPasswords: {}, // Format: { email: true }
 
   render(container) {
+    // Force reload users database from localStorage to ensure it is always up to date
+    try {
+      const rawUsers = localStorage.getItem('cajs_users_db');
+      if (rawUsers) {
+        State.users = JSON.parse(rawUsers);
+      }
+    } catch (e) {
+      console.error("Failed to reload users database in owner console:", e);
+    }
+
     const allUsers = { ...State.users };
     const userList = [];
 
@@ -78,7 +92,40 @@ export const OwnerConsoleModule = {
       // Level match
       const matchesLevel = this.levelFilter === 'all' || u.examLevel.toLowerCase() === this.levelFilter.toLowerCase();
 
-      return matchesSearch && matchesLevel;
+      // Date match
+      let matchesDate = true;
+      if (this.datePreset !== 'all') {
+        const regDateStr = u.registeredAt.split('T')[0];
+        
+        if (this.datePreset === 'today') {
+          const todayStr = new Date().toISOString().split('T')[0];
+          matchesDate = regDateStr === todayStr;
+        } else if (this.datePreset === 'yesterday') {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          const yesterdayStr = yesterday.toISOString().split('T')[0];
+          matchesDate = regDateStr === yesterdayStr;
+        } else if (this.datePreset === '7days') {
+          const sevenDaysAgo = new Date();
+          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+          const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0];
+          matchesDate = regDateStr >= sevenDaysAgoStr;
+        } else if (this.datePreset === '30days') {
+          const thirtyDaysAgo = new Date();
+          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+          const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
+          matchesDate = regDateStr >= thirtyDaysAgoStr;
+        } else if (this.datePreset === 'custom') {
+          if (this.startDateFilter) {
+            matchesDate = matchesDate && regDateStr >= this.startDateFilter;
+          }
+          if (this.endDateFilter) {
+            matchesDate = matchesDate && regDateStr <= this.endDateFilter;
+          }
+        }
+      }
+
+      return matchesSearch && matchesLevel && matchesDate;
     });
 
     // Apply sorting
@@ -103,6 +150,20 @@ export const OwnerConsoleModule = {
     const interCount = userList.filter(u => u.examLevel === 'Intermediate').length;
     const foundCount = userList.filter(u => u.examLevel === 'Foundation').length;
 
+    // Show welcome popup once per console visit
+    if (!this.hasShownWelcomePopup) {
+      this.hasShownWelcomePopup = true;
+      setTimeout(() => {
+        if (window.cajsShowAlert) {
+          window.cajsShowAlert(
+            "👥 Student Registrations",
+            `Welcome back, Platform Owner! There are currently <strong>${studentUsersCount}</strong> registered student accounts in the platform database.`,
+            "success"
+          );
+        }
+      }, 500);
+    }
+
     // Render HTML structure
     container.innerHTML = `
       <header class="app-header">
@@ -114,11 +175,11 @@ export const OwnerConsoleModule = {
 
       <!-- 1. Stats Panels -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px;">
-        <div class="glass-card" style="display: flex; align-items: center; gap: 16px; padding: 20px;">
+        <div class="glass-card" id="btn-stats-students-popup" style="display: flex; align-items: center; gap: 16px; padding: 20px; cursor: pointer;" title="Show Registration Summary (Click to trigger Pop-up)">
           <div style="font-size: 32px; background: rgba(124, 58, 237, 0.08); padding: 12px; border-radius: 16px;">👥</div>
           <div>
             <h4 style="font-size: 20px; font-weight: 800; color: var(--pastel-purple-dark); margin: 0;">${studentUsersCount}</h4>
-            <span style="font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Registered Students</span>
+            <span style="font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Registered Students 🔔</span>
           </div>
         </div>
 
@@ -172,6 +233,24 @@ export const OwnerConsoleModule = {
               <option value="intermediate" ${this.levelFilter === 'intermediate' ? 'selected' : ''}>CA Intermediate</option>
               <option value="foundation" ${this.levelFilter === 'foundation' ? 'selected' : ''}>CA Foundation</option>
             </select>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Registered:</span>
+            <select class="form-select" id="admin-filter-date" style="padding: 8px 12px; font-size: 12.5px; border-radius: 10px;">
+              <option value="all" ${this.datePreset === 'all' ? 'selected' : ''}>All Time</option>
+              <option value="today" ${this.datePreset === 'today' ? 'selected' : ''}>Today</option>
+              <option value="yesterday" ${this.datePreset === 'yesterday' ? 'selected' : ''}>Yesterday</option>
+              <option value="7days" ${this.datePreset === '7days' ? 'selected' : ''}>Last 7 Days</option>
+              <option value="30days" ${this.datePreset === '30days' ? 'selected' : ''}>Last 30 Days</option>
+              <option value="custom" ${this.datePreset === 'custom' ? 'selected' : ''}>Custom Range...</option>
+            </select>
+          </div>
+
+          <div id="admin-custom-date-container" style="display: ${this.datePreset === 'custom' ? 'flex' : 'none'}; align-items: center; gap: 8px;">
+            <input class="form-input" type="date" id="admin-start-date" value="${this.startDateFilter}" style="padding: 6px 10px; font-size: 12px; border-radius: 10px; width: 130px; height: 35px;">
+            <span style="font-size: 11px; color: var(--text-muted);">to</span>
+            <input class="form-input" type="date" id="admin-end-date" value="${this.endDateFilter}" style="padding: 6px 10px; font-size: 12px; border-radius: 10px; width: 130px; height: 35px;">
           </div>
 
           <div style="display: flex; align-items: center; gap: 6px;">
@@ -331,12 +410,53 @@ export const OwnerConsoleModule = {
       });
     }
 
+    // Bind Date Preset Dropdown
+    const filterDate = container.querySelector('#admin-filter-date');
+    if (filterDate) {
+      filterDate.addEventListener('change', (e) => {
+        this.datePreset = e.target.value;
+        this.render(container);
+      });
+    }
+
+    // Bind Start Date Input
+    const startDateInput = container.querySelector('#admin-start-date');
+    if (startDateInput) {
+      startDateInput.addEventListener('change', (e) => {
+        this.startDateFilter = e.target.value;
+        this.render(container);
+      });
+    }
+
+    // Bind End Date Input
+    const endDateInput = container.querySelector('#admin-end-date');
+    if (endDateInput) {
+      endDateInput.addEventListener('change', (e) => {
+        this.endDateFilter = e.target.value;
+        this.render(container);
+      });
+    }
+
     // Bind Sort Dropdown
     const sortDropdown = container.querySelector('#admin-sort-by');
     if (sortDropdown) {
       sortDropdown.addEventListener('change', (e) => {
         this.sortBy = e.target.value;
         this.render(container);
+      });
+    }
+
+    // Bind Stats Panel Students Count Click for Pop-up Trigger
+    const btnStudentsPopup = container.querySelector('#btn-stats-students-popup');
+    if (btnStudentsPopup) {
+      btnStudentsPopup.addEventListener('click', () => {
+        if (window.cajsShowAlert) {
+          window.cajsShowAlert(
+            "👥 Registered Student Count",
+            `There are currently <strong>${studentUsersCount}</strong> registered student accounts in the platform database.`,
+            "success"
+          );
+        }
       });
     }
 

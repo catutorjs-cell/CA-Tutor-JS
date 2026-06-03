@@ -245,6 +245,18 @@ const Router = {
   init() {
     this.viewport = document.getElementById('app-viewport');
     
+    // Helper to close mobile sidebar drawer
+    const closeMobileSidebar = () => {
+      const sidebar = document.querySelector('.app-sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (sidebar && sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+      }
+      if (backdrop && backdrop.classList.contains('active')) {
+        backdrop.classList.remove('active');
+      }
+    };
+
     // Bind sidebar clicks
     const navItems = document.querySelectorAll('.nav-menu .nav-item');
     navItems.forEach(item => {
@@ -259,6 +271,11 @@ const Router = {
         
         const tab = item.getAttribute('data-tab');
         this.navigate(tab);
+
+        // Close mobile drawer when link clicked
+        if (window.innerWidth <= 768) {
+          closeMobileSidebar();
+        }
       });
     });
 
@@ -270,6 +287,11 @@ const Router = {
         // Remove active class from other standard nav items
         navItems.forEach(nav => nav.classList.remove('active'));
         this.navigate('profile');
+        
+        // Close mobile drawer when clicked
+        if (window.innerWidth <= 768) {
+          closeMobileSidebar();
+        }
       });
     }
 
@@ -279,6 +301,11 @@ const Router = {
       sidebarUserInfo.addEventListener('click', (e) => {
         e.preventDefault();
         window.cajsGoToProfile();
+        
+        // Close mobile drawer when clicked
+        if (window.innerWidth <= 768) {
+          closeMobileSidebar();
+        }
       });
     }
 
@@ -291,7 +318,64 @@ const Router = {
     window.cajsGoToProfile = () => {
       navItems.forEach(nav => nav.classList.remove('active'));
       this.navigate('profile');
+      
+      // Close mobile drawer when clicked
+      if (window.innerWidth <= 768) {
+        closeMobileSidebar();
+      }
     };
+
+    // --- Desktop Sidebar Collapse Toggle Binding ---
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const appContainer = document.querySelector('.app-container');
+    
+    // Load saved collapsed state
+    const isCollapsed = localStorage.getItem('cajs_sidebar_collapsed') === 'true';
+    if (isCollapsed && window.innerWidth > 768 && appContainer) {
+      appContainer.classList.add('collapsed');
+    }
+
+    if (sidebarToggle) {
+      sidebarToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (appContainer) {
+          appContainer.classList.toggle('collapsed');
+          const collapsedNow = appContainer.classList.contains('collapsed');
+          localStorage.setItem('cajs_sidebar_collapsed', collapsedNow);
+        }
+      });
+    }
+
+    // --- Mobile Sidebar Sliding Drawer Event Bindings ---
+    const mobileSidebarToggle = document.getElementById('mobile-sidebar-toggle');
+    const mobileSidebarClose = document.getElementById('mobile-sidebar-close');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+    const sidebarElement = document.querySelector('.app-sidebar');
+
+    if (mobileSidebarToggle) {
+      mobileSidebarToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (sidebarElement) sidebarElement.classList.add('open');
+        if (sidebarBackdrop) sidebarBackdrop.classList.add('active');
+      });
+    }
+
+    if (mobileSidebarClose) {
+      mobileSidebarClose.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        closeMobileSidebar();
+      });
+    }
+
+    if (sidebarBackdrop) {
+      sidebarBackdrop.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeMobileSidebar();
+      });
+    }
 
     // Dropdown Toggling Behavior
     const floatProfileWidget = document.getElementById('cajs-floating-profile');
@@ -337,6 +421,11 @@ const Router = {
   },
 
   navigate(tab) {
+    // If navigating away from owner-console, reset welcome popup flag
+    if (this.activeTab === 'owner-console' && tab !== 'owner-console') {
+      OwnerConsoleModule.hasShownWelcomePopup = false;
+    }
+
     this.activeTab = tab;
     this.viewport.style.opacity = '0';
     

@@ -58,10 +58,14 @@ export const State = {
         password: "Password123",
         userId: "CA-92899",
         role: "student",
-        registeredAt: new Date().toISOString(),
+        registeredAt: "2026-05-15T10:30:00.000Z",
         avatar: "letter",
         gender: "female"
       };
+      databaseUpdated = true;
+    } else {
+      // Force set past date for robust date filtering demonstration
+      this.users["student@cajs.com"].registeredAt = "2026-05-15T10:30:00.000Z";
       databaseUpdated = true;
     }
 
@@ -74,10 +78,14 @@ export const State = {
         password: "OwnerPassword123",
         userId: "CA-OWNER",
         role: "owner",
-        registeredAt: new Date().toISOString(),
+        registeredAt: "2026-05-01T09:00:00.000Z",
         avatar: "letter",
         gender: "male"
       };
+      databaseUpdated = true;
+    } else {
+      // Force set past date
+      this.users["owner@cajs.com"].registeredAt = "2026-05-01T09:00:00.000Z";
       databaseUpdated = true;
     }
 
