@@ -90,7 +90,7 @@ export const GeneratorModule = {
           </div>
 
           <!-- Total Score card dial -->
-          <div style="display:grid; grid-template-columns:1fr 2fr; gap:20px; align-items:center; background:rgba(0,0,0,0.02); border:1px solid rgba(0,0,0,0.03); padding:16px; border-radius:16px;">
+          <div class="generator-setup-grid" style="display:grid; grid-template-columns:1fr 2fr; gap:20px; align-items:center; background:rgba(0,0,0,0.02); border:1px solid rgba(0,0,0,0.03); padding:16px; border-radius:16px;">
             <div style="text-align:center; border-right:1px solid rgba(0,0,0,0.06); padding-right:15px;">
               <span style="font-size:9px; font-weight:700; color:var(--text-muted); letter-spacing:0.5px;">AWARDED GRADE</span>
               <div style="font-size:42px; font-family:var(--font-display); font-weight:800; color:var(--pastel-purple-dark); line-height:1.2;">${rep.score}<span style="font-size:16px; font-weight:600; color:var(--text-muted);">/${rep.total}</span></div>
@@ -440,7 +440,7 @@ export const GeneratorModule = {
               </select>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="generator-button-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
               <div class="form-group">
                 <label class="form-label" for="gen-marks">Target Marks</label>
                 <select class="form-select" id="gen-marks" required>

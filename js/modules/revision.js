@@ -574,9 +574,9 @@ export const RevisionModule = {
       ${headerTabs}
 
       <!-- Top stats cards dashboard section -->
-      <div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px; margin-bottom:24px; align-items:stretch;">
+      <div class="revision-layout-grid" style="display:grid; grid-template-columns: 2fr 1fr; gap:20px; margin-bottom:24px; align-items:stretch;">
         <!-- Left: Overall revision status & subject readiness bars -->
-        <div class="glass-card" style="display:grid; grid-template-columns: 1.2fr 1.8fr; gap:24px; padding:24px;">
+        <div class="glass-card revision-detail-grid" style="display:grid; grid-template-columns: 1.2fr 1.8fr; gap:24px; padding:24px;">
           <!-- Dial readiness preview -->
           <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; border-right: 1px solid rgba(0,0,0,0.06); padding-right:20px; text-align:center;">
             <span style="font-size:11px; font-weight:bold; color:var(--text-muted); letter-spacing:0.5px; margin-bottom:8px;">OVERALL READINESS</span>

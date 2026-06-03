@@ -1042,3 +1042,26 @@ html {
   }
 }
 
+@media (max-width: 480px) {
+  .auth-overlay.open {
+    align-items: flex-start !important;
+    padding: 40px 10px !important;
+  }
+  .auth-card {
+    padding: 24px 16px !important;
+    border-radius: 20px !important;
+  }
+  .otp-inputs {
+    gap: 6px !important;
+  }
+  .otp-digit {
+    width: 38px !important;
+    height: 44px !important;
+    font-size: 16px !important;
+  }
+  .password-requirements {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+

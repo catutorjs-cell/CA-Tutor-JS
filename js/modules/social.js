@@ -67,7 +67,7 @@ export const SocialModule = {
           <button class="btn btn-danger" style="padding: 4px 8px; font-size:10px;" onclick="window.cajsUnfollow('${friend.id}')">Unfollow</button>
         </div>
         
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:12px;">
+        <div class="social-stats-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:12px;">
           <div style="background:rgba(0,0,0,0.02); padding:8px; border-radius:8px; display:flex; justify-content:space-between;">
             <span style="color:var(--text-muted);">Syllabus:</span>
             <strong>${friend.progress}%</strong>

@@ -52,7 +52,7 @@ export const MistakesModule = {
         </div>
       </header>
 
-      <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap: 24px; align-items: start;">
+      <div class="mistakes-layout-grid" style="display:grid; grid-template-columns: 1.5fr 1fr; gap: 24px; align-items: start;">
         <!-- Left: List panel -->
         <div>
           <!-- Tab toggles -->

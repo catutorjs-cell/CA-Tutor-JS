@@ -115,7 +115,7 @@ export const ProfileModule = {
           </h3>
           
           <form id="profile-editor-form">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-grid-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px;">
               <div class="form-group">
                 <label class="form-label" for="prof-name">Full Name</label>
                 <input class="form-input" type="text" id="prof-name" value="${user.fullName}" required placeholder="Your Name">
@@ -130,7 +130,7 @@ export const ProfileModule = {
               </div>
             </div>
 
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div class="form-grid-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
               <div class="form-group">
                 <label class="form-label" for="prof-email">Email ID (Username)</label>
                 <input class="form-input" type="email" id="prof-email" value="${user.email}" required placeholder="name@domain.com">
@@ -270,7 +270,7 @@ export const ProfileModule = {
               <span id="prof-pass-otp-feedback" style="font-size: 11px; margin-top: 4px; display: block;"></span>
             </div>
 
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-grid-2" style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px;">
               <div class="form-group">
                 <label class="form-label" for="prof-new-pass">New Password</label>
                 <div class="password-input-wrapper">

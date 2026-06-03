@@ -1446,3 +1446,61 @@
   color: var(--text-muted);
   line-height: 1.6;
 }
+
+@media (max-width: 768px) {
+  /* Stack grid layouts to single-column */
+  .dashboard-grid,
+  .dashboard-split,
+  .syllabus-container,
+  .arena-layout-grid,
+  .supplemental-upload-grid,
+  .profile-container,
+  .exam-workspace-grid,
+  .revision-layout-grid,
+  .revision-detail-grid,
+  .generator-setup-grid,
+  .generator-button-grid,
+  .social-stats-grid,
+  .mistakes-layout-grid,
+  .pomodoro-grid,
+  .form-grid-2 {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Make subject sidebar tabs scroll horizontally */
+  .subject-sidebar {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    padding-bottom: 8px !important;
+    width: 100% !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .subject-sidebar::-webkit-scrollbar {
+    display: none;
+  }
+  .subject-tab {
+    flex-shrink: 0 !important;
+    padding: 8px 16px !important;
+    font-size: 13px !important;
+  }
+
+  /* Make sliding drawer full width */
+  .study-drawer {
+    width: 100% !important;
+    right: -100% !important;
+    padding: 30px 20px !important;
+  }
+  .study-drawer.open {
+    right: 0 !important;
+  }
+
+  /* Adjust heights for PDF viewer and interactive solver panels */
+  #cajs-pdf-container,
+  #cajs-interactive-solver {
+    height: 450px !important;
+  }
+}
+

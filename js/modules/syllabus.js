@@ -358,7 +358,7 @@ export const SyllabusModule = {
         </button>
       </header>
 
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; animation:fadeIn 0.3s ease-out;">
+      <div class="arena-layout-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:24px; animation:fadeIn 0.3s ease-out;">
         
         <!-- LEFT COLUMN: Video Player & PDF Uploaders -->
         <div style="display:flex; flex-direction:column; gap:20px;">
@@ -436,7 +436,7 @@ export const SyllabusModule = {
               📁 Supplemental Reference Manuals
             </h4>
             
-            <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:16px;">
+            <div class="supplemental-upload-grid" style="display:grid; grid-template-columns:1.2fr 1fr; gap:16px;">
               <!-- Upload zone -->
               <div id="cajs-dropzone" style="border: 2px dashed rgba(0,0,0,0.1); border-radius:12px; padding:15px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; background:rgba(0,0,0,0.01); position:relative; min-height:120px;" onclick="document.getElementById('cajs-notes-file-input').click()">
                 <div id="cajs-upload-spinner" style="display:none; flex-direction:column; align-items:center; gap:8px;">

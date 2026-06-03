@@ -640,7 +640,7 @@ export const PyqMtpModule = {
         </div>
       </header>
 
-      <div style="max-width:1000px; margin: 0 auto; padding-bottom:30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+      <div class="exam-workspace-grid" style="max-width:1000px; margin: 0 auto; padding-bottom:30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
         ${examContentHtml}
       </div>
     `;
