@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
   <!-- Homepage / Landing Page -->
   <url>
     <loc>https://ca-tutor-js-self.vercel.app/</loc>
@@ -8,7 +7,6 @@
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
-
   <!-- OTP / Auth Page -->
   <url>
     <loc>https://ca-tutor-js-self.vercel.app/otp.html</loc>
@@ -16,7 +14,6 @@
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
-
   <!-- Interactive Prototype -->
   <url>
     <loc>https://ca-tutor-js-self.vercel.app/frontend/interactive_prototype.html</loc>
