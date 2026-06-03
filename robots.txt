@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
+
 Sitemap: https://ca-tutor-js-self.vercel.app/sitemap.xml
