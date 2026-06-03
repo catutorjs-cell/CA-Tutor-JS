@@ -9,6 +9,14 @@
   <link rel="stylesheet" href="./styles/main.css?v=1.0.8">
   <link rel="stylesheet" href="./styles/auth.css?v=1.0.8">
   <link rel="stylesheet" href="./styles/modules.css?v=1.0.8">
+  
+  <!-- PWA Manifest & Meta Tags -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#a855f7">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CA TUTOR JS">
+  <link rel="apple-touch-icon" href="./assets/logo.png">
   <script>
     window.onerror = function(message, source, lineno, colno, error) {
       if (document.body) {
@@ -661,5 +669,16 @@
 
   <!-- Scripts -->
   <script type="module" src="./js/app.js"></script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('[Service Worker] Registered successfully', reg.scope))
+          .catch(err => console.error('[Service Worker] Registration failed', err));
+      });
+    }
+  </script>
 </body>
 </html>
