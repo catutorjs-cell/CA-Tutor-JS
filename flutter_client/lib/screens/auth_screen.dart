@@ -10,8 +10,8 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen> {
   bool _showRegister = false;
-  final _loginController = TextEditingController(text: "CAJS7382");
-  final _passwordController = TextEditingController(text: "123456");
+  final _loginController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   // Registration controllers
   final _regNameController = TextEditingController();

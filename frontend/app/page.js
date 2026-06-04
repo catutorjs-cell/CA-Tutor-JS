@@ -34,9 +34,7 @@ export default function Home() {
   const [loginPassword, setLoginPassword] = useState('');
 
   // Local storage DB mockup
-  const [usersDb, setUsersDb] = useState([
-    { id: 1, name: "Jananni Shree", email: "jananni.s@cajs.com", phone: "9876543210", user_id: "CAJS7382", exam_level: "Intermediate", points: 450, streak: 5, accuracy_pct: 92.5, revision_cycle: 1 }
-  ]);
+  const [usersDb, setUsersDb] = useState([]);
 
   const handleRegister = (e) => {
     e.preventDefault();

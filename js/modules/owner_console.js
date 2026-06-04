@@ -10,8 +10,33 @@ export const OwnerConsoleModule = {
   endDateFilter: '', // YYYY-MM-DD
   hasShownWelcomePopup: false,
   revealedPasswords: {}, // Format: { email: true }
+  liveUsers: null,
+  isLoadingLive: false,
+
+  async loadLiveUsers() {
+    const syncUrl = localStorage.getItem('cajs_database_sync_url') || 'https://script.google.com/macros/s/AKfycbz9X3WAEvymy46wSeP3fNRZ0MJS47UQxVceC2HbzFXEnHN2j-BdJstm0zX0179MBdTw/exec';
+    if (!syncUrl) return null;
+    try {
+      const response = await fetch(syncUrl);
+      const data = await response.json();
+      return data;
+    } catch (e) {
+      console.error("Failed to fetch live users from Google Sheet:", e);
+      return null;
+    }
+  },
 
   render(container) {
+    const syncUrl = localStorage.getItem('cajs_database_sync_url') || 'https://script.google.com/macros/s/AKfycbz9X3WAEvymy46wSeP3fNRZ0MJS47UQxVceC2HbzFXEnHN2j-BdJstm0zX0179MBdTw/exec';
+    if (syncUrl && !this.liveUsers && !this.isLoadingLive) {
+      this.isLoadingLive = true;
+      this.loadLiveUsers().then(users => {
+        this.liveUsers = users;
+        this.isLoadingLive = false;
+        this.render(container);
+      });
+    }
+
     // Force reload users database from localStorage to ensure it is always up to date
     try {
       const rawUsers = localStorage.getItem('cajs_users_db');
@@ -23,6 +48,25 @@ export const OwnerConsoleModule = {
     }
 
     const allUsers = { ...State.users };
+
+    // Merge live users from Google Sheets
+    if (this.liveUsers && this.liveUsers.length > 0) {
+      this.liveUsers.forEach(u => {
+        if (!allUsers[u.email]) {
+          allUsers[u.email] = {
+            fullName: u.fullName,
+            email: u.email,
+            phone: u.phone,
+            examLevel: u.examLevel,
+            password: u.password,
+            userId: u.userId,
+            registeredAt: u.registeredAt,
+            role: 'student'
+          };
+        }
+      });
+    }
+
     const userList = [];
 
     const formatTimeSpent = (mins) => {
@@ -172,6 +216,27 @@ export const OwnerConsoleModule = {
           <span class="header-subtitle">Administrative dashboard to monitor all registered student accounts, streaks, and database statistics.</span>
         </div>
       </header>
+
+      <!-- Live Sync Settings Card -->
+      <div class="glass-card" style="padding: 20px; margin-bottom: 25px; background: linear-gradient(135deg, rgba(16,185,129,0.03), rgba(59,130,246,0.03)); border-color: rgba(16,185,129,0.15); display: flex; flex-direction: column; gap: 12px; animation: fadeIn 0.3s ease-out;">
+        <h4 style="font-size: 14px; font-weight: 700; color: var(--pastel-green-dark); display: flex; align-items: center; gap: 8px; margin: 0;">
+          <span>🌐</span> Live Database Sync (Google Sheets)
+        </h4>
+        <p style="font-size: 12.5px; color: var(--text-main); line-height: 1.5; margin: 0;">
+          Since the website runs statically on GitHub Pages, registrations are normally saved locally in your friends' browsers. Set up a free Google Sheet to collect all registrations in a central sheet and view them live here!
+        </p>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+          <input class="form-input" type="text" id="admin-sync-url-input" placeholder="Default CA-JS Sync URL configured..." value="${localStorage.getItem('cajs_database_sync_url') || ''}" style="padding: 8px 12px; font-size: 12.5px; flex-grow: 1; min-width: 280px; height: 38px;">
+          <button class="btn btn-primary" id="btn-save-sync-url" style="padding: 8px 16px; font-size: 12px; background: var(--pastel-green-dark); border-color: var(--pastel-green-dark); color: white; height: 38px; display: flex; align-items: center; justify-content: center; font-weight: 700; border-radius: 10px;">
+            Save Sync URL
+          </button>
+          <button class="btn btn-secondary" id="btn-show-sync-instructions" style="padding: 8px 16px; font-size: 12px; height: 38px; display: flex; align-items: center; justify-content: center; font-weight: 700; border-radius: 10px; border: var(--glass-border);">
+            Setup Instructions 📋
+          </button>
+          ${this.isLoadingLive ? `<span style="font-size: 12px; color: var(--pastel-green-dark); font-weight: 600; display: flex; align-items: center; gap: 6px;">🔄 Loading live data...</span>` : ''}
+          ${syncUrl && !this.isLoadingLive ? `<button class="btn btn-secondary" id="btn-refresh-live" style="padding: 6px 12px; font-size: 11px; height: 32px; border-radius: 8px; font-weight: 600; border: var(--glass-border);">🔄 Refresh</button>` : ''}
+        </div>
+      </div>
 
       <!-- 1. Stats Panels -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px;">
@@ -443,6 +508,143 @@ export const OwnerConsoleModule = {
       sortDropdown.addEventListener('change', (e) => {
         this.sortBy = e.target.value;
         this.render(container);
+      });
+    }
+
+    // Save Sync URL
+    const btnSaveSyncUrl = container.querySelector('#btn-save-sync-url');
+    const syncUrlInput = container.querySelector('#admin-sync-url-input');
+    if (btnSaveSyncUrl && syncUrlInput) {
+      btnSaveSyncUrl.addEventListener('click', () => {
+        const urlVal = syncUrlInput.value.trim();
+        if (urlVal) {
+          if (!urlVal.startsWith('https://script.google.com/')) {
+            alert("Invalid URL. Please enter a valid Google Apps Script Web App URL.");
+            return;
+          }
+          localStorage.setItem('cajs_database_sync_url', urlVal);
+          this.liveUsers = null; // force reload
+          window.cajsShowAlert("✨ Sync URL Saved", "Google Sheets Sync URL saved successfully. Auto-loading live student registrations!", "success", () => {
+            this.render(container);
+          });
+        } else {
+          localStorage.removeItem('cajs_database_sync_url');
+          this.liveUsers = null;
+          window.cajsShowAlert("Sync URL Removed", "Sync URL removed. Displaying local storage database only.", "info", () => {
+            this.render(container);
+          });
+        }
+      });
+    }
+
+    // Refresh Live Data
+    const btnRefreshLive = container.querySelector('#btn-refresh-live');
+    if (btnRefreshLive) {
+      btnRefreshLive.addEventListener('click', () => {
+        this.liveUsers = null;
+        this.render(container);
+      });
+    }
+
+    // Setup Instructions Dialog
+    const btnShowInstructions = container.querySelector('#btn-show-sync-instructions');
+    if (btnShowInstructions) {
+      btnShowInstructions.addEventListener('click', () => {
+        const scriptCode = `function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = JSON.parse(e.postData.contents);
+  if (data.action === 'register') {
+    sheet.appendRow([
+      data.user.registeredAt,
+      data.user.fullName,
+      data.user.email,
+      data.user.phone,
+      data.user.examLevel,
+      data.user.userId,
+      data.user.password
+    ]);
+    return ContentService.createTextOutput(JSON.stringify({ status: 'success' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var rows = sheet.getDataRange().getValues();
+  var users = [];
+  for (var i = 1; i < rows.length; i++) {
+    users.push({
+      registeredAt: rows[i][0],
+      fullName: rows[i][1],
+      email: rows[i][2],
+      phone: rows[i][3],
+      examLevel: rows[i][4],
+      userId: rows[i][5],
+      password: rows[i][6]
+    });
+  }
+  return ContentService.createTextOutput(JSON.stringify(users))
+    .setMimeType(ContentService.MimeType.JSON);
+}`;
+
+        // Create customized overlay popup showing instructions
+        let modal = document.getElementById('cajs-sync-instructions-modal');
+        if (modal) modal.remove();
+
+        modal = document.createElement('div');
+        modal.id = 'cajs-sync-instructions-modal';
+        modal.className = 'cajs-alert-overlay';
+        modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(30, 30, 47, 0.4); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; align-items: center; justify-content: center; z-index: 10009; padding: 20px;";
+        modal.innerHTML = `
+          <div class="glass-card" style="width: 100%; max-width: 580px; max-height: 90vh; overflow-y: auto; padding: 30px; border-radius: 28px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15); display: flex; flex-direction: column; gap: 16px; background: white; border: 1px solid rgba(0,0,0,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,0,0,0.06); padding-bottom: 12px;">
+              <h3 style="font-size: 16px; font-weight: 700; margin: 0; color: var(--pastel-green-dark); display: flex; align-items: center; gap: 8px;">📊 Google Sheets Sync Setup</h3>
+              <button id="btn-close-sync-instructions" style="background:none; border:none; font-size:22px; cursor:pointer; color:var(--text-muted); font-weight:bold;">&times;</button>
+            </div>
+            
+            <div style="font-size: 12.5px; line-height: 1.6; color: var(--text-main); text-align: left; display: flex; flex-direction: column; gap: 12px;">
+              <p>Follow these quick steps to create a free live database spreadsheet for your website:</p>
+              <ol style="padding-left: 18px; display: flex; flex-direction: column; gap: 8px; margin: 0;">
+                <li>Create a new <strong>Google Sheet</strong> in your Google Drive.</li>
+                <li>Write these column headers in row 1: <code>Registered At</code>, <code>Full Name</code>, <code>Email</code>, <code>Phone</code>, <code>Exam Level</code>, <code>User ID</code>, <code>Password</code>.</li>
+                <li>Go to the menu: <strong>Extensions > Apps Script</strong>.</li>
+                <li>Delete any default code in the editor, and paste the code below.</li>
+                <li>Click <strong>Deploy > New Deployment</strong>.</li>
+                <li>Click the Gear icon next to Select type, choose <strong>Web app</strong>.</li>
+                <li>Set Description, execute as: <strong>"Me"</strong>, who has access: <strong>"Anyone"</strong> (crucial for student registrations to sync).</li>
+                <li>Click <strong>Deploy</strong>, grant database script permissions, and copy the <strong>Web App URL</strong>.</li>
+                <li>Paste the URL in the input field behind this screen and click <strong>Save Sync URL</strong>!</li>
+              </ol>
+
+              <div style="position: relative; margin-top: 10px;">
+                <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); display:block; margin-bottom: 4px;">Apps Script Code:</span>
+                <textarea readonly style="width: 100%; height: 160px; font-family: monospace; font-size: 11px; padding: 10px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); background: rgba(0,0,0,0.03); outline:none; resize:none; box-sizing: border-box;" id="cajs-script-textarea">${scriptCode}</textarea>
+                <button class="btn btn-secondary" id="btn-copy-apps-script" style="position: absolute; bottom: 10px; right: 10px; padding: 4px 10px; font-size: 11px; font-weight: 700; border-radius: 8px;">Copy Code 📋</button>
+              </div>
+            </div>
+
+            <button class="btn btn-primary" id="btn-close-sync-instructions-ok" style="width: 100%; padding: 10px; border-radius: 12px; font-weight: 700; margin-top: 10px;">
+              I Understood! Let's Set It Up
+            </button>
+          </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        const closeModal = () => modal.remove();
+        modal.querySelector('#btn-close-sync-instructions').addEventListener('click', closeModal);
+        modal.querySelector('#btn-close-sync-instructions-ok').addEventListener('click', closeModal);
+
+        const btnCopy = modal.querySelector('#btn-copy-apps-script');
+        btnCopy.addEventListener('click', () => {
+          const textarea = modal.querySelector('#cajs-script-textarea');
+          textarea.select();
+          document.execCommand('copy');
+          btnCopy.textContent = 'Copied! ✓';
+          setTimeout(() => {
+            btnCopy.textContent = 'Copy Code 📋';
+          }, 2000);
+        });
       });
     }
 

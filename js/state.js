@@ -47,25 +47,9 @@ export const State = {
       this.users = {};
     }
 
-    // Seed default users if they are not already in the database
     let databaseUpdated = false;
-    if (!this.users["student@cajs.com"]) {
-      this.users["student@cajs.com"] = {
-        fullName: "Jananni Shree",
-        email: "student@cajs.com",
-        phone: "9876543210",
-        examLevel: "Intermediate",
-        password: "Password123",
-        userId: "CA-92899",
-        role: "student",
-        registeredAt: "2026-05-15T10:30:00.000Z",
-        avatar: "letter",
-        gender: "female"
-      };
-      databaseUpdated = true;
-    } else {
-      // Force set past date for robust date filtering demonstration
-      this.users["student@cajs.com"].registeredAt = "2026-05-15T10:30:00.000Z";
+    if (this.users["student@cajs.com"]) {
+      delete this.users["student@cajs.com"];
       databaseUpdated = true;
     }
 
@@ -212,6 +196,22 @@ export const State = {
 
     this.users[email] = newUser;
     localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
+
+    // Sync to Google Sheet if configured
+    const syncUrl = localStorage.getItem('cajs_database_sync_url') || 'https://script.google.com/macros/s/AKfycbz9X3WAEvymy46wSeP3fNRZ0MJS47UQxVceC2HbzFXEnHN2j-BdJstm0zX0179MBdTw/exec';
+    if (syncUrl) {
+      fetch(syncUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'register', user: newUser })
+      }).then(() => {
+        console.log("Registration successfully pushed to Google Sheet!");
+      }).catch(e => {
+        console.error("Failed to sync registration to Google Sheet:", e);
+      });
+    }
+
     return newUser;
   },
 

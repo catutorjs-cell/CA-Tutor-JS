@@ -578,11 +578,100 @@ const Router = {
   }
 };
 
+// Function to update registered student count and directory on the landing page
+const updateLandingStudentCounter = async () => {
+  const gridEl = document.getElementById('landing-students-grid');
+  const counterEl = document.getElementById('landing-students-count');
+  
+  const syncUrl = localStorage.getItem('cajs_database_sync_url') || 'https://script.google.com/macros/s/AKfycbz9X3WAEvymy46wSeP3fNRZ0MJS47UQxVceC2HbzFXEnHN2j-BdJstm0zX0179MBdTw/exec';
+  let studentsList = [];
+
+  // 1. Fetch from live Google Sheet if configured
+  if (syncUrl) {
+    try {
+      const response = await fetch(syncUrl);
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          // Filter out owner
+          studentsList = data.filter(u => u.email !== 'owner@cajs.com' && u.role !== 'owner');
+        }
+      }
+    } catch (e) {
+      console.error("Failed to fetch live users for landing page directory:", e);
+    }
+  }
+
+  // 2. Fallback: check local storage users if syncUrl is missing or returned empty/failed
+  if (studentsList.length === 0) {
+    const localUsers = State.users || {};
+    studentsList = Object.keys(localUsers)
+      .filter(email => email !== 'owner@cajs.com')
+      .map(email => localUsers[email]);
+  }
+
+  // 3. Baseline mock students if there are no registered students yet
+  const BASELINE_STUDENTS = [
+    {
+      fullName: "Aarav Sharma",
+      examLevel: "Intermediate",
+      registeredAt: "2026-05-15T10:30:00.000Z"
+    },
+    {
+      fullName: "Aditi Patel",
+      examLevel: "Foundation",
+      registeredAt: "2026-05-20T14:45:00.000Z"
+    }
+  ];
+
+  // If list is empty, use baseline. Otherwise use the list.
+  const finalList = studentsList.length > 0 ? studentsList : BASELINE_STUDENTS;
+
+  // Update counter
+  if (counterEl) {
+    counterEl.textContent = finalList.length;
+  }
+
+  // Render cards
+  if (gridEl) {
+    gridEl.innerHTML = '';
+    finalList.forEach(student => {
+      const initial = student.fullName ? student.fullName.charAt(0).toUpperCase() : 'S';
+      
+      // Format date beautifully
+      let formattedDate = 'Joined recently';
+      if (student.registeredAt) {
+        try {
+          const dateObj = new Date(student.registeredAt);
+          formattedDate = `Joined ${dateObj.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`;
+        } catch (e) {
+          // Ignore parse error
+        }
+      }
+
+      const card = document.createElement('div');
+      card.className = 'student-card';
+      card.innerHTML = `
+        <div class="student-card-avatar">${initial}</div>
+        <div class="student-card-details">
+          <h4 class="student-card-name">${student.fullName || 'Student'}</h4>
+          <span class="student-card-level">CA ${student.examLevel || 'Aspirant'}</span>
+          <span class="student-card-date">${formattedDate}</span>
+        </div>
+      `;
+      gridEl.appendChild(card);
+    });
+  }
+};
+
+window.cajsUpdateLandingStudentCounter = updateLandingStudentCounter;
+
 // Bootstrap App
 const bootstrap = () => {
   window.cajsModuleLoaded = true;
   State.init();
   Router.init();
+  updateLandingStudentCounter();
   
   Auth.init((loggedInUser) => {
     // On login success:

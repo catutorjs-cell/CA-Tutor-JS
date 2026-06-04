@@ -93,7 +93,7 @@ class DashboardHome extends StatelessWidget {
                       SizedBox(height: 2),
                       // Automatically generated alphanumeric user ID
                       Text(
-                        'User ID: CAJS7382',
+                        'User ID: CA-STUDENT',
                         style: TextStyle(fontSize: 12, color: Colors.grey, fontFamily: 'monospace'),
                       ),
                     ],

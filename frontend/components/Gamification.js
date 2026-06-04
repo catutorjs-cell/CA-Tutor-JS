@@ -42,7 +42,7 @@ export default function Gamification({ currentUser }) {
   const leaderboardList = [
     { name: "Rahul Sharma", user_id: "CAJS1023", points: 890, streak: 12 },
     { name: "Priya Patel", user_id: "CAJS4829", points: 740, streak: 8 },
-    { name: currentUser?.name || "Jananni Kumar", user_id: currentUser?.user_id || "CAJS7382", points: currentUser?.points || 450, streak: currentUser?.streak || 5 },
+    { name: currentUser?.name || "Jananni Kumar", user_id: currentUser?.user_id || "CA-STUDENT", points: currentUser?.points || 450, streak: currentUser?.streak || 5 },
     { name: "Ananya Iyer", user_id: "CAJS9012", points: 340, streak: 4 }
   ];
 
