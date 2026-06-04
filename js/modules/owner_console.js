@@ -226,7 +226,7 @@ export const OwnerConsoleModule = {
           Since the website runs statically on GitHub Pages, registrations are normally saved locally in your friends' browsers. Set up a free Google Sheet to collect all registrations in a central sheet and view them live here!
         </p>
         <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-          <input class="form-input" type="text" id="admin-sync-url-input" placeholder="Default CA-JS Sync URL configured..." value="${localStorage.getItem('cajs_database_sync_url') || ''}" style="padding: 8px 12px; font-size: 12.5px; flex-grow: 1; min-width: 280px; height: 38px;">
+          <input class="form-input" type="text" id="admin-sync-url-input" placeholder="Paste your Google Apps Script Web App URL here..." value="${localStorage.getItem('cajs_database_sync_url') || 'https://script.google.com/macros/s/AKfycbz9X3WAEvymy46wSeP3fNRZ0MJS47UQxVceC2HbzFXEnHN2j-BdJstm0zX0179MBdTw/exec'}" style="padding: 8px 12px; font-size: 12.5px; flex-grow: 1; min-width: 280px; height: 38px;">
           <button class="btn btn-primary" id="btn-save-sync-url" style="padding: 8px 16px; font-size: 12px; background: var(--pastel-green-dark); border-color: var(--pastel-green-dark); color: white; height: 38px; display: flex; align-items: center; justify-content: center; font-weight: 700; border-radius: 10px;">
             Save Sync URL
           </button>

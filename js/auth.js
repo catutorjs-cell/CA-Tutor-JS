@@ -38,21 +38,21 @@ export const Auth = {
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('.password-toggle-btn');
       if (!btn) return;
-      
+
       // If button has inline onclick, let it handle the event exclusively to prevent double-toggling
       if (btn.hasAttribute('onclick')) return;
-      
+
       e.preventDefault();
       e.stopPropagation();
-      
+
       const wrapper = btn.closest('.password-input-wrapper');
       if (!wrapper) return;
-      
+
       const input = wrapper.querySelector('input');
       const prefixEmoji = wrapper.querySelector('.password-prefix-emoji');
-      
+
       if (!input) return;
-      
+
       if (input.type === 'password') {
         input.type = 'text';
         btn.textContent = '🐵';
@@ -100,7 +100,7 @@ export const Auth = {
 
     regPassword.addEventListener('input', () => {
       const val = regPassword.value;
-      
+
       // Length check
       if (val.length >= 8) {
         reqLen.classList.add('valid');
@@ -146,7 +146,7 @@ export const Auth = {
           regOtp.style.borderColor = 'var(--pastel-green-dark)';
           regOtp.style.boxShadow = '0 0 0 3px var(--pastel-green)';
           regOtp.disabled = true;
-          
+
           const sendOtpBtn = document.getElementById('btn-send-otp');
           sendOtpBtn.textContent = 'Verified!';
           sendOtpBtn.disabled = true;
@@ -173,7 +173,7 @@ export const Auth = {
         // Successful login
         const landing = document.getElementById('landing-page');
         if (landing) landing.style.display = 'none';
-        
+
         const authPanel = document.getElementById('auth-panel');
         if (authPanel) authPanel.classList.remove('open');
 
@@ -189,7 +189,7 @@ export const Auth = {
     // Register Form Submit
     registerForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      
+
       const name = document.getElementById('reg-name').value.trim();
       const email = document.getElementById('reg-email').value.trim();
       const phone = document.getElementById('reg-phone').value.trim();
@@ -215,12 +215,12 @@ export const Auth = {
       try {
         State.registerUser(name, email, phone, level, pass);
         alert("Registration Successful! Please login with your credentials.");
-        
+
         // Update landing page counter
         if (typeof window.cajsUpdateLandingStudentCounter === 'function') {
           window.cajsUpdateLandingStudentCounter();
         }
-        
+
         // Auto-fill login email, switch to login tab
         document.getElementById('login-email').value = email;
         document.getElementById('login-password').value = '';
@@ -268,16 +268,16 @@ export const Auth = {
       linkForgotPassword.addEventListener('click', (e) => {
         e.preventDefault();
         this.activeTab = 'forgot';
-        
+
         // Hide other forms & tabs
         loginForm.style.display = 'none';
         registerForm.style.display = 'none';
         document.querySelector('.auth-tabs').style.display = 'none';
-        
+
         // Show forgot form
         forgotForm.style.display = 'flex';
         authHeaderText.textContent = 'Reset your student profile password';
-        
+
         resetForgotFormState();
 
         // Prefill email if typed in login form
@@ -293,11 +293,11 @@ export const Auth = {
     if (linkBackToLogin) {
       linkBackToLogin.addEventListener('click', (e) => {
         e.preventDefault();
-        
+
         // Show tabs & login form
         document.querySelector('.auth-tabs').style.display = 'flex';
         forgotForm.style.display = 'none';
-        
+
         // Trigger login tab active
         tabLogin.click();
       });
@@ -478,7 +478,7 @@ export const Auth = {
         try {
           State.resetPassword(email, newPass);
           alert("Password Reset Successful! Please login with your new credentials.");
-          
+
           // Switch back to login form
           document.querySelector('.auth-tabs').style.display = 'flex';
           forgotForm.style.display = 'none';
@@ -498,20 +498,20 @@ export const Auth = {
     document.getElementById('btn-logout').addEventListener('click', () => {
       State.logoutUser();
       document.getElementById('app-shell').style.display = 'none';
-      
+
       const landing = document.getElementById('landing-page');
       if (landing) landing.style.display = 'flex';
-      
+
       const authPanel = document.getElementById('auth-panel');
       if (authPanel) authPanel.classList.remove('open');
 
       this.resetState();
-      
+
       // Update landing page counter
       if (typeof window.cajsUpdateLandingStudentCounter === 'function') {
         window.cajsUpdateLandingStudentCounter();
       }
-      
+
       // Clear fields
       document.getElementById('login-email').value = '';
       document.getElementById('login-password').value = '';
@@ -544,12 +544,12 @@ export const Auth = {
     // Generate secure random 6-digit OTP using the custom generator
     const otp = this.generateOTP().toString();
     this.generatedOtp = otp;
-    
+
     // Calculate expiration time (15 minutes from now)
     const now = new Date();
     const expiry = new Date(now.getTime() + 15 * 60 * 1000);
     const formattedExpiryTime = expiry.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    
+
     // Trigger animated Email toast showing sending status
     const container = document.getElementById('sms-container');
     container.innerHTML = `

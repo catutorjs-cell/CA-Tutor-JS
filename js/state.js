@@ -38,6 +38,11 @@ export const State = {
   calendar: null, // Format: { examDate, subjects: [], schedule: [] }
 
   init() {
+    // Initialize default sync URL if not set
+    if (localStorage.getItem('cajs_database_sync_url') === null) {
+      localStorage.setItem('cajs_database_sync_url', 'https://script.google.com/macros/s/AKfycbz9X3WAEvymy46wSeP3fNRZ0MJS47UQxVceC2HbzFXEnHN2j-BdJstm0zX0179MBdTw/exec');
+    }
+
     // 1. Load users database
     try {
       const rawUsers = localStorage.getItem(STORAGE_KEYS.USERS_DB);
