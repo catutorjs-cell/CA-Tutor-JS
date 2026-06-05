@@ -14,7 +14,7 @@ export const OwnerConsoleModule = {
   isLoadingLive: false,
 
   async loadLiveUsers() {
-    const syncUrl = localStorage.getItem('cajs_database_sync_url') || 'https://script.google.com/macros/s/AKfycbz9X3WAEvymy46wSeP3fNRZ0MJS47UQxVceC2HbzFXEnHN2j-BdJstm0zX0179MBdTw/exec';
+    const syncUrl = localStorage.getItem('cajs_database_sync_url') || 'https://script.google.com/macros/s/AKfycbyKpAEnW999UvqgASLU7AMTdVXh239jzq9rhINaJB_vc6RPZUz5sxyNo-MHNw78Z1s1/exec';
     if (!syncUrl) return null;
     try {
       const response = await fetch(syncUrl);
@@ -27,7 +27,7 @@ export const OwnerConsoleModule = {
   },
 
   render(container) {
-    const syncUrl = localStorage.getItem('cajs_database_sync_url') || 'https://script.google.com/macros/s/AKfycbz9X3WAEvymy46wSeP3fNRZ0MJS47UQxVceC2HbzFXEnHN2j-BdJstm0zX0179MBdTw/exec';
+    const syncUrl = localStorage.getItem('cajs_database_sync_url') || 'https://script.google.com/macros/s/AKfycbyKpAEnW999UvqgASLU7AMTdVXh239jzq9rhINaJB_vc6RPZUz5sxyNo-MHNw78Z1s1/exec';
     if (syncUrl && !this.liveUsers && !this.isLoadingLive) {
       this.isLoadingLive = true;
       this.loadLiveUsers().then(users => {
@@ -80,7 +80,7 @@ export const OwnerConsoleModule = {
     // Construct enriched user list with real study stats from localStorage
     for (const email in allUsers) {
       const u = allUsers[email];
-      
+
       // Default fallback values
       let points = 100;
       let streak = 0;
@@ -130,7 +130,7 @@ export const OwnerConsoleModule = {
       const emailMatch = u.email.toLowerCase().includes(query);
       const phoneMatch = u.phone.toLowerCase().includes(query);
       const idMatch = u.userId.toLowerCase().includes(query);
-      
+
       const matchesSearch = nameMatch || emailMatch || phoneMatch || idMatch;
 
       // Level match
@@ -140,7 +140,7 @@ export const OwnerConsoleModule = {
       let matchesDate = true;
       if (this.datePreset !== 'all') {
         const regDateStr = u.registeredAt.split('T')[0];
-        
+
         if (this.datePreset === 'today') {
           const todayStr = new Date().toISOString().split('T')[0];
           matchesDate = regDateStr === todayStr;
@@ -353,18 +353,18 @@ export const OwnerConsoleModule = {
                   </td>
                 </tr>
               ` : filteredList.map(u => {
-                const isOwner = u.role === 'owner';
-                const regDate = new Date(u.registeredAt).toLocaleDateString('en-IN', {
-                  day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
-                });
-                
-                const levelColor = u.examLevel === 'Final' ? 'var(--pastel-rose-dark)' : (u.examLevel === 'Intermediate' ? 'var(--pastel-purple-dark)' : 'var(--pastel-blue-dark)');
-                const levelBg = u.examLevel === 'Final' ? 'var(--pastel-rose)' : (u.examLevel === 'Intermediate' ? 'var(--pastel-purple)' : 'var(--pastel-blue)');
-                
-                const passwordRevealed = this.revealedPasswords[u.email];
-                const passwordText = passwordRevealed ? u.password : '••••••';
+      const isOwner = u.role === 'owner';
+      const regDate = new Date(u.registeredAt).toLocaleDateString('en-IN', {
+        day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
 
-                return `
+      const levelColor = u.examLevel === 'Final' ? 'var(--pastel-rose-dark)' : (u.examLevel === 'Intermediate' ? 'var(--pastel-purple-dark)' : 'var(--pastel-blue-dark)');
+      const levelBg = u.examLevel === 'Final' ? 'var(--pastel-rose)' : (u.examLevel === 'Intermediate' ? 'var(--pastel-purple)' : 'var(--pastel-blue)');
+
+      const passwordRevealed = this.revealedPasswords[u.email];
+      const passwordText = passwordRevealed ? u.password : '••••••';
+
+      return `
                   <tr style="border-bottom: 1px solid rgba(0,0,0,0.04); transition: all 0.2s; vertical-align: middle;" class="admin-table-row">
                     <!-- Student Profile -->
                     <td style="padding: 16px 20px;">
@@ -437,7 +437,7 @@ export const OwnerConsoleModule = {
                     </td>
                   </tr>
                 `;
-              }).join('')}
+    }).join('')}
             </tbody>
           </table>
         </div>
@@ -663,7 +663,7 @@ function doGet(e) {
     }
 
     // --- BIND GLOBALS FOR ONCLICK DELEGATIONS ---
-    
+
     // 1. Toggle Password Visibility
     window.cajsToggleAdminPassword = (email) => {
       this.revealedPasswords[email] = !this.revealedPasswords[email];
@@ -687,10 +687,10 @@ function doGet(e) {
     window.cajsAdminEditLevel = (email, currentLevel) => {
       const u = State.users[email];
       if (!u) return;
-      
+
       const newLevel = prompt(`Edit Exam Grade Level for ${u.fullName}:\n\nEnter "Foundation", "Intermediate", or "Final":`, currentLevel);
       if (newLevel === null) return; // cancelled
-      
+
       const normalizedLevel = newLevel.trim().charAt(0).toUpperCase() + newLevel.trim().slice(1).toLowerCase();
       if (['Foundation', 'Intermediate', 'Final'].includes(normalizedLevel)) {
         State.adminChangeUserLevel(email, normalizedLevel);
@@ -713,7 +713,7 @@ function doGet(e) {
         alert("Cannot delete the platform owner admin account!");
         return;
       }
-      
+
       const confirmDelete = confirm(`⚠️ DANGER ZONE ⚠️\n\nAre you absolutely sure you want to permanently delete student "${u.fullName}" (${email}) from the platform database?\n\nThis will completely purge all their chapter revisions, evaluations, points, and stored custom papers. This action CANNOT be undone!`);
       if (confirmDelete) {
         State.adminDeleteUser(email);
@@ -730,7 +730,7 @@ function doGet(e) {
   reactiveFilterRows(container) {
     const query = this.searchQuery.toLowerCase();
     const rows = container.querySelectorAll('.admin-table-row');
-    
+
     rows.forEach(row => {
       const text = row.innerText.toLowerCase();
       if (text.includes(query)) {

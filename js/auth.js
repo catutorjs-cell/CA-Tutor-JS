@@ -230,6 +230,24 @@ export const Auth = {
           });
         }
 
+        // ✅ Telegram Notification to Owner
+        const telegramToken = '8967061142:AAFcdXYoco3XrTM1NMgF3vqmdYSUJQOeb3I';
+        const telegramChatId = '1192186015';
+        const telegramMessage = `🎉 New Student Registered!\n\n👤 Name: ${name}\n📧 Email: ${email}\n📞 Phone: ${phone}\n🎓 Level: ${level}\n🕐 Time: ${new Date().toLocaleString('en-IN')}`;
+        fetch(`https://api.telegram.org/bot${telegramToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: telegramChatId,
+            text: telegramMessage
+            // No parse_mode - plain text handles \n correctly
+          })
+        }).then(() => {
+          console.log('✅ Telegram notification sent!');
+        }).catch(err => {
+          console.warn('⚠️ Telegram notification failed:', err);
+        });
+
         alert("Registration Successful! Please login with your credentials.");
 
         if (typeof window.cajsUpdateLandingStudentCounter === 'function') {
