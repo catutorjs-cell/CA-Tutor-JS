@@ -239,8 +239,8 @@ export const Auth = {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             chat_id: telegramChatId,
-            text: telegramMessage
-            // No parse_mode - plain text handles \n correctly
+            text: telegramMessage,
+            parse_mode: 'HTML'
           })
         }).then(() => {
           console.log('✅ Telegram notification sent!');
@@ -372,10 +372,10 @@ export const Auth = {
             console.log('Reset OTP Email Sent!', r.status, r.text);
           }).catch(err => {
             console.error('EmailJS OTP Send Failed:', err);
-            alert(`Failed to send OTP. Your reset OTP is: ${otp}`);
+            alert(`Failed to send OTP. Please try again.`);
           });
         } else {
-          alert(`EmailJS not found. Your reset OTP is: ${otp}`);
+          alert(`OTP service unavailable. Please try again later.`);
         }
 
         setTimeout(() => {
@@ -563,10 +563,10 @@ export const Auth = {
         console.log('OTP Email Sent!', r.status, r.text);
       }).catch(err => {
         console.error('EmailJS OTP Send Failed:', err);
-        alert(`Failed to send OTP. Your OTP is: ${otp}`);
+        alert(`Failed to send OTP email. Please try again.`);
       });
     } else {
-      alert(`EmailJS not found. Your OTP is: ${otp}`);
+      alert(`OTP service unavailable. Please try again later.`);
     }
 
     setTimeout(() => {
