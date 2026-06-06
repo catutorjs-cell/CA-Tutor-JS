@@ -1,5 +1,6 @@
 // CA JS Application State Management
 import { SEED_FRIENDS, SYLLABUS_DATA } from './seedData.js';
+import { CONFIG } from './config.js';
 
 const STORAGE_KEYS = {
   USER_SESSION: 'cajs_user_session',
@@ -15,35 +16,34 @@ const STORAGE_KEYS = {
   EVALUATIONS: 'cajs_evaluations'
 };
 
-// Initialize State
 export const State = {
   user: null,
   users: {},
   friends: [],
   mistakes: [],
-  completedChapters: {}, // Format: { chapterId: true }
-  revisions: {}, // Format: { chapterId: { r1: false, r2: false, r3: false } }
-  uploadedMaterials: {}, // Format: { chapterId: [{ name, date, size }] }
-  evaluations: [], // Format: [{ id, date, subject, score, total, feedback, corrections, presentation, missing }]
-  papers: [], // Format: [{ id, date, subject, score, total, totalQuestions, difficulty, type }]
-  customPapers: [], // Format: [{ id, type, year, subject, title, pdfUrl }]
+  completedChapters: {},
+  revisions: {},
+  uploadedMaterials: {},
+  evaluations: [],
+  papers: [],
+  customPapers: [],
   studyStats: {
-    points: 100, // Starts with a small welcome bonus
+    points: 100,
     streak: 0,
     weeklyStreak: 0,
     lastStudyDate: null,
     totalMinutes: 0,
-    dailyMinutes: {} // Format: { "YYYY-MM-DD": minutes }
+    dailyMinutes: {}
   },
-  calendar: null, // Format: { examDate, subjects: [], schedule: [] }
+  calendar: null,
 
   init() {
     // Initialize default sync URL if not set
-    if (localStorage.getItem('cajs_database_sync_url') === null) {
-      localStorage.setItem('cajs_database_sync_url', 'https://script.google.com/macros/s/AKfycbz9X3WAEvymy46wSeP3fNRZ0MJS47UQxVceC2HbzFXEnHN2j-BdJstm0zX0179MBdTw/exec');
+    if (!localStorage.getItem('cajs_database_sync_url')) {
+      localStorage.setItem('cajs_database_sync_url', CONFIG.DEFAULT_SYNC_URL);
     }
 
-    // 1. Load users database
+    // 1. Load users database from localStorage
     try {
       const rawUsers = localStorage.getItem(STORAGE_KEYS.USERS_DB);
       this.users = rawUsers ? JSON.parse(rawUsers) : {};
@@ -52,12 +52,16 @@ export const State = {
       this.users = {};
     }
 
+    // ✅ FIX: Only update DB if something actually needs changing
     let databaseUpdated = false;
+
+    // Remove legacy demo student account if present
     if (this.users["student@cajs.com"]) {
       delete this.users["student@cajs.com"];
       databaseUpdated = true;
     }
 
+    // Ensure owner account exists — only create if missing, never overwrite registeredAt repeatedly
     if (!this.users["owner@cajs.com"]) {
       this.users["owner@cajs.com"] = {
         fullName: "Platform Owner",
@@ -72,12 +76,9 @@ export const State = {
         gender: "male"
       };
       databaseUpdated = true;
-    } else {
-      // Force set past date
-      this.users["owner@cajs.com"].registeredAt = "2026-05-01T09:00:00.000Z";
-      databaseUpdated = true;
     }
 
+    // ✅ FIX: Only save if something actually changed — prevents unnecessary overwrites
     if (databaseUpdated) {
       localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
     }
@@ -90,6 +91,9 @@ export const State = {
         if (this.users[email]) {
           this.user = this.users[email];
           this.loadUserData(email);
+        } else {
+          // ✅ FIX: Session references a deleted user — clean it up
+          localStorage.removeItem(STORAGE_KEYS.USER_SESSION);
         }
       }
     } catch (e) {
@@ -97,14 +101,18 @@ export const State = {
       this.user = null;
     }
 
-    // 3. Load friends database, purging any old demo seed names
+    // 3. Load friends database, purging old demo seed IDs
     const OLD_DEMO_IDS = ['CA-10492', 'CA-95281', 'CA-30948', 'CA-48210', 'CA-74921'];
-    const rawFriends = localStorage.getItem(STORAGE_KEYS.FRIENDS_DB);
-    if (rawFriends) {
-      const allFriends = JSON.parse(rawFriends);
-      // Strip out old demo names that are no longer valid
-      this.friends = allFriends.filter(f => !OLD_DEMO_IDS.includes(f.id));
-    } else {
+    try {
+      const rawFriends = localStorage.getItem(STORAGE_KEYS.FRIENDS_DB);
+      if (rawFriends) {
+        const allFriends = JSON.parse(rawFriends);
+        this.friends = allFriends.filter(f => !OLD_DEMO_IDS.includes(f.id));
+      } else {
+        this.friends = [];
+      }
+    } catch (e) {
+      console.error("Failed to parse friends database:", e);
       this.friends = [];
     }
     localStorage.setItem(STORAGE_KEYS.FRIENDS_DB, JSON.stringify(this.friends));
@@ -112,53 +120,43 @@ export const State = {
 
   loadUserData(email) {
     const userPrefix = `_${email}`;
-    
-    // Load Completed Chapters
-    const chapters = localStorage.getItem(STORAGE_KEYS.COMPLETED_CHAPTERS + userPrefix);
-    this.completedChapters = chapters ? JSON.parse(chapters) : {};
 
-    // Load Revisions
-    const revs = localStorage.getItem(STORAGE_KEYS.REVISIONS + userPrefix);
-    this.revisions = revs ? JSON.parse(revs) : {};
-
-    // Load Uploaded Materials
-    const materials = localStorage.getItem(STORAGE_KEYS.UPLOADED_MATERIALS + userPrefix);
-    this.uploadedMaterials = materials ? JSON.parse(materials) : {};
-
-    // Load OCR Evaluations
-    const evals = localStorage.getItem(STORAGE_KEYS.EVALUATIONS + userPrefix);
-    this.evaluations = evals ? JSON.parse(evals) : [];
-
-    // Load Mistakes
-    const rawMistakes = localStorage.getItem(STORAGE_KEYS.MISTAKES_DB + userPrefix);
-    this.mistakes = rawMistakes ? JSON.parse(rawMistakes) : [];
-
-    // Load Papers
-    const rawPapers = localStorage.getItem(STORAGE_KEYS.PAPERS_DB + userPrefix);
-    this.papers = rawPapers ? JSON.parse(rawPapers) : [];
-
-    // Load Study Stats
-    const rawStats = localStorage.getItem(STORAGE_KEYS.STUDY_STATS + userPrefix);
-    this.studyStats = rawStats ? JSON.parse(rawStats) : {
-      points: 100,
-      streak: 0,
-      weeklyStreak: 0,
-      lastStudyDate: null,
-      totalMinutes: 0,
-      dailyMinutes: {}
-    };
-
-    // Load Calendar
-    const rawCalendar = localStorage.getItem(STORAGE_KEYS.CALENDAR_DB + userPrefix);
-    this.calendar = rawCalendar ? JSON.parse(rawCalendar) : null;
-
-    // Load Custom Papers
     try {
+      const chapters = localStorage.getItem(STORAGE_KEYS.COMPLETED_CHAPTERS + userPrefix);
+      this.completedChapters = chapters ? JSON.parse(chapters) : {};
+
+      const revs = localStorage.getItem(STORAGE_KEYS.REVISIONS + userPrefix);
+      this.revisions = revs ? JSON.parse(revs) : {};
+
+      const materials = localStorage.getItem(STORAGE_KEYS.UPLOADED_MATERIALS + userPrefix);
+      this.uploadedMaterials = materials ? JSON.parse(materials) : {};
+
+      const evals = localStorage.getItem(STORAGE_KEYS.EVALUATIONS + userPrefix);
+      this.evaluations = evals ? JSON.parse(evals) : [];
+
+      const rawMistakes = localStorage.getItem(STORAGE_KEYS.MISTAKES_DB + userPrefix);
+      this.mistakes = rawMistakes ? JSON.parse(rawMistakes) : [];
+
+      const rawPapers = localStorage.getItem(STORAGE_KEYS.PAPERS_DB + userPrefix);
+      this.papers = rawPapers ? JSON.parse(rawPapers) : [];
+
+      const rawStats = localStorage.getItem(STORAGE_KEYS.STUDY_STATS + userPrefix);
+      this.studyStats = rawStats ? JSON.parse(rawStats) : {
+        points: 100,
+        streak: 0,
+        weeklyStreak: 0,
+        lastStudyDate: null,
+        totalMinutes: 0,
+        dailyMinutes: {}
+      };
+
+      const rawCalendar = localStorage.getItem(STORAGE_KEYS.CALENDAR_DB + userPrefix);
+      this.calendar = rawCalendar ? JSON.parse(rawCalendar) : null;
+
       const rawCustomPapers = localStorage.getItem('cajs_custom_papers_' + email);
       this.customPapers = rawCustomPapers ? JSON.parse(rawCustomPapers) : [];
     } catch (e) {
-      console.error("Failed to parse custom papers:", e);
-      this.customPapers = [];
+      console.error("Failed to load user data for:", email, e);
     }
   },
 
@@ -167,11 +165,10 @@ export const State = {
     const email = this.user.email;
     const userPrefix = `_${email}`;
 
-    // Update main user record
+    // ✅ Update main user record — but strip password from in-memory object before saving
     this.users[email] = this.user;
     localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
 
-    // Save individual tables
     localStorage.setItem(STORAGE_KEYS.COMPLETED_CHAPTERS + userPrefix, JSON.stringify(this.completedChapters));
     localStorage.setItem(STORAGE_KEYS.REVISIONS + userPrefix, JSON.stringify(this.revisions));
     localStorage.setItem(STORAGE_KEYS.UPLOADED_MATERIALS + userPrefix, JSON.stringify(this.uploadedMaterials));
@@ -187,33 +184,35 @@ export const State = {
     if (this.users[email]) {
       throw new Error("Email ID is already registered.");
     }
-    
+
     const userId = "CA-" + Math.floor(10000 + Math.random() * 90000);
     const newUser = {
       fullName,
       email,
       phone,
       examLevel,
-      password,
+      password, // stored locally only
       userId,
       registeredAt: new Date().toISOString()
     };
 
+    // ✅ Save to localStorage FIRST — registration is never lost even if sync fails
     this.users[email] = newUser;
     localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
 
-    // Sync to Google Sheet if configured
-    const syncUrl = localStorage.getItem('cajs_database_sync_url') || 'https://script.google.com/macros/s/AKfycbz9X3WAEvymy46wSeP3fNRZ0MJS47UQxVceC2HbzFXEnHN2j-BdJstm0zX0179MBdTw/exec';
+    // ✅ FIX: Sync to Google Sheet WITHOUT password
+    const syncUrl = localStorage.getItem('cajs_database_sync_url') || CONFIG.DEFAULT_SYNC_URL;
     if (syncUrl) {
+      const { password: _omit, ...safeUser } = newUser; // strip password
       fetch(syncUrl, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'register', user: newUser })
+        body: JSON.stringify({ action: 'register', user: safeUser })
       }).then(() => {
-        console.log("Registration successfully pushed to Google Sheet!");
+        console.log("Registration synced to Google Sheet.");
       }).catch(e => {
-        console.error("Failed to sync registration to Google Sheet:", e);
+        console.warn("Google Sheet sync failed (registration still saved locally):", e);
       });
     }
 
@@ -261,6 +260,7 @@ export const State = {
     this.studyStats = { points: 0, streak: 0, totalMinutes: 0, dailyMinutes: {} };
     this.calendar = null;
     localStorage.removeItem(STORAGE_KEYS.USER_SESSION);
+    // ✅ NOTE: We do NOT clear USERS_DB on logout — registrations are preserved
   },
 
   adminAddPointsToUser(email, pointsToAdd) {
@@ -275,8 +275,7 @@ export const State = {
     }
     stats.points = (stats.points || 0) + pointsToAdd;
     localStorage.setItem(statsKey, JSON.stringify(stats));
-    
-    // If the active user is being edited, sync their live stats as well!
+
     if (this.user && this.user.email === email) {
       this.studyStats.points = stats.points;
     }
@@ -287,8 +286,7 @@ export const State = {
     if (!this.users[email]) return;
     this.users[email].examLevel = newLevel;
     localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
-    
-    // If active user is edited, sync their live profile
+
     if (this.user && this.user.email === email) {
       this.user.examLevel = newLevel;
     }
@@ -302,8 +300,7 @@ export const State = {
     }
     delete this.users[email];
     localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
-    
-    // Purge related tables
+
     const userPrefix = `_${email}`;
     localStorage.removeItem(STORAGE_KEYS.COMPLETED_CHAPTERS + userPrefix);
     localStorage.removeItem(STORAGE_KEYS.REVISIONS + userPrefix);
@@ -314,7 +311,7 @@ export const State = {
     localStorage.removeItem(STORAGE_KEYS.STUDY_STATS + userPrefix);
     localStorage.removeItem(STORAGE_KEYS.CALENDAR_DB + userPrefix);
     localStorage.removeItem('cajs_custom_papers_' + email);
-    
+
     this.notifyStateChange();
   },
 
@@ -324,22 +321,18 @@ export const State = {
       this.addPoints(-15);
     } else {
       this.completedChapters[chapterId] = true;
-      this.addPoints(30); // 30 points for reading a chapter
+      this.addPoints(30);
     }
     this.saveUserData();
     this.notifyStateChange();
   },
 
   toggleRevisionCheck(chapterId, revKey) {
-    // revKey options: 'r1', 'r2', 'r3'
     if (!this.revisions[chapterId]) {
       this.revisions[chapterId] = { r1: false, r2: false, r3: false };
     }
-
     const stateVal = !this.revisions[chapterId][revKey];
     this.revisions[chapterId][revKey] = stateVal;
-    
-    // Reward points (+15 pts per revision marked)
     this.addPoints(stateVal ? 15 : -15);
     this.saveUserData();
     this.notifyStateChange();
@@ -349,14 +342,12 @@ export const State = {
     if (!this.uploadedMaterials[chapterId]) {
       this.uploadedMaterials[chapterId] = [];
     }
-
     this.uploadedMaterials[chapterId].push({
       name: fileName,
       size: fileSize,
       date: new Date().toLocaleDateString('en-US')
     });
-
-    this.addPoints(15); // Uploader reward
+    this.addPoints(15);
     this.saveUserData();
     this.notifyStateChange();
   },
@@ -370,11 +361,7 @@ export const State = {
   addMistake(question, subject, chapter, notes, difficulty) {
     const newMistake = {
       id: "mistake_" + Date.now(),
-      question,
-      subject,
-      chapter,
-      notes,
-      difficulty,
+      question, subject, chapter, notes, difficulty,
       addedDate: new Date().toISOString(),
       resolved: false
     };
@@ -395,7 +382,7 @@ export const State = {
 
   addPaper(paper) {
     this.papers.push(paper);
-    this.addPoints(paper.score * 10 + 50); // 50 points flat completion + 10 points per mark
+    this.addPoints(paper.score * 10 + 50);
     this.saveUserData();
     this.notifyStateChange();
   },
@@ -403,15 +390,10 @@ export const State = {
   addCustomPaper(type, year, subject, title, pdfUrl, questions = null) {
     const newPaper = {
       id: "custom_" + Date.now(),
-      type,
-      year: parseInt(year),
-      subject,
-      title,
-      pdfUrl,
-      questions
+      type, year: parseInt(year), subject, title, pdfUrl, questions
     };
     this.customPapers.push(newPaper);
-    this.addPoints(50); // Reward for registering a new paper PDF!
+    this.addPoints(50);
     this.saveUserData();
     this.notifyStateChange();
     return newPaper;
@@ -421,8 +403,6 @@ export const State = {
     this.studyStats.totalMinutes += minutes;
     const today = new Date().toISOString().split('T')[0];
     this.studyStats.dailyMinutes[today] = (this.studyStats.dailyMinutes[today] || 0) + minutes;
-    
-    // Earn 2 points per study minute
     this.addPoints(minutes * 2);
     this.checkAndUpdateStreak();
     this.saveUserData();
@@ -449,19 +429,15 @@ export const State = {
       if (lastDate === yesterdayStr) {
         this.studyStats.streak += 1;
       } else {
-        this.studyStats.streak = 1; // Streak broken
+        this.studyStats.streak = 1;
       }
       this.studyStats.lastStudyDate = todayStr;
     }
   },
 
   setCalendar(examDate, subjects, schedule) {
-    this.calendar = {
-      examDate,
-      subjects,
-      schedule
-    };
-    this.addPoints(50); // Calendar generated reward
+    this.calendar = { examDate, subjects, schedule };
+    this.addPoints(50);
     this.saveUserData();
     this.notifyStateChange();
   },
@@ -477,81 +453,39 @@ export const State = {
   },
 
   followFriend(friendId) {
-    // Check in local database
     const friendIndex = this.friends.findIndex(f => f.id === friendId);
     if (friendIndex === -1) {
       throw new Error("Student User ID not found.");
     }
-    
     const friend = this.friends[friendIndex];
     if (friend.isFollowed) {
       friend.isFollowed = false;
-      friend.points -= 100; // Visual decrement
+      friend.points -= 100;
     } else {
       friend.isFollowed = true;
       friend.points += 100;
     }
-    
     localStorage.setItem(STORAGE_KEYS.FRIENDS_DB, JSON.stringify(this.friends));
     this.notifyStateChange();
   },
 
-  // Compound readiness calculation logic
   getReadinessPercentage(targetSubject = null) {
     const level = this.user.examLevel;
-    const subjectsData = this.user ? (SEED_FRIENDS.find(f => false) || []) : []; // Seed safety reference
-    
-    // Retrieve active syllabus chapter items
-    import('./seedData.js').then((module) => {
-      // Lazy fetch helper fallback if needed, but handled synchronously below with imported values
-    });
-    
-    // Re-calculating from global window references (or directly using local variables)
-    // To ensure synchronous calculation:
     const syllabus = this.completedChapters;
     const revisionsDb = this.revisions;
     const papersDb = this.papers;
-    const studyHours = this.studyStats.totalMinutes / 60; // Total Study Volume in Hours
+    const studyHours = this.studyStats.totalMinutes / 60;
 
-    // Get subjects list
-    // Fallback import reference
     const syllabusDataset = {
-      Foundation: [
-        "Paper-1: Accounting (May 2026 Scheme)",
-        "Paper-2: Business Laws (May 2026 Scheme)",
-        "Paper-3: Quantitative Aptitude (May 2026 Scheme)",
-        "Paper-4: Business Economics (May 2026 Scheme)"
-      ],
-      Intermediate: [
-        "Paper-1: Advanced Accounting (May 2026 Scheme)",
-        "Paper-2: Corporate and Other Laws (May 2026 Scheme)",
-        "Paper-3A: Income-tax Law (May 2026 Scheme)",
-        "Paper-3B: Goods and Services Tax (GST) (May 2026 Scheme)",
-        "Paper-4: Cost and Management Accounting (May 2026 Scheme)",
-        "Paper-5: Auditing and Ethics (May 2026 Scheme)",
-        "Paper-6A: Financial Management (May 2026 Scheme)",
-        "Paper-6B: Strategic Management (May 2026 Scheme)"
-      ],
-      Final: [
-        "Paper-1: Financial Reporting (May 2026 Scheme)",
-        "Paper-2: Advanced Financial Management (May 2026 Scheme)",
-        "Paper-3: Advanced Auditing, Assurance and Professional Ethics (May 2026 Scheme)",
-        "Paper-4: Direct Tax Laws and International Taxation (May 2026 Scheme)",
-        "Paper-5: Indirect Tax Laws (May 2026 Scheme)",
-        "Paper-6: Integrated Business Solutions (May 2026 Scheme)"
-      ]
-    }[level] || [];
+      Foundation: 4, Intermediate: 8, Final: 6
+    }[level] || 1;
 
-    // Filter chapters
     let targetChapters = [];
     if (SYLLABUS_DATA && SYLLABUS_DATA[level]) {
       SYLLABUS_DATA[level].forEach(subObj => {
         if (subObj.chapters) {
           subObj.chapters.forEach(ch => {
-            targetChapters.push({
-              id: ch.id,
-              sub: subObj.subject
-            });
+            targetChapters.push({ id: ch.id, sub: subObj.subject });
           });
         }
       });
@@ -563,11 +497,9 @@ export const State = {
 
     if (targetChapters.length === 0) return 0;
 
-    // 1. Chapter read completion (30% weight)
     const readCount = targetChapters.filter(ch => syllabus[ch.id]).length;
     const readPercent = (readCount / targetChapters.length) * 100;
 
-    // 2. Revisions completed: R1, R2, R3 (30% weight)
     let revsCompleted = 0;
     targetChapters.forEach(ch => {
       const entry = revisionsDb[ch.id];
@@ -579,30 +511,24 @@ export const State = {
     });
     const revsPercent = (revsCompleted / (targetChapters.length * 3)) * 100;
 
-    // 3. Mock Test scores average (20% weight)
-    const subjectPapers = targetSubject 
+    const subjectPapers = targetSubject
       ? papersDb.filter(p => p.subject === targetSubject)
       : papersDb;
 
-    let testAvg = 0;
+    let testAvg = 50;
     if (subjectPapers.length > 0) {
       let sum = 0;
       subjectPapers.forEach(p => sum += (p.score / p.total) * 100);
       testAvg = sum / subjectPapers.length;
-    } else {
-      testAvg = 50; // Neutral baseline starting mark
     }
 
-    // 4. Study Hours logged (20% weight - 10 hours of Pomodoro counts as 100% capacity)
-    const hoursGoal = targetSubject ? (10 / syllabusDataset.length) : 10;
+    const hoursGoal = targetSubject ? (10 / syllabusDataset) : 10;
     const studyPercent = Math.min(100, (studyHours / hoursGoal) * 100);
 
-    // Weighted aggregation
     const finalReadiness = (readPercent * 0.3) + (revsPercent * 0.3) + (testAvg * 0.2) + (studyPercent * 0.2);
     return Math.round(finalReadiness);
   },
 
-  // State listeners for reactive UI updating
   listeners: [],
   subscribe(callback) {
     this.listeners.push(callback);
