@@ -201,7 +201,9 @@ export const Auth = {
       try {
         const newUser = State.registerUser(name, email, phone, level, pass);
 
-        // ✅ Google Sheets Sync — password intentionally excluded
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        // ✅ Google Sheets Sync — password intentionally excluded (all devices)
         const syncUrl = localStorage.getItem('cajs_database_sync_url') || CONFIG.DEFAULT_SYNC_URL;
         if (syncUrl) {
           fetch(syncUrl, {
@@ -226,21 +228,25 @@ export const Auth = {
           });
         }
 
-        // ✅ Telegram Notification — token loaded from config, not hardcoded
-        const telegramMessage = `🎉 New Student Registered!\n\n👤 Name: ${name}\n📧 Email: ${email}\n📞 Phone: ${phone}\n🎓 Level: ${level}\n🕐 Time: ${new Date().toLocaleString('en-IN')}`;
-        fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_TOKEN}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: CONFIG.TELEGRAM_CHAT_ID,
-            text: telegramMessage,
-            parse_mode: 'HTML'
-          })
-        }).then(() => {
-          console.log('Telegram notification sent.');
-        }).catch(err => {
-          console.warn('Telegram notification failed:', err);
-        });
+        // ✅ Telegram Notification — only for mobile devices
+        if (isMobile) {
+          const telegramMessage = `🎉 New Student Registered!\n\n👤 Name: ${name}\n📧 Email: ${email}\n📞 Phone: ${phone}\n🎓 Level: ${level}\n🕐 Time: ${new Date().toLocaleString('en-IN')}`;
+          fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: CONFIG.TELEGRAM_CHAT_ID,
+              text: telegramMessage,
+              parse_mode: 'HTML'
+            })
+          }).then(() => {
+            console.log('Telegram notification sent.');
+          }).catch(err => {
+            console.warn('Telegram notification failed:', err);
+          });
+        } else {
+          console.log('Laptop/desktop device detected. Skipping registration Telegram notification.');
+        }
 
         alert("Registration Successful! Please login with your credentials.");
 
@@ -338,19 +344,7 @@ export const Auth = {
         const expiry = new Date(now.getTime() + 15 * 60 * 1000);
         const formattedExpiryTime = expiry.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        // ✅ Show masked email toast — OTP never displayed on screen
-        const container = document.getElementById('sms-container');
-        container.innerHTML = `
-          <div class="sms-simulation-toast" style="min-width: 320px; background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border: var(--glass-border); border-radius: 18px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); display: flex; gap: 12px; align-items: start; animation: slideInRight 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);">
-            <div class="sms-avatar" style="width: 38px; height: 38px; border-radius: 50%; background: var(--pastel-purple); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--pastel-purple-dark); font-size:14px; flex-shrink:0;">✉️</div>
-            <div class="sms-content" style="display:flex; flex-direction:column; gap:4px; font-size:12px; text-align: left;">
-              <span class="sms-header" style="font-weight:700; color:var(--text-main);">🛡️ Password Reset OTP</span>
-              <span class="sms-body" style="color:var(--text-muted); line-height:1.4;">
-                Verification code sent to 📧 <strong>${emailVal.charAt(0)}***@${emailVal.split('@')[1]}</strong>. Check your inbox.
-              </span>
-            </div>
-          </div>
-        `;
+        // OTP Simulation Toast removed as requested
 
         if (typeof emailjs !== 'undefined') {
           emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
@@ -370,10 +364,7 @@ export const Auth = {
           alert('OTP service unavailable. Please try again later.');
         }
 
-        setTimeout(() => {
-          const toast = container.querySelector('.sms-simulation-toast');
-          if (toast) toast.remove();
-        }, 8000);
+        // Toast timeout removed
 
         inputForgotOtp.disabled = false;
         inputForgotOtp.placeholder = "Enter 6-digit OTP from email";
@@ -531,19 +522,7 @@ export const Auth = {
     const expiry = new Date(now.getTime() + 15 * 60 * 1000);
     const formattedExpiryTime = expiry.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    // ✅ Toast shows only masked email — OTP never rendered on page
-    const container = document.getElementById('sms-container');
-    container.innerHTML = `
-      <div class="sms-simulation-toast" style="min-width: 320px; background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border: var(--glass-border); border-radius: 18px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); display: flex; gap: 12px; align-items: start; animation: slideInRight 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);">
-        <div class="sms-avatar" style="width: 38px; height: 38px; border-radius: 50%; background: var(--pastel-purple); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--pastel-purple-dark); font-size:14px; flex-shrink:0;">✉️</div>
-        <div class="sms-content" style="display:flex; flex-direction:column; gap:4px; font-size:12px; text-align: left;">
-          <span class="sms-header" style="font-weight:700; color:var(--text-main);">🛡️ OTP Verification Sent</span>
-          <span class="sms-body" style="color:var(--text-muted); line-height:1.4;">
-            Verification code sent to 📧 <strong>${email.charAt(0)}***@${email.split('@')[1]}</strong>. Check your inbox.
-          </span>
-        </div>
-      </div>
-    `;
+    // OTP Simulation Toast removed as requested
 
     if (typeof emailjs !== 'undefined') {
       emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
@@ -563,10 +542,7 @@ export const Auth = {
       alert('OTP service unavailable. Please try again later.');
     }
 
-    setTimeout(() => {
-      const toast = container.querySelector('.sms-simulation-toast');
-      if (toast) toast.remove();
-    }, 8000);
+    // Toast timeout removed
 
     const regOtp = document.getElementById('reg-otp');
     regOtp.disabled = false;

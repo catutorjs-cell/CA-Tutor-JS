@@ -762,19 +762,7 @@ export const ProfileModule = {
         const expiry = new Date(now.getTime() + 15 * 60 * 1000);
         const formattedExpiryTime = expiry.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        // Trigger visual simulator toast showing OTP transmission
-        const container = document.getElementById('sms-container');
-        container.innerHTML = `
-          <div class="sms-simulation-toast" style="min-width: 320px; background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border: var(--glass-border); border-radius: 18px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); display: flex; gap: 12px; align-items: start; animation: slideInRight 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);">
-            <div class="sms-avatar" style="width: 38px; height: 38px; border-radius: 50%; background: var(--pastel-purple); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--pastel-purple-dark); font-size:14px; flex-shrink:0;">✉️</div>
-            <div class="sms-content" style="display:flex; flex-direction:column; gap:4px; font-size:12px; text-align: left;">
-              <span class="sms-header" style="font-weight:700; color:var(--text-main);">🛡️ Profile Password Reset</span>
-              <span class="sms-body" style="color:var(--text-muted); line-height:1.4;">
-                Verification code sent to email 📧 <strong>${emailVal.charAt(0)}***@${emailVal.split('@')[1]}</strong>.
-              </span>
-            </div>
-          </div>
-        `;
+        // OTP Simulation Toast removed as requested
 
         // Send the email via EmailJS
         if (typeof emailjs !== 'undefined') {
@@ -808,10 +796,7 @@ export const ProfileModule = {
           alert(`EmailJS SDK not found. Falling back to simulated verification. Your password reset OTP is: ${otp}`);
         }
 
-        setTimeout(() => {
-          const toast = container.querySelector('.sms-simulation-toast');
-          if (toast) toast.remove();
-        }, 8000);
+        // Toast timeout removed
 
         // Enable OTP Input
         inputPassOtp.disabled = false;
@@ -1132,24 +1117,9 @@ export const ProfileModule = {
     const otp = "1234";
     this.generatedOtp = otp;
 
-    // Trigger animated SMS / Email delivery simulation toast without showing the OTP on the webpage
-    const container = document.getElementById('sms-container');
-    container.innerHTML = `
-      <div class="sms-simulation-toast" style="min-width: 320px; background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border: var(--glass-border); border-radius: 18px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); display: flex; gap: 12px; align-items: start; animation: slideInRight 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);">
-        <div class="sms-avatar" style="width: 38px; height: 38px; border-radius: 50%; background: var(--pastel-purple); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--pastel-purple-dark); font-size:14px; flex-shrink:0;">CA</div>
-        <div class="sms-content" style="display:flex; flex-direction:column; gap:4px; font-size:12px; text-align: left;">
-          <span class="sms-header" style="font-weight:700; color:var(--text-main);">🛡️ Profile Security Verification</span>
-          <span class="sms-body" style="color:var(--text-muted); line-height:1.4;">
-            OTP verification code sent to 📱 <strong>+91 ******${phone.slice(-4)}</strong> & 📧 <strong>${email.charAt(0)}***@${email.split('@')[1]}</strong>.
-          </span>
-        </div>
-      </div>
-    `;
+    // OTP Simulation Toast removed as requested
 
-    setTimeout(() => {
-      const toast = container.querySelector('.sms-simulation-toast');
-      if (toast) toast.remove();
-    }, 10000);
+    // Toast timeout removed
 
     input.disabled = false;
     input.placeholder = "Enter code (Demo: 1234)";

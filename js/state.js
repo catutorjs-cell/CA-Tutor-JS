@@ -200,7 +200,7 @@ export const State = {
     this.users[email] = newUser;
     localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
 
-    // ✅ FIX: Sync to Google Sheet WITHOUT password
+    // ✅ FIX: Sync to Google Sheet WITHOUT password (all devices)
     const syncUrl = localStorage.getItem('cajs_database_sync_url') || CONFIG.DEFAULT_SYNC_URL;
     if (syncUrl) {
       const { password: _omit, ...safeUser } = newUser; // strip password
