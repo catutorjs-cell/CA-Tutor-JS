@@ -8,7 +8,7 @@ const GEMINI_STORAGE_KEY = 'cajs_gemini_api_key';
 
 // If you want all your users to share a master key (so they are not prompted),
 // paste your Gemini API key inside the quotes below:
-const DEFAULT_GEMINI_API_KEY = '';
+const DEFAULT_GEMINI_API_KEY = 'AIzaSyCIUkVYZPW_3GHj21OqZklXpqwFKYgzxqw';
 
 export const Evaluator = {
 

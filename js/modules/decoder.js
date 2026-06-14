@@ -647,7 +647,7 @@ ${foundQ.notes ? `* **Explanation:** ${foundQ.notes}` : ''}`;
 
   async askGemini(queryText) {
     const GEMINI_KEY_STORAGE = 'cajs_gemini_api_key';
-    const DEFAULT_KEY = '';
+    const DEFAULT_KEY = 'AIzaSyCIUkVYZPW_3GHj21OqZklXpqwFKYgzxqw';
 
     // 1. Get saved key or prompt user
     let apiKey = await this.loadEnvApiKey();

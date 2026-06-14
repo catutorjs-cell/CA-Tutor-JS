@@ -203,30 +203,6 @@ export const Auth = {
 
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-        // ✅ Google Sheets Sync — password intentionally excluded (all devices)
-        const syncUrl = localStorage.getItem('cajs_database_sync_url') || CONFIG.DEFAULT_SYNC_URL;
-        if (syncUrl) {
-          fetch(syncUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              action: 'register',
-              user: {
-                fullName: name,
-                email: email,
-                phone: phone,
-                examLevel: level,
-                // ✅ FIX: Password never sent to external services
-                userId: newUser?.userId || 'CA-STUDENT',
-                registeredAt: new Date().toISOString()
-              }
-            })
-          }).then(() => {
-            console.log('Registration synced to Google Sheets.');
-          }).catch(err => {
-            console.warn('Google Sheets sync failed:', err);
-          });
-        }
 
         // ✅ Telegram Notification — only for mobile devices
         if (isMobile) {
