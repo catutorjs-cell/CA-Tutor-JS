@@ -131,7 +131,6 @@ export const Auth = {
     regOtp.addEventListener('input', () => {
       const otpVal = regOtp.value.trim();
       if (otpVal.length === 6) {
-        // ✅ FIX: Removed '123456' master bypass — only real OTP accepted
         if (otpVal === this.generatedOtp) {
           this.isEmailVerified = true;
           regOtp.style.borderColor = 'var(--pastel-green-dark)';
@@ -153,14 +152,21 @@ export const Auth = {
       }
     });
 
-    // Login Form Submit
-    loginForm.addEventListener('submit', (e) => {
+    // ✅ FIXED: Login Form Submit — now async to support cross-device login
+    loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value.trim();
       const pass = document.getElementById('login-password').value;
 
+      // Show loading state on button
+      const submitBtn = document.getElementById('btn-login-submit');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Logging in...';
+      submitBtn.disabled = true;
+
       try {
-        const user = State.loginUser(email, pass);
+        const user = await State.loginUser(email, pass);
+
         const landing = document.getElementById('landing-page');
         if (landing) landing.style.display = 'none';
 
@@ -171,6 +177,8 @@ export const Auth = {
         this.onLoginSuccess(user);
       } catch (err) {
         alert(err.message);
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
       }
     });
 
@@ -205,8 +213,7 @@ export const Auth = {
 
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-
-        // ✅ Telegram Notification — only for mobile devices
+        // Telegram Notification — only for mobile devices
         if (isMobile) {
           const telegramMessage = `🎉 New Student Registered!\n\n👤 Name: ${name}\n📧 Email: ${email}\n📞 Phone: ${phone}\n🎓 Level: ${level}\n🕐 Time: ${new Date().toLocaleString('en-IN')}`;
           fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_TOKEN}/sendMessage`, {
@@ -303,16 +310,41 @@ export const Auth = {
     }
 
     if (btnForgotSendOtp) {
-      btnForgotSendOtp.addEventListener('click', () => {
+      // ✅ FIXED: Forgot password OTP also checks Google Sheet for cross-device users
+      btnForgotSendOtp.addEventListener('click', async () => {
         const emailVal = forgotEmailInput.value.trim();
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
           alert("Please enter a valid email address.");
           return;
         }
 
-        if (!State.users[emailVal]) {
+        // Check locally first
+        let userExists = !!State.users[emailVal];
+
+        // If not local, check Google Sheet
+        if (!userExists) {
+          btnForgotSendOtp.textContent = 'Checking...';
+          btnForgotSendOtp.disabled = true;
+          const sheetUsers = await State.fetchUsersFromSheet();
+          userExists = sheetUsers.some(u => u.email === emailVal);
+          btnForgotSendOtp.textContent = 'Send OTP';
+          btnForgotSendOtp.disabled = false;
+        }
+
+        if (!userExists) {
           alert("This email is not registered with us.");
           return;
+        }
+
+        // If user found in sheet but not locally, add them locally (without password)
+        // so that after reset they can login on this device
+        if (!State.users[emailVal]) {
+          const sheetUsers = await State.fetchUsersFromSheet();
+          const sheetUser = sheetUsers.find(u => u.email === emailVal);
+          if (sheetUser) {
+            State.users[emailVal] = { ...sheetUser, password: null };
+            localStorage.setItem('cajs_users_db', JSON.stringify(State.users));
+          }
         }
 
         const otp = this.generateOTP().toString();
@@ -322,8 +354,6 @@ export const Auth = {
         const expiry = new Date(now.getTime() + 15 * 60 * 1000);
         const formattedExpiryTime = expiry.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        // OTP Simulation Toast removed as requested
-
         if (typeof emailjs !== 'undefined') {
           emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
             passcode: otp, time: formattedExpiryTime, otp: otp,
@@ -332,7 +362,6 @@ export const Auth = {
             to_name: emailVal.split('@')[0], name: emailVal.split('@')[0],
             message: `Your CA TUTOR JS password reset verification code is ${otp}. Valid until ${formattedExpiryTime}.`
           }).then(() => {
-            // ✅ FIX: OTP not logged to console
             console.log('Reset OTP email dispatched.');
           }).catch(err => {
             console.error('EmailJS OTP send failed:', err);
@@ -341,8 +370,6 @@ export const Auth = {
         } else {
           alert('OTP service unavailable. Please try again later.');
         }
-
-        // Toast timeout removed
 
         inputForgotOtp.disabled = false;
         inputForgotOtp.placeholder = "Enter 6-digit OTP from email";
@@ -368,7 +395,6 @@ export const Auth = {
       inputForgotOtp.addEventListener('input', () => {
         const otpVal = inputForgotOtp.value.trim();
         if (otpVal.length === 6) {
-          // ✅ FIX: Removed '123456' master bypass
           if (otpVal === forgotGeneratedOtp) {
             isForgotOtpVerified = true;
             inputForgotOtp.style.borderColor = 'var(--pastel-green-dark)';
@@ -486,7 +512,6 @@ export const Auth = {
   },
 
   generateOTP() {
-    // ✅ Cryptographically stronger OTP using crypto API
     const array = new Uint32Array(1);
     crypto.getRandomValues(array);
     return 100000 + (array[0] % 900000);
@@ -500,8 +525,6 @@ export const Auth = {
     const expiry = new Date(now.getTime() + 15 * 60 * 1000);
     const formattedExpiryTime = expiry.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    // OTP Simulation Toast removed as requested
-
     if (typeof emailjs !== 'undefined') {
       emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
         passcode: otp, time: formattedExpiryTime, otp: otp,
@@ -510,7 +533,6 @@ export const Auth = {
         to_name: email.split('@')[0], name: email.split('@')[0],
         message: `Your CA TUTOR JS verification code is ${otp}. Valid until ${formattedExpiryTime}.`
       }).then(() => {
-        // ✅ FIX: OTP not logged to console
         console.log('OTP email dispatched.');
       }).catch(err => {
         console.error('EmailJS OTP send failed:', err);
@@ -519,8 +541,6 @@ export const Auth = {
     } else {
       alert('OTP service unavailable. Please try again later.');
     }
-
-    // Toast timeout removed
 
     const regOtp = document.getElementById('reg-otp');
     regOtp.disabled = false;
