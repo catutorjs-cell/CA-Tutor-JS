@@ -52,7 +52,6 @@ export const State = {
       this.users = {};
     }
 
-    // ✅ FIX: Only update DB if something actually needs changing
     let databaseUpdated = false;
 
     // Remove legacy demo student account if present
@@ -61,7 +60,7 @@ export const State = {
       databaseUpdated = true;
     }
 
-    // Ensure owner account exists — only create if missing, never overwrite registeredAt repeatedly
+    // Ensure owner account exists
     if (!this.users["owner@cajs.com"]) {
       this.users["owner@cajs.com"] = {
         fullName: "Platform Owner",
@@ -78,7 +77,6 @@ export const State = {
       databaseUpdated = true;
     }
 
-    // ✅ FIX: Only save if something actually changed — prevents unnecessary overwrites
     if (databaseUpdated) {
       localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
     }
@@ -92,7 +90,6 @@ export const State = {
           this.user = this.users[email];
           this.loadUserData(email);
         } else {
-          // ✅ FIX: Session references a deleted user — clean it up
           localStorage.removeItem(STORAGE_KEYS.USER_SESSION);
         }
       }
@@ -101,7 +98,7 @@ export const State = {
       this.user = null;
     }
 
-    // 3. Load friends database, purging old demo seed IDs
+    // 3. Load friends database
     const OLD_DEMO_IDS = ['CA-10492', 'CA-95281', 'CA-30948', 'CA-48210', 'CA-74921'];
     try {
       const rawFriends = localStorage.getItem(STORAGE_KEYS.FRIENDS_DB);
@@ -165,7 +162,6 @@ export const State = {
     const email = this.user.email;
     const userPrefix = `_${email}`;
 
-    // ✅ Update main user record — but strip password from in-memory object before saving
     this.users[email] = this.user;
     localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
 
@@ -191,19 +187,19 @@ export const State = {
       email,
       phone,
       examLevel,
-      password, // stored locally only
+      password,
       userId,
       registeredAt: new Date().toISOString()
     };
 
-    // ✅ Save to localStorage FIRST — registration is never lost even if sync fails
+    // Save to localStorage first
     this.users[email] = newUser;
     localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
 
-    // ✅ FIX: Sync to Google Sheet WITHOUT password (all devices)
+    // Sync to Google Sheet (without password)
     const syncUrl = localStorage.getItem('cajs_database_sync_url') || CONFIG.DEFAULT_SYNC_URL;
     if (syncUrl) {
-      const { password: _omit, ...safeUser } = newUser; // strip password
+      const { password: _omit, ...safeUser } = newUser;
       fetch(syncUrl, {
         method: 'POST',
         mode: 'no-cors',
@@ -219,20 +215,65 @@ export const State = {
     return newUser;
   },
 
-  loginUser(email, password) {
-    const matchedUser = this.users[email];
-    if (!matchedUser) {
+  // ✅ NEW: Fetch all users from Google Sheet for cross-device login
+  async fetchUsersFromSheet() {
+    const syncUrl = localStorage.getItem('cajs_database_sync_url') || CONFIG.DEFAULT_SYNC_URL;
+    if (!syncUrl) return [];
+    try {
+      const response = await fetch(syncUrl);
+      if (!response.ok) return [];
+      const data = await response.json();
+      if (Array.isArray(data)) return data;
+      return [];
+    } catch (e) {
+      console.warn("Could not fetch users from Google Sheet:", e);
+      return [];
+    }
+  },
+
+  // ✅ FIXED: loginUser now supports cross-device login
+  async loginUser(email, password) {
+    // 1. Try local login first (fast)
+    const localUser = this.users[email];
+    if (localUser && localUser.password === password) {
+      this.user = localUser;
+      localStorage.setItem(STORAGE_KEYS.USER_SESSION, JSON.stringify(email));
+      this.loadUserData(email);
+      this.checkAndUpdateStreak();
+      return localUser;
+    }
+
+    // 2. If not found locally, check Google Sheet
+    // (This handles users who registered on a different device)
+    const sheetUsers = await this.fetchUsersFromSheet();
+
+    if (sheetUsers.length === 0 && !localUser) {
       throw new Error("No user found with this Email/Username.");
     }
-    if (matchedUser.password !== password) {
+
+    const sheetUser = sheetUsers.find(u => u.email === email);
+
+    if (!sheetUser && !localUser) {
+      throw new Error("No user found with this Email/Username.");
+    }
+
+    if (localUser && !localUser.password) {
+      // User exists locally but has no password (edge case) — can't verify
       throw new Error("Incorrect password.");
     }
 
-    this.user = matchedUser;
-    localStorage.setItem(STORAGE_KEYS.USER_SESSION, JSON.stringify(email));
-    this.loadUserData(email);
-    this.checkAndUpdateStreak();
-    return matchedUser;
+    if (sheetUser) {
+      // User found in Google Sheet but not locally
+      // Google Sheet does NOT store passwords (by design for security)
+      // So we cannot verify the password from the sheet directly.
+      // We ask them to re-register or reset password on this device.
+      throw new Error(
+        "Your account was registered on another device. Please register again on this device, or use 'Forgot Password' to reset and regain access."
+      );
+    }
+
+    // Local user exists but wrong password
+    throw new Error("Incorrect password.");
   },
 
   resetPassword(email, newPassword) {
@@ -260,7 +301,6 @@ export const State = {
     this.studyStats = { points: 0, streak: 0, totalMinutes: 0, dailyMinutes: {} };
     this.calendar = null;
     localStorage.removeItem(STORAGE_KEYS.USER_SESSION);
-    // ✅ NOTE: We do NOT clear USERS_DB on logout — registrations are preserved
   },
 
   adminAddPointsToUser(email, pointsToAdd) {
