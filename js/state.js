@@ -76,7 +76,7 @@ export const State = {
     // 1. Load users database from localStorage
     try {
       const rawUsers = localStorage.getItem(STORAGE_KEYS.USERS_DB);
-      this.users = rawUsers ? JSON.parse(rawUsers) : {};
+      this.users = (rawUsers && JSON.parse(rawUsers)) || {};
     } catch (e) {
       console.error("Failed to parse users database:", e);
       this.users = {};
@@ -85,13 +85,13 @@ export const State = {
     let databaseUpdated = false;
 
     // Remove legacy demo student account if present
-    if (this.users["student@cajs.com"]) {
+    if (this.users && this.users["student@cajs.com"]) {
       delete this.users["student@cajs.com"];
       databaseUpdated = true;
     }
 
     // Ensure owner account exists
-    if (!this.users["owner@cajs.com"]) {
+    if (this.users && !this.users["owner@cajs.com"]) {
       this.users["owner@cajs.com"] = {
         fullName: "Platform Owner",
         email: "owner@cajs.com",
@@ -107,7 +107,7 @@ export const State = {
       databaseUpdated = true;
     }
 
-    if (databaseUpdated) {
+    if (databaseUpdated && this.users) {
       localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
     }
 
@@ -116,7 +116,7 @@ export const State = {
       const rawSession = localStorage.getItem(STORAGE_KEYS.USER_SESSION);
       if (rawSession) {
         const email = JSON.parse(rawSession);
-        if (this.users[email]) {
+        if (this.users && this.users[email]) {
           this.user = this.users[email];
           this.loadUserData(email);
         } else {
@@ -134,7 +134,7 @@ export const State = {
       const rawFriends = localStorage.getItem(STORAGE_KEYS.FRIENDS_DB);
       if (rawFriends) {
         const allFriends = JSON.parse(rawFriends);
-        this.friends = allFriends.filter(f => !OLD_DEMO_IDS.includes(f.id));
+        this.friends = (allFriends && Array.isArray(allFriends)) ? allFriends.filter(f => f && f.id && !OLD_DEMO_IDS.includes(f.id)) : [];
       } else {
         this.friends = [];
       }
@@ -150,25 +150,25 @@ export const State = {
 
     try {
       const chapters = localStorage.getItem(STORAGE_KEYS.COMPLETED_CHAPTERS + userPrefix);
-      this.completedChapters = chapters ? JSON.parse(chapters) : {};
+      this.completedChapters = (chapters && JSON.parse(chapters)) || {};
 
       const revs = localStorage.getItem(STORAGE_KEYS.REVISIONS + userPrefix);
-      this.revisions = revs ? JSON.parse(revs) : {};
+      this.revisions = (revs && JSON.parse(revs)) || {};
 
       const materials = localStorage.getItem(STORAGE_KEYS.UPLOADED_MATERIALS + userPrefix);
-      this.uploadedMaterials = materials ? JSON.parse(materials) : {};
+      this.uploadedMaterials = (materials && JSON.parse(materials)) || {};
 
       const evals = localStorage.getItem(STORAGE_KEYS.EVALUATIONS + userPrefix);
-      this.evaluations = evals ? JSON.parse(evals) : [];
+      this.evaluations = (evals && JSON.parse(evals)) || [];
 
       const rawMistakes = localStorage.getItem(STORAGE_KEYS.MISTAKES_DB + userPrefix);
-      this.mistakes = rawMistakes ? JSON.parse(rawMistakes) : [];
+      this.mistakes = (rawMistakes && JSON.parse(rawMistakes)) || [];
 
       const rawPapers = localStorage.getItem(STORAGE_KEYS.PAPERS_DB + userPrefix);
-      this.papers = rawPapers ? JSON.parse(rawPapers) : [];
+      this.papers = (rawPapers && JSON.parse(rawPapers)) || [];
 
       const rawStats = localStorage.getItem(STORAGE_KEYS.STUDY_STATS + userPrefix);
-      this.studyStats = rawStats ? JSON.parse(rawStats) : {
+      this.studyStats = (rawStats && JSON.parse(rawStats)) || {
         points: 100,
         streak: 0,
         weeklyStreak: 0,
@@ -178,10 +178,10 @@ export const State = {
       };
 
       const rawCalendar = localStorage.getItem(STORAGE_KEYS.CALENDAR_DB + userPrefix);
-      this.calendar = rawCalendar ? JSON.parse(rawCalendar) : null;
+      this.calendar = (rawCalendar && JSON.parse(rawCalendar)) || null;
 
       const rawCustomPapers = localStorage.getItem('cajs_custom_papers_' + email);
-      this.customPapers = rawCustomPapers ? JSON.parse(rawCustomPapers) : [];
+      this.customPapers = (rawCustomPapers && JSON.parse(rawCustomPapers)) || [];
     } catch (e) {
       console.error("Failed to load user data for:", email, e);
     }
@@ -192,8 +192,10 @@ export const State = {
     const email = this.user.email;
     const userPrefix = `_${email}`;
 
-    this.users[email] = this.user;
-    localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
+    if (this.users) {
+      this.users[email] = this.user;
+      localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
+    }
 
     localStorage.setItem(STORAGE_KEYS.COMPLETED_CHAPTERS + userPrefix, JSON.stringify(this.completedChapters));
     localStorage.setItem(STORAGE_KEYS.REVISIONS + userPrefix, JSON.stringify(this.revisions));

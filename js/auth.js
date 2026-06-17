@@ -27,12 +27,17 @@ export const Auth = {
   resetState() {
     this.generatedOtp = null;
     this.isEmailVerified = false;
-    document.getElementById('reg-otp').disabled = true;
-    document.getElementById('reg-otp').value = '';
+    const regOtp = document.getElementById('reg-otp');
+    if (regOtp) {
+      regOtp.disabled = true;
+      regOtp.value = '';
+    }
     const sendOtpBtn = document.getElementById('btn-send-otp');
-    sendOtpBtn.textContent = 'Send OTP';
-    sendOtpBtn.disabled = false;
-    sendOtpBtn.className = 'btn btn-secondary';
+    if (sendOtpBtn) {
+      sendOtpBtn.textContent = 'Send OTP';
+      sendOtpBtn.disabled = false;
+      sendOtpBtn.className = 'btn btn-secondary';
+    }
     clearInterval(this.otpInterval);
   },
 
@@ -71,25 +76,29 @@ export const Auth = {
     const authHeaderText = document.getElementById('auth-header-text');
 
     // Tab Switches
-    tabLogin.addEventListener('click', () => {
-      this.activeTab = 'login';
-      tabLogin.classList.add('active');
-      tabRegister.classList.remove('active');
-      loginForm.style.display = 'flex';
-      registerForm.style.display = 'none';
-      authHeaderText.textContent = 'Login to access your study portal';
-      this.resetState();
-    });
+    if (tabLogin) {
+      tabLogin.addEventListener('click', () => {
+        this.activeTab = 'login';
+        tabLogin.classList.add('active');
+        if (tabRegister) tabRegister.classList.remove('active');
+        if (loginForm) loginForm.style.display = 'flex';
+        if (registerForm) registerForm.style.display = 'none';
+        if (authHeaderText) authHeaderText.textContent = 'Login to access your study portal';
+        this.resetState();
+      });
+    }
 
-    tabRegister.addEventListener('click', () => {
-      this.activeTab = 'register';
-      tabRegister.classList.add('active');
-      tabLogin.classList.remove('active');
-      registerForm.style.display = 'flex';
-      loginForm.style.display = 'none';
-      authHeaderText.textContent = 'Create your premium CA-JS student profile';
-      this.resetState();
-    });
+    if (tabRegister) {
+      tabRegister.addEventListener('click', () => {
+        this.activeTab = 'register';
+        tabRegister.classList.add('active');
+        if (tabLogin) tabLogin.classList.remove('active');
+        if (registerForm) registerForm.style.display = 'flex';
+        if (loginForm) loginForm.style.display = 'none';
+        if (authHeaderText) authHeaderText.textContent = 'Create your premium CA-JS student profile';
+        this.resetState();
+      });
+    }
 
     // Password requirements validation (Register)
     const regPassword = document.getElementById('reg-password');
@@ -98,154 +107,189 @@ export const Auth = {
     const reqNum = document.getElementById('req-num');
     const passMatchLabel = document.getElementById('pass-match-label');
 
-    regPassword.addEventListener('input', () => {
-      const val = regPassword.value;
-      if (val.length >= 8) reqLen.classList.add('valid');
-      else reqLen.classList.remove('valid');
+    if (regPassword) {
+      regPassword.addEventListener('input', () => {
+        const val = regPassword.value;
+        if (reqLen) {
+          if (val.length >= 8) reqLen.classList.add('valid');
+          else reqLen.classList.remove('valid');
+        }
+        if (reqNum) {
+          if (/\d/.test(val)) reqNum.classList.add('valid');
+          else reqNum.classList.remove('valid');
+        }
+        this.checkPasswordMatch(regPassword, regConfirm, passMatchLabel);
+      });
+    }
 
-      if (/\d/.test(val)) reqNum.classList.add('valid');
-      else reqNum.classList.remove('valid');
-
-      this.checkPasswordMatch(regPassword, regConfirm, passMatchLabel);
-    });
-
-    regConfirm.addEventListener('input', () => {
-      this.checkPasswordMatch(regPassword, regConfirm, passMatchLabel);
-    });
+    if (regConfirm) {
+      regConfirm.addEventListener('input', () => {
+        this.checkPasswordMatch(regPassword, regConfirm, passMatchLabel);
+      });
+    }
 
     // Send OTP handler
     const btnSendOtp = document.getElementById('btn-send-otp');
     const regEmail = document.getElementById('reg-email');
 
-    btnSendOtp.addEventListener('click', () => {
-      const emailVal = regEmail.value.trim();
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
-        alert("Please enter a valid email address.");
-        return;
-      }
-      this.sendOtp(emailVal);
-    });
+    if (btnSendOtp) {
+      btnSendOtp.addEventListener('click', () => {
+        if (regEmail) {
+          const emailVal = regEmail.value.trim();
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+            alert("Please enter a valid email address.");
+            return;
+          }
+          this.sendOtp(emailVal);
+        }
+      });
+    }
 
     // Verify OTP input handler (Registration)
     const regOtp = document.getElementById('reg-otp');
-    regOtp.addEventListener('input', () => {
-      const otpVal = regOtp.value.trim();
-      if (otpVal.length === 6) {
-        if (otpVal === this.generatedOtp) {
-          this.isEmailVerified = true;
-          regOtp.style.borderColor = 'var(--pastel-green-dark)';
-          regOtp.style.boxShadow = '0 0 0 3px var(--pastel-green)';
-          regOtp.disabled = true;
+    if (regOtp) {
+      regOtp.addEventListener('input', () => {
+        const otpVal = regOtp.value.trim();
+        if (otpVal.length === 6) {
+          if (otpVal === this.generatedOtp) {
+            this.isEmailVerified = true;
+            regOtp.style.borderColor = 'var(--pastel-green-dark)';
+            regOtp.style.boxShadow = '0 0 0 3px var(--pastel-green)';
+            regOtp.disabled = true;
 
-          const sendOtpBtn = document.getElementById('btn-send-otp');
-          sendOtpBtn.textContent = 'Verified ✓';
-          sendOtpBtn.disabled = true;
-          sendOtpBtn.className = 'btn btn-success';
-          clearInterval(this.otpInterval);
+            const sendOtpBtn = document.getElementById('btn-send-otp');
+            if (sendOtpBtn) {
+              sendOtpBtn.textContent = 'Verified ✓';
+              sendOtpBtn.disabled = true;
+              sendOtpBtn.className = 'btn btn-success';
+            }
+            clearInterval(this.otpInterval);
+          } else {
+            regOtp.style.borderColor = 'var(--pastel-rose-dark)';
+            regOtp.style.boxShadow = '0 0 0 3px var(--pastel-rose)';
+          }
         } else {
-          regOtp.style.borderColor = 'var(--pastel-rose-dark)';
-          regOtp.style.boxShadow = '0 0 0 3px var(--pastel-rose)';
+          regOtp.style.borderColor = '';
+          regOtp.style.boxShadow = '';
         }
-      } else {
-        regOtp.style.borderColor = '';
-        regOtp.style.boxShadow = '';
-      }
-    });
+      });
+    }
 
     // ✅ FIXED: Login Form Submit — now async to support cross-device login
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('login-email').value.trim();
-      const pass = document.getElementById('login-password').value;
+    if (loginForm) {
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const emailEl = document.getElementById('login-email');
+        const passwordEl = document.getElementById('login-password');
+        if (!emailEl || !passwordEl) return;
+        const email = emailEl.value.trim();
+        const pass = passwordEl.value;
 
-      // Show loading state on button
-      const submitBtn = document.getElementById('btn-login-submit');
-      const originalText = submitBtn.textContent;
-      submitBtn.textContent = 'Logging in...';
-      submitBtn.disabled = true;
+        // Show loading state on button
+        const submitBtn = document.getElementById('btn-login-submit');
+        let originalText = 'Login';
+        if (submitBtn) {
+          originalText = submitBtn.textContent;
+          submitBtn.textContent = 'Logging in...';
+          submitBtn.disabled = true;
+        }
 
-      try {
-        const user = await State.loginUser(email, pass);
+        try {
+          const user = await State.loginUser(email, pass);
 
-        const landing = document.getElementById('landing-page');
-        if (landing) landing.style.display = 'none';
+          const landing = document.getElementById('landing-page');
+          if (landing) landing.style.display = 'none';
 
-        const authPanel = document.getElementById('auth-panel');
-        if (authPanel) authPanel.classList.remove('open');
+          const authPanel = document.getElementById('auth-panel');
+          if (authPanel) authPanel.classList.remove('open');
 
-        document.getElementById('app-shell').style.display = 'flex';
-        this.onLoginSuccess(user);
-      } catch (err) {
-        alert(err.message);
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-      }
-    });
+          const appShell = document.getElementById('app-shell');
+          if (appShell) appShell.style.display = 'flex';
+          this.onLoginSuccess(user);
+        } catch (err) {
+          alert(err.message);
+          if (submitBtn) {
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+          }
+        }
+      });
+    }
 
     // Register Form Submit
-    registerForm.addEventListener('submit', (e) => {
-      e.preventDefault();
+    if (registerForm) {
+      registerForm.addEventListener('submit', (e) => {
+        e.preventDefault();
 
-      const name = document.getElementById('reg-name').value.trim();
-      const email = document.getElementById('reg-email').value.trim();
-      const phone = document.getElementById('reg-phone').value.trim();
-      const level = document.getElementById('reg-level').value;
-      const pass = regPassword.value;
-      const confirmPass = regConfirm.value;
+        const nameEl = document.getElementById('reg-name');
+        const emailEl = document.getElementById('reg-email');
+        const phoneEl = document.getElementById('reg-phone');
+        const levelEl = document.getElementById('reg-level');
+        if (!nameEl || !emailEl || !phoneEl || !levelEl || !regPassword) return;
 
-      if (!this.isEmailVerified) {
-        alert("Please complete the Email OTP verification first.");
-        return;
-      }
+        const name = nameEl.value.trim();
+        const email = emailEl.value.trim();
+        const phone = phoneEl.value.trim();
+        const level = levelEl.value;
+        const pass = regPassword.value;
+        const confirmPass = regConfirm ? regConfirm.value : '';
 
-      if (pass.length < 8 || !/\d/.test(pass)) {
-        alert("Password does not meet the complexity requirements.");
-        return;
-      }
-
-      if (pass !== confirmPass) {
-        alert("Passwords do not match.");
-        return;
-      }
-
-      try {
-        const newUser = State.registerUser(name, email, phone, level, pass);
-
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-        // Telegram Notification — only for mobile devices
-        if (isMobile) {
-          const telegramMessage = `🎉 New Student Registered!\n\n👤 Name: ${name}\n📧 Email: ${email}\n📞 Phone: ${phone}\n🎓 Level: ${level}\n🕐 Time: ${new Date().toLocaleString('en-IN')}`;
-          fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chat_id: CONFIG.TELEGRAM_CHAT_ID,
-              text: telegramMessage,
-              parse_mode: 'HTML'
-            })
-          }).then(() => {
-            console.log('Telegram notification sent.');
-          }).catch(err => {
-            console.warn('Telegram notification failed:', err);
-          });
-        } else {
-          console.log('Laptop/desktop device detected. Skipping registration Telegram notification.');
+        if (!this.isEmailVerified) {
+          alert("Please complete the Email OTP verification first.");
+          return;
         }
 
-        alert("Registration Successful! Please login with your credentials.");
-
-        if (typeof window.cajsUpdateLandingStudentCounter === 'function') {
-          window.cajsUpdateLandingStudentCounter();
+        if (pass.length < 8 || !/\d/.test(pass)) {
+          alert("Password does not meet the complexity requirements.");
+          return;
         }
 
-        document.getElementById('login-email').value = email;
-        document.getElementById('login-password').value = '';
-        tabLogin.click();
-      } catch (err) {
-        alert(err.message);
-      }
-    });
+        if (pass !== confirmPass) {
+          alert("Passwords do not match.");
+          return;
+        }
+
+        try {
+          const newUser = State.registerUser(name, email, phone, level, pass);
+
+          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+          // Telegram Notification — only for mobile devices
+          if (isMobile) {
+            const telegramMessage = `🎉 New Student Registered!\n\n👤 Name: ${name}\n📧 Email: ${email}\n📞 Phone: ${phone}\n🎓 Level: ${level}\n🕐 Time: ${new Date().toLocaleString('en-IN')}`;
+            fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_TOKEN}/sendMessage`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                chat_id: CONFIG.TELEGRAM_CHAT_ID,
+                text: telegramMessage,
+                parse_mode: 'HTML'
+              })
+            }).then(() => {
+              console.log('Telegram notification sent.');
+            }).catch(err => {
+              console.warn('Telegram notification failed:', err);
+            });
+          } else {
+            console.log('Laptop/desktop device detected. Skipping registration Telegram notification.');
+          }
+
+          alert("Registration Successful! Please login with your credentials.");
+
+          if (typeof window.cajsUpdateLandingStudentCounter === 'function') {
+            window.cajsUpdateLandingStudentCounter();
+          }
+
+          const loginEmailEl = document.getElementById('login-email');
+          const loginPasswordEl = document.getElementById('login-password');
+          if (loginEmailEl) loginEmailEl.value = email;
+          if (loginPasswordEl) loginPasswordEl.value = '';
+          if (tabLogin) tabLogin.click();
+        } catch (err) {
+          alert(err.message);
+        }
+      });
+    }
 
     // --- Forgot Password Flow ---
     const linkForgotPassword = document.getElementById('link-forgot-password');
@@ -268,17 +312,23 @@ export const Auth = {
       isForgotOtpVerified = false;
       forgotOtpCountdown = 0;
       clearInterval(forgotOtpInterval);
-      btnForgotSendOtp.textContent = 'Send OTP';
-      btnForgotSendOtp.disabled = false;
-      btnForgotSendOtp.className = 'btn btn-secondary';
-      inputForgotOtp.value = '';
-      inputForgotOtp.disabled = true;
-      inputForgotOtp.style.borderColor = '';
-      inputForgotOtp.style.boxShadow = '';
-      inputForgotNewPass.value = '';
-      inputForgotNewPass.disabled = true;
-      forgotPassReqs.style.display = 'none';
-      btnForgotSubmit.disabled = true;
+      if (btnForgotSendOtp) {
+        btnForgotSendOtp.textContent = 'Send OTP';
+        btnForgotSendOtp.disabled = false;
+        btnForgotSendOtp.className = 'btn btn-secondary';
+      }
+      if (inputForgotOtp) {
+        inputForgotOtp.value = '';
+        inputForgotOtp.disabled = true;
+        inputForgotOtp.style.borderColor = '';
+        inputForgotOtp.style.boxShadow = '';
+      }
+      if (inputForgotNewPass) {
+        inputForgotNewPass.value = '';
+        inputForgotNewPass.disabled = true;
+      }
+      if (forgotPassReqs) forgotPassReqs.style.display = 'none';
+      if (btnForgotSubmit) btnForgotSubmit.disabled = true;
     };
 
     if (linkForgotPassword) {
@@ -286,32 +336,36 @@ export const Auth = {
         e.preventDefault();
         this.activeTab = 'forgot';
 
-        loginForm.style.display = 'none';
-        registerForm.style.display = 'none';
-        document.querySelector('.auth-tabs').style.display = 'none';
+        if (loginForm) loginForm.style.display = 'none';
+        if (registerForm) registerForm.style.display = 'none';
+        const authTabs = document.querySelector('.auth-tabs');
+        if (authTabs) authTabs.style.display = 'none';
 
-        forgotForm.style.display = 'flex';
-        authHeaderText.textContent = 'Reset your student profile password';
+        if (forgotForm) forgotForm.style.display = 'flex';
+        if (authHeaderText) authHeaderText.textContent = 'Reset your student profile password';
 
         resetForgotFormState();
 
-        const loginEmail = document.getElementById('login-email').value.trim();
-        forgotEmailInput.value = loginEmail || '';
+        const loginEmailEl = document.getElementById('login-email');
+        const loginEmail = loginEmailEl ? loginEmailEl.value.trim() : '';
+        if (forgotEmailInput) forgotEmailInput.value = loginEmail || '';
       });
     }
 
     if (linkBackToLogin) {
       linkBackToLogin.addEventListener('click', (e) => {
         e.preventDefault();
-        document.querySelector('.auth-tabs').style.display = 'flex';
-        forgotForm.style.display = 'none';
-        tabLogin.click();
+        const authTabs = document.querySelector('.auth-tabs');
+        if (authTabs) authTabs.style.display = 'flex';
+        if (forgotForm) forgotForm.style.display = 'none';
+        if (tabLogin) tabLogin.click();
       });
     }
 
     if (btnForgotSendOtp) {
       // ✅ FIXED: Forgot password OTP also checks Google Sheet for cross-device users
       btnForgotSendOtp.addEventListener('click', async () => {
+        if (!forgotEmailInput) return;
         const emailVal = forgotEmailInput.value.trim();
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
           alert("Please enter a valid email address.");
@@ -371,21 +425,26 @@ export const Auth = {
           alert('OTP service unavailable. Please try again later.');
         }
 
-        inputForgotOtp.disabled = false;
-        inputForgotOtp.placeholder = "Enter 6-digit OTP from email";
-        inputForgotOtp.focus();
+        if (inputForgotOtp) {
+          inputForgotOtp.disabled = false;
+          inputForgotOtp.placeholder = "Enter 6-digit OTP from email";
+          inputForgotOtp.focus();
+        }
 
         btnForgotSendOtp.disabled = true;
         forgotOtpCountdown = 60;
         clearInterval(forgotOtpInterval);
         forgotOtpInterval = setInterval(() => {
           forgotOtpCountdown--;
-          if (forgotOtpCountdown <= 0) {
-            btnForgotSendOtp.textContent = 'Resend OTP';
-            btnForgotSendOtp.disabled = false;
-            clearInterval(forgotOtpInterval);
-          } else {
-            btnForgotSendOtp.textContent = `Resend in ${forgotOtpCountdown}s`;
+          const btnForgotSendOtpUpdate = document.getElementById('btn-forgot-send-otp');
+          if (btnForgotSendOtpUpdate) {
+            if (forgotOtpCountdown <= 0) {
+              btnForgotSendOtpUpdate.textContent = 'Resend OTP';
+              btnForgotSendOtpUpdate.disabled = false;
+              clearInterval(forgotOtpInterval);
+            } else {
+              btnForgotSendOtpUpdate.textContent = `Resend in ${forgotOtpCountdown}s`;
+            }
           }
         }, 1000);
       });
@@ -401,14 +460,19 @@ export const Auth = {
             inputForgotOtp.style.boxShadow = '0 0 0 3px var(--pastel-green)';
             inputForgotOtp.disabled = true;
 
-            btnForgotSendOtp.textContent = 'Verified ✓';
-            btnForgotSendOtp.disabled = true;
-            btnForgotSendOtp.className = 'btn btn-success';
+            const btnForgotSendOtpUpdate = document.getElementById('btn-forgot-send-otp');
+            if (btnForgotSendOtpUpdate) {
+              btnForgotSendOtpUpdate.textContent = 'Verified ✓';
+              btnForgotSendOtpUpdate.disabled = true;
+              btnForgotSendOtpUpdate.className = 'btn btn-success';
+            }
             clearInterval(forgotOtpInterval);
 
-            inputForgotNewPass.disabled = false;
-            forgotPassReqs.style.display = 'grid';
-            inputForgotNewPass.focus();
+            if (inputForgotNewPass) {
+              inputForgotNewPass.disabled = false;
+              if (forgotPassReqs) forgotPassReqs.style.display = 'grid';
+              inputForgotNewPass.focus();
+            }
           } else {
             inputForgotOtp.style.borderColor = 'var(--pastel-rose-dark)';
             inputForgotOtp.style.boxShadow = '0 0 0 3px var(--pastel-rose)';
@@ -429,21 +493,26 @@ export const Auth = {
         const lenValid = val.length >= 8;
         const numValid = /\d/.test(val);
 
-        if (lenValid) forgotReqLen.classList.add('valid');
-        else forgotReqLen.classList.remove('valid');
+        if (forgotReqLen) {
+          if (lenValid) forgotReqLen.classList.add('valid');
+          else forgotReqLen.classList.remove('valid');
+        }
+        if (forgotReqNum) {
+          if (numValid) forgotReqNum.classList.add('valid');
+          else forgotReqNum.classList.remove('valid');
+        }
 
-        if (numValid) forgotReqNum.classList.add('valid');
-        else forgotReqNum.classList.remove('valid');
-
-        btnForgotSubmit.disabled = !(lenValid && numValid && isForgotOtpVerified);
+        if (btnForgotSubmit) {
+          btnForgotSubmit.disabled = !(lenValid && numValid && isForgotOtpVerified);
+        }
       });
     }
 
     if (forgotForm) {
       forgotForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const email = forgotEmailInput.value.trim();
-        const newPass = inputForgotNewPass.value;
+        const email = forgotEmailInput ? forgotEmailInput.value.trim() : '';
+        const newPass = inputForgotNewPass ? inputForgotNewPass.value : '';
 
         if (!isForgotOtpVerified) {
           alert("Please complete the OTP verification first.");
@@ -459,13 +528,18 @@ export const Auth = {
           State.resetPassword(email, newPass);
           alert("Password Reset Successful! Please login with your new credentials.");
 
-          document.querySelector('.auth-tabs').style.display = 'flex';
+          const authTabs = document.querySelector('.auth-tabs');
+          if (authTabs) authTabs.style.display = 'flex';
           forgotForm.style.display = 'none';
-          tabLogin.click();
+          if (tabLogin) tabLogin.click();
 
-          document.getElementById('login-email').value = email;
-          document.getElementById('login-password').value = '';
-          document.getElementById('login-password').focus();
+          const loginEmailEl = document.getElementById('login-email');
+          const loginPasswordEl = document.getElementById('login-password');
+          if (loginEmailEl) loginEmailEl.value = email;
+          if (loginPasswordEl) {
+            loginPasswordEl.value = '';
+            loginPasswordEl.focus();
+          }
         } catch (err) {
           alert(err.message);
         }
@@ -473,25 +547,31 @@ export const Auth = {
     }
 
     // Logout
-    document.getElementById('btn-logout').addEventListener('click', () => {
-      State.logoutUser();
-      document.getElementById('app-shell').style.display = 'none';
+    const btnLogout = document.getElementById('btn-logout');
+    if (btnLogout) {
+      btnLogout.addEventListener('click', () => {
+        State.logoutUser();
+        const appShell = document.getElementById('app-shell');
+        if (appShell) appShell.style.display = 'none';
 
-      const landing = document.getElementById('landing-page');
-      if (landing) landing.style.display = 'flex';
+        const landing = document.getElementById('landing-page');
+        if (landing) landing.style.display = 'flex';
 
-      const authPanel = document.getElementById('auth-panel');
-      if (authPanel) authPanel.classList.remove('open');
+        const authPanel = document.getElementById('auth-panel');
+        if (authPanel) authPanel.classList.remove('open');
 
-      this.resetState();
+        this.resetState();
 
-      if (typeof window.cajsUpdateLandingStudentCounter === 'function') {
-        window.cajsUpdateLandingStudentCounter();
-      }
+        if (typeof window.cajsUpdateLandingStudentCounter === 'function') {
+          window.cajsUpdateLandingStudentCounter();
+        }
 
-      document.getElementById('login-email').value = '';
-      document.getElementById('login-password').value = '';
-    });
+        const loginEmailEl = document.getElementById('login-email');
+        const loginPasswordEl = document.getElementById('login-password');
+        if (loginEmailEl) loginEmailEl.value = '';
+        if (loginPasswordEl) loginPasswordEl.value = '';
+      });
+    }
   },
 
   checkPasswordMatch(pass, confirm, label) {

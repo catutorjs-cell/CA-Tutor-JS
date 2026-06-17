@@ -595,8 +595,8 @@ const updateLandingStudentCounter = async () => {
       if (response.ok) {
         const data = await response.json();
         if (Array.isArray(data)) {
-          // Filter out owner
-          studentsList = data.filter(u => u.email !== 'owner@cajs.com' && u.role !== 'owner');
+          // Filter out owner and invalid users
+          studentsList = data.filter(u => u && u.email && u.email !== 'owner@cajs.com' && u.role !== 'owner');
         }
       }
     } catch (e) {
@@ -609,7 +609,8 @@ const updateLandingStudentCounter = async () => {
     const localUsers = State.users || {};
     studentsList = Object.keys(localUsers)
       .filter(email => email !== 'owner@cajs.com')
-      .map(email => localUsers[email]);
+      .map(email => localUsers[email])
+      .filter(Boolean);
   }
 
   // 3. Baseline mock students if there are no registered students yet
@@ -638,6 +639,7 @@ const updateLandingStudentCounter = async () => {
   if (gridEl) {
     gridEl.innerHTML = '';
     finalList.forEach(student => {
+      if (!student) return;
       const initial = student.fullName ? student.fullName.charAt(0).toUpperCase() : 'S';
       
       // Format date beautifully
@@ -683,7 +685,8 @@ const bootstrap = () => {
     const authPanel = document.getElementById('auth-panel');
     if (authPanel) authPanel.classList.remove('open');
     
-    document.getElementById('app-shell').style.display = 'flex';
+    const appShell = document.getElementById('app-shell');
+    if (appShell) appShell.style.display = 'flex';
     Router.updateSidebarWidgets();
     Router.navigate('dashboard');
   });
@@ -691,20 +694,6 @@ const bootstrap = () => {
   const landingPage = document.getElementById('landing-page');
   const authPanel = document.getElementById('auth-panel');
   const appShell = document.getElementById('app-shell');
-
-  if (State.user) {
-    // If session is already open:
-    if (landingPage) landingPage.style.display = 'none';
-    if (authPanel) authPanel.classList.remove('open');
-    appShell.style.display = 'flex';
-    Router.updateSidebarWidgets();
-    Router.navigate('dashboard');
-  } else {
-    // If not logged in, show landing, hide dashboard
-    if (landingPage) landingPage.style.display = 'flex';
-    if (authPanel) authPanel.classList.remove('open');
-    appShell.style.display = 'none';
-  }
 
   // --- Landing Page Interactive Triggers ---
   const btnLandingLogin = document.getElementById('btn-landing-login');
@@ -736,6 +725,20 @@ const bootstrap = () => {
   if (btnHeroLogin) btnHeroLogin.addEventListener('click', () => openAuthModal('login'));
   if (btnHeroStart) btnHeroStart.addEventListener('click', () => openAuthModal('register'));
   if (btnAuthClose) btnAuthClose.addEventListener('click', closeAuthModal);
+
+  if (State.user) {
+    // If session is already open:
+    if (landingPage) landingPage.style.display = 'none';
+    if (authPanel) authPanel.classList.remove('open');
+    if (appShell) appShell.style.display = 'flex';
+    Router.updateSidebarWidgets();
+    Router.navigate('dashboard');
+  } else {
+    // If not logged in, show landing, hide dashboard
+    if (landingPage) landingPage.style.display = 'flex';
+    if (authPanel) authPanel.classList.remove('open');
+    if (appShell) appShell.style.display = 'none';
+  }
 
   // Close modal when clicking on the blurred backdrop outside the card
   if (authPanel) {
