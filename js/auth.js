@@ -1,6 +1,8 @@
 // CA JS Authentication Controller
-import { State } from './state.js';
+import { State, SafeStorage } from './state.js';
 import { CONFIG } from './config.js';
+
+const localStorage = SafeStorage;
 
 export const Auth = {
   activeTab: 'login',

@@ -1,5 +1,7 @@
 // CA JS Profile Editor Module
-import { State } from '../state.js';
+import { State, SafeStorage } from '../state.js';
+
+const localStorage = SafeStorage;
 
 export const ProfileModule = {
   generatedOtp: null,

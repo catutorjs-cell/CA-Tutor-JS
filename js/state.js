@@ -2,6 +2,36 @@
 import { SEED_FRIENDS, SYLLABUS_DATA } from './seedData.js';
 import { CONFIG } from './config.js';
 
+export const SafeStorage = {
+  _memStore: {},
+  getItem(key) {
+    try {
+      return window.localStorage.getItem(key);
+    } catch (e) {
+      console.warn(`SafeStorage: Failed to get item for key "${key}":`, e);
+      return this._memStore[key] || null;
+    }
+  },
+  setItem(key, value) {
+    try {
+      window.localStorage.setItem(key, value);
+    } catch (e) {
+      console.warn(`SafeStorage: Failed to set item for key "${key}":`, e);
+      this._memStore[key] = String(value);
+    }
+  },
+  removeItem(key) {
+    try {
+      window.localStorage.removeItem(key);
+    } catch (e) {
+      console.warn(`SafeStorage: Failed to remove item for key "${key}":`, e);
+      delete this._memStore[key];
+    }
+  }
+};
+
+const localStorage = SafeStorage;
+
 const STORAGE_KEYS = {
   USER_SESSION: 'cajs_user_session',
   USERS_DB: 'cajs_users_db',

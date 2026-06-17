@@ -1,8 +1,10 @@
 // CA JS Answer Evaluator — OCR + AI Grading Engine
 // Handles: PDF→Image, Preprocessing, Tesseract OCR, Question Splitting, Gemini AI Grading
 
-import { State } from '../state.js';
+import { State, SafeStorage } from '../state.js';
 import { SYLLABUS_DATA } from '../seedData.js';
+
+const localStorage = SafeStorage;
 
 const GEMINI_STORAGE_KEY = 'cajs_gemini_api_key';
 
