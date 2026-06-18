@@ -140,6 +140,7 @@ export const RevisionModule = {
   },
 
   renderScheduleSetup(container, headerTabs, subjects) {
+    const level = State.user.examLevel;
     const subjectCheckboxes = subjects.map(sub => `
       <label class="preset-sub-checkbox-label" style="display:flex; align-items:center; gap:8px; margin-bottom: 8px; font-size:14px; cursor:pointer;" data-subgroup="${getSubjectGroup(sub.subject)}">
         <input type="checkbox" name="rev-subjects" value="${sub.subject}" checked style="width:16px; height:16px; accent-color:var(--pastel-purple-dark);">
@@ -167,11 +168,13 @@ export const RevisionModule = {
 
           <div class="form-group">
             <label class="form-label">Subjects to Include</label>
+            ${level === 'Intermediate' && this.activeGroup === 'All' ? `
             <div style="display:flex; gap:8px; margin-bottom: 12px; flex-wrap:wrap;">
               <button type="button" class="btn btn-secondary preset-btn-select" data-preset="Group 1" style="padding: 6px 12px; font-size:11px; border-radius: 20px; font-weight: 600;">Select Group 1 Only</button>
               <button type="button" class="btn btn-secondary preset-btn-select" data-preset="Group 2" style="padding: 6px 12px; font-size:11px; border-radius: 20px; font-weight: 600;">Select Group 2 Only</button>
               <button type="button" class="btn btn-secondary preset-btn-select" data-preset="Both" style="padding: 6px 12px; font-size:11px; border-radius: 20px; font-weight: 600;">Select Both Groups</button>
             </div>
+            ` : ''}
             <div style="background: rgba(0,0,0,0.02); border-radius: 12px; padding: 15px; border: 1px solid rgba(0,0,0,0.03);">
               ${subjectCheckboxes}
             </div>
@@ -299,10 +302,23 @@ export const RevisionModule = {
 
     const schedule = [];
     const startDate = new Date();
-    
-    // Generate daily slots for all chapters in priority/mix pool
+    startDate.setHours(0, 0, 0, 0);
+
+    const examDate = new Date(examDateVal);
+    examDate.setHours(0, 0, 0, 0);
+    const diffTime = examDate.getTime() - startDate.getTime();
+    let totalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (totalDays <= 0) totalDays = 1;
+
+    // Generate daily slots for all chapters in priority/mix pool distributed across totalDays
     sortedMixedPool.forEach((chInfo, index) => {
-      const day = index + 1;
+      let day;
+      if (sortedMixedPool.length === 1) {
+        day = totalDays;
+      } else {
+        day = Math.round((index * (totalDays - 1)) / (sortedMixedPool.length - 1)) + 1;
+      }
+
       const dayDate = new Date(startDate);
       dayDate.setDate(startDate.getDate() + day);
       const dayDateStr = dayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -328,7 +344,14 @@ export const RevisionModule = {
     const completed = calendar.schedule.filter(item => item.done).length;
     const progressPercent = Math.round((completed / total) * 100);
 
-    const scheduleRows = calendar.schedule.map((item, idx) => {
+    const level = State.user.examLevel;
+    let filteredSchedule = calendar.schedule.map((item, idx) => ({ ...item, originalIndex: idx }));
+
+    if (level === 'Intermediate' && this.activeGroup && this.activeGroup !== 'All') {
+      filteredSchedule = filteredSchedule.filter(item => getSubjectGroup(item.subject) === this.activeGroup);
+    }
+
+    const scheduleRows = filteredSchedule.map((item) => {
       const colors = getSubjectColors(item.subject);
       return `
         <div class="calendar-day-card ${item.done ? 'done' : ''}" style="padding:12px 16px; border-left: 5px solid ${colors.accent}; background: ${colors.bg}; border-color: ${colors.border}; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='none';">
@@ -341,7 +364,7 @@ export const RevisionModule = {
               <span style="font-size:9px; color:var(--text-muted);">${item.date}</span>
             </div>
           </div>
-          <button class="btn ${item.done ? 'btn-success' : 'btn-secondary'}" style="padding: 5px 10px; font-size:10px; border-color:${colors.accent}; color:${item.done ? 'white' : colors.text}; background:${item.done ? 'var(--pastel-green-dark)' : 'white'};" onclick="window.cajsToggleCalendarItem(${idx})">
+          <button class="btn ${item.done ? 'btn-success' : 'btn-secondary'}" style="padding: 5px 10px; font-size:10px; border-color:${colors.accent}; color:${item.done ? 'white' : colors.text}; background:${item.done ? 'var(--pastel-green-dark)' : 'white'};" onclick="window.cajsToggleCalendarItem(${item.originalIndex})">
             ${item.done ? 'Done ✓' : 'Mark Done'}
           </button>
         </div>

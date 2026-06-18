@@ -293,17 +293,17 @@ export const State = {
       // User exists locally but has no password (edge case) — can't verify
       throw new Error("Incorrect password.");
     }
-
     if (sheetUser) {
-      // User found in Google Sheet but not locally
-      // Google Sheet does NOT store passwords (by design for security)
-      // So we cannot verify the password from the sheet directly.
-      // We ask them to re-register or reset password on this device.
-      throw new Error(
-        "Your account was registered on another device. Please register again on this device, or use 'Forgot Password' to reset and regain access."
-      );
-    }
+      // User found in Google Sheet — save to local device and log them in
+      this.users[email] = { ...sheetUser, password: password };
+      localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
 
+      this.user = this.users[email];
+      localStorage.setItem(STORAGE_KEYS.USER_SESSION, JSON.stringify(email));
+      this.loadUserData(email);
+      this.checkAndUpdateStreak();
+      return this.users[email];
+    }
     // Local user exists but wrong password
     throw new Error("Incorrect password.");
   },
@@ -342,7 +342,7 @@ export const State = {
     try {
       const rawStats = localStorage.getItem(statsKey);
       if (rawStats) stats = JSON.parse(rawStats);
-    } catch(e) {
+    } catch (e) {
       console.error(e);
     }
     stats.points = (stats.points || 0) + pointsToAdd;

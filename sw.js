@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ca-tutor-js-v5';
+const CACHE_NAME = 'ca-tutor-js-v7';
 
 const ASSETS_TO_CACHE = [
   './',

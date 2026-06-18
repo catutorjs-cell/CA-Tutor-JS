@@ -20,7 +20,7 @@ export const PomodoroModule = {
     const minutes = Math.floor(this.timeLeft / 60);
     const seconds = this.timeLeft % 60;
     const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    
+
     // Ring circumference logic
     const circumference = 2 * Math.PI * 90;
     const progressPercent = (this.timeLeft / this.totalDuration) * 100;
@@ -128,7 +128,7 @@ export const PomodoroModule = {
     let bgUrl = '';
     const userGender = (State.user && State.user.gender) ? State.user.gender : 'female';
     const isBreak = this.activeMode === 'short' || this.activeMode === 'long';
-    
+
     if (this.studyMode === 'group' && this.isRunning) {
       const room = this.rooms.find(r => r.name === this.joinedRoom);
       if (isBreak) {
@@ -159,20 +159,20 @@ export const PomodoroModule = {
     } else {
       bgUrl = userGender === 'male' ? './assets/bg_male_rest.png' : './assets/bg_female_rest.png';
     }
-    
+
     // Overlay opacity: lighter and warmer during breaks, darker during focus
     const overlayColor = isBreak
       ? 'linear-gradient(rgba(0,0,0, 0.25), rgba(0,0,0, 0.45))'
       : 'linear-gradient(rgba(0,0,0, 0.5), rgba(0,0,0, 0.7))';
 
-    const bgStyle = this.isRunning 
+    const bgStyle = this.isRunning
       ? `background: ${overlayColor}, url('${bgUrl}'); background-size: cover; background-position: center; border-radius: 24px; padding: 30px; margin: -10px; min-height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: background 0.8s ease, all 0.5s ease;`
       : `background: transparent; border-radius: 24px; padding: 30px; margin: -10px; min-height: 80vh; transition: background 0.5s ease, all 0.5s ease;`;
-    
+
     // Mode toggles
     let modeToggles = '';
     if (!this.isRunning) {
-       modeToggles = `
+      modeToggles = `
         <div class="pomo-modes" style="margin-bottom: 12px;">
           <button class="pomo-mode-btn ${this.activeMode === 'work' ? 'active' : ''}" onclick="window.cajsChangePomoMode('work', 25)">Study Interval</button>
           <button class="pomo-mode-btn ${this.activeMode === 'short' ? 'active' : ''}" onclick="window.cajsChangePomoMode('short', 5)">Short Break</button>
@@ -262,9 +262,9 @@ export const PomodoroModule = {
       if (!input) return;
       const val = input.value.trim();
       if (!val) return;
-      
+
       this.chatMessages.push({ isMe: true, sender: 'You', text: val });
-      
+
       const cw = document.getElementById('cajs-chat-window');
       if (cw) {
         const msgDiv = document.createElement('div');
@@ -324,17 +324,17 @@ export const PomodoroModule = {
       const room = this.rooms[idx];
       this.studyMode = 'group';
       this.joinedRoom = room.name;
-      
+
       // Shift theme background dynamically
       document.body.style.background = room.bg;
-      
+
       this.render(container);
     };
 
     window.cajsLeaveRoom = () => {
       this.studyMode = 'solo';
       this.joinedRoom = null;
-      
+
       // Reset main background theme
       document.body.style.background = 'var(--bg-gradient)';
       this.render(container);
@@ -354,7 +354,7 @@ export const PomodoroModule = {
       modal.className = 'cajs-alert-overlay';
 
       const following = State.friends.filter(f => f.isFollowed);
-      const friendsHtml = following.length > 0 
+      const friendsHtml = following.length > 0
         ? following.map(f => `
           <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:8px; cursor:pointer;">
             <input type="checkbox" class="friend-cb" value="${f.name}">
@@ -439,12 +439,12 @@ export const PomodoroModule = {
       } else {
         this.timeLeft--;
         ticks++;
-        
+
         // Dynamically increment study duration in state every 30 seconds for simulation satisfaction!
         if (ticks % 30 === 0) {
           State.addStudyTime(0.5); // Add 0.5 study minutes
         }
-        
+
         // Live update time texts and circles
         const display = this.container.querySelector('.timer-text');
         const ring = this.container.querySelector('#timer-ring');
@@ -452,7 +452,7 @@ export const PomodoroModule = {
           const minutes = Math.floor(this.timeLeft / 60);
           const seconds = this.timeLeft % 60;
           display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-          
+
           const circumference = 2 * Math.PI * 90;
           const progressPercent = (this.timeLeft / this.totalDuration) * 100;
           const strokeOffset = circumference - (progressPercent / 100) * circumference;
@@ -473,7 +473,7 @@ export const PomodoroModule = {
               ];
               const msgText = messages[Math.floor(Math.random() * messages.length)];
               this.chatMessages.push({ isMe: false, sender: randomPartner, text: msgText });
-              
+
               const cw = document.getElementById('cajs-chat-window');
               if (cw) {
                 const msgDiv = document.createElement('div');
@@ -512,26 +512,42 @@ export const PomodoroModule = {
 
   playAudioBell() {
     try {
+      // Resume context only after user interaction
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      
-      osc.type = 'sine';
-      // Synthesize elegant chime notes (C5 -> E5 -> G5 -> C6)
-      osc.frequency.setValueAtTime(523.25, ctx.currentTime); 
-      osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.15); 
-      osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.3); 
-      osc.frequency.setValueAtTime(1046.50, ctx.currentTime + 0.45); 
-      
-      gain.gain.setValueAtTime(0.4, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
-      
-      osc.start();
-      osc.stop(ctx.currentTime + 0.8);
-    } catch(err) {
-      console.warn("Web Audio API not allowed or supported yet by user gestures:", err);
+
+      if (ctx.state === 'suspended') {
+        ctx.resume().then(() => {
+          this._playChime(ctx);
+        }).catch(err => {
+          console.log("Audio context blocked:", err);
+        });
+      } else {
+        this._playChime(ctx);
+      }
+    } catch (err) {
+      console.log("Audio not supported:", err);
+    }
+  },
+
+  _playChime(ctx) {
+    try {
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, ctx.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.5);
+
+      gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1);
+
+      oscillator.start(ctx.currentTime);
+      oscillator.stop(ctx.currentTime + 1);
+    } catch (err) {
+      console.log("Chime failed:", err);
     }
   }
 };
