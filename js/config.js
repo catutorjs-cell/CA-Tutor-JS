@@ -3,7 +3,7 @@
 
 export const CONFIG = {
   // Groq AI — for Paper Generator (Free & Fast)
-  GROQ_API_KEY: "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",
+  GROQ_API_KEY: "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",
 
   // EmailJS
   EMAILJS_PUBLIC_KEY: "wwVVazJ7m9EB2dZUf",
