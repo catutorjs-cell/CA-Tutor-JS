@@ -13,6 +13,108 @@ export const GeneratorModule = {
   ocrScanningStage: null,
   ocrScanningInterval: null,
   ocrReport: null,
+  GROQ_STORAGE_KEY: 'cajs_groq_api_key',
+
+  async loadEnvApiKey() {
+    try {
+      const response = await fetch('/.env');
+      if (response.ok) {
+        const text = await response.text();
+        const match = text.match(/GROQ_API_KEY\s*=\s*(.+)/);
+        if (match && match[1]) {
+          return match[1].trim();
+        }
+      }
+    } catch (e) {
+      console.warn("Could not load Groq API key from .env file:", e);
+    }
+    return '';
+  },
+
+  async getApiKey() {
+    // 1. Try localStorage first so user overrides are respected
+    const localKey = localStorage.getItem(this.GROQ_STORAGE_KEY) || '';
+    if (localKey) return localKey;
+
+    // Check if the default key has been flagged as invalid
+    const isDefaultInvalid = localStorage.getItem('cajs_default_groq_key_invalid') === 'true';
+    if (!isDefaultInvalid) {
+      // 2. Try to load from .env
+      const envKey = await this.loadEnvApiKey();
+      if (envKey) return envKey;
+
+      // 3. Try config key
+      if (CONFIG.GROQ_API_KEY && CONFIG.GROQ_API_KEY.trim() !== '') {
+        return CONFIG.GROQ_API_KEY.trim();
+      }
+    }
+
+    return '';
+  },
+
+  setApiKey(key) {
+    localStorage.setItem(this.GROQ_STORAGE_KEY, key);
+  },
+
+  showApiKeyModal() {
+    return new Promise(async (resolve) => {
+      const existing = await this.getApiKey();
+      if (existing) { resolve(existing); return; }
+
+      const modalId = 'cajs-groq-key-modal';
+      let modal = document.getElementById(modalId);
+      if (modal) modal.remove();
+
+      modal = document.createElement('div');
+      modal.id = modalId;
+      modal.style.cssText = `
+        position:fixed; top:0; left:0; width:100%; height:100%;
+        background:rgba(0,0,0,0.45); backdrop-filter:blur(14px);
+        display:flex; align-items:center; justify-content:center;
+        z-index:10001; animation:fadeIn 0.25s ease-out;
+      `;
+      modal.innerHTML = `
+        <div class="glass-card" style="width:100%; max-width:440px; padding:28px; border-radius:24px; box-shadow:0 20px 40px rgba(0,0,0,0.15); animation:scaleUp 0.3s cubic-bezier(0.34,1.56,0.64,1); background:rgba(255,255,255,0.92); border:1px solid rgba(255,255,255,0.4);">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px; border-bottom:1px solid rgba(0,0,0,0.06); padding-bottom:12px;">
+            <div style="width:36px; height:36px; border-radius:12px; background:linear-gradient(135deg,#f59e0b,#ef4444); display:flex; align-items:center; justify-content:center; color:white; font-size:18px;">🔑</div>
+            <div>
+              <h3 style="font-size:16px; font-weight:700; margin:0; font-family:var(--font-display);">Groq API Key Required</h3>
+              <p style="font-size:11px; color:var(--text-muted); margin:2px 0 0;">One-time setup for AI-powered Paper Generator</p>
+            </div>
+          </div>
+          <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px; line-height:1.5;">
+            Get a free API key from the <a href="https://console.groq.com/keys" target="_blank" style="color:var(--pastel-purple-dark); font-weight:600;">Groq Console</a>. Your key is stored locally in your browser and never sent to any third party.
+          </p>
+          <input type="text" id="cajs-groq-key-input" placeholder="Paste your Groq API key here..." style="width:100%; padding:10px 14px; border:1.5px solid rgba(0,0,0,0.1); border-radius:12px; font-size:13px; font-family:var(--font-body); box-sizing:border-box; margin-bottom:14px; background:rgba(0,0,0,0.02);">
+          <div style="display:flex; gap:10px;">
+            <button id="cajs-groq-key-cancel" class="btn btn-secondary" style="flex:1; font-size:12px; padding:10px;">Cancel</button>
+            <button id="cajs-groq-key-save" class="btn btn-primary" style="flex:2; font-size:12px; padding:10px;">Save & Continue</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      modal.querySelector('#cajs-groq-key-cancel').addEventListener('click', () => {
+        modal.remove();
+        resolve(null);
+      });
+
+      modal.querySelector('#cajs-groq-key-save').addEventListener('click', () => {
+        const key = modal.querySelector('#cajs-groq-key-input').value.trim();
+        if (!key) {
+          modal.querySelector('#cajs-groq-key-input').style.borderColor = '#f87171';
+          return;
+        }
+        this.setApiKey(key);
+        modal.remove();
+        resolve(key);
+      });
+
+      modal.querySelector('#cajs-groq-key-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') modal.querySelector('#cajs-groq-key-save').click();
+      });
+    });
+  },
 
   render(container) {
     if (!this.selectedLevel) this.selectedLevel = State.user.examLevel;
@@ -464,6 +566,11 @@ export const GeneratorModule = {
   },
 
   async generatePaper(subject, chapter, difficulty, targetMarks, questionType, examSource, isAdaptive, studyFile, container) {
+    const apiKey = CONFIG.GROQ_API_KEY;
+    if (!apiKey) {
+      window.cajsShowAlert("Error", "API key not found in config.js", "error");
+      return;
+    }
     this.isGenerating = true;
     this.activePaper = null;
     this.gradedResult = null;
@@ -559,7 +666,7 @@ Respond ONLY with valid JSON (no markdown, no backticks, no explanation):
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${CONFIG.GROQ_API_KEY}`
+          "Authorization": `Bearer ${apiKey}`
         },
         body: JSON.stringify({
           model: "llama-3.3-70b-versatile",
@@ -570,6 +677,9 @@ Respond ONLY with valid JSON (no markdown, no backticks, no explanation):
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Invalid API Key. Check GROQ_API_KEY in config.js');
+        }
         const errData = await response.json();
         throw new Error(`API error ${response.status}: ${errData?.error?.message || 'Unknown error'}`);
       }

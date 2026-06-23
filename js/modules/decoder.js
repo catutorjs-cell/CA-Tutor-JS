@@ -650,9 +650,18 @@ ${foundQ.notes ? `* **Explanation:** ${foundQ.notes}` : ''}`;
     const DEFAULT_KEY = 'AIzaSyCIUkVYZPW_3GHj21OqZklXpqwFKYgzxqw';
 
     // 1. Get saved key or prompt user
-    let apiKey = await this.loadEnvApiKey();
+    // First, try localStorage so user overrides are respected
+    let apiKey = localStorage.getItem(GEMINI_KEY_STORAGE) || '';
+
+    // If not set, try the default/env keys if they haven't been flagged as invalid
     if (!apiKey) {
-      apiKey = DEFAULT_KEY || localStorage.getItem(GEMINI_KEY_STORAGE) || '';
+      const isDefaultInvalid = localStorage.getItem('cajs_default_gemini_key_invalid') === 'true';
+      if (!isDefaultInvalid) {
+        apiKey = await this.loadEnvApiKey();
+        if (!apiKey) {
+          apiKey = DEFAULT_KEY || '';
+        }
+      }
     }
     if (!apiKey) {
       apiKey = await new Promise((resolve) => {
@@ -726,6 +735,11 @@ ${foundQ.notes ? `* **Explanation:** ${foundQ.notes}` : ''}`;
         if (!response.ok) {
           if (response.status === 400 || response.status === 403) {
             localStorage.removeItem(GEMINI_KEY_STORAGE);
+            // If the failing key was the default or env key, flag it so we don't try it again
+            const envKey = await this.loadEnvApiKey();
+            if (apiKey === envKey || apiKey === DEFAULT_KEY) {
+              localStorage.setItem('cajs_default_gemini_key_invalid', 'true');
+            }
             return `### ❌ Invalid API Key\n\nYour API key appears to be invalid or expired. Please ask your next question to re-enter your key.\n\n*Get a free key at [Google AI Studio ↗](https://aistudio.google.com/apikey)*`;
           }
           if (response.status === 429) {

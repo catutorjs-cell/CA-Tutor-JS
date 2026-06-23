@@ -35,17 +35,23 @@ export const Evaluator = {
   },
 
   async getApiKey() {
-    // 1. Try to load from .env
-    const envKey = await this.loadEnvApiKey();
-    if (envKey) return envKey;
+    // 1. Try localStorage first so user overrides are respected
+    const localKey = localStorage.getItem(GEMINI_STORAGE_KEY) || '';
+    if (localKey) return localKey;
 
-    // 2. Try hardcoded default
-    if (DEFAULT_GEMINI_API_KEY && DEFAULT_GEMINI_API_KEY.trim() !== '') {
-      return DEFAULT_GEMINI_API_KEY.trim();
+    // 2. Try to load from .env if the default keys have not been flagged as invalid
+    const isDefaultInvalid = localStorage.getItem('cajs_default_gemini_key_invalid') === 'true';
+    if (!isDefaultInvalid) {
+      const envKey = await this.loadEnvApiKey();
+      if (envKey) return envKey;
+
+      // 3. Try hardcoded default
+      if (DEFAULT_GEMINI_API_KEY && DEFAULT_GEMINI_API_KEY.trim() !== '') {
+        return DEFAULT_GEMINI_API_KEY.trim();
+      }
     }
 
-    // 3. Try localStorage
-    return localStorage.getItem(GEMINI_STORAGE_KEY) || '';
+    return '';
   },
 
   setApiKey(key) {
@@ -436,6 +442,11 @@ ${saText ? `## Suggested Answer Content (for reference):\n${saText}\n` : ''}
           if (response.status === 400 || response.status === 403) {
             // Invalid API key — clear it so user is prompted again
             localStorage.removeItem(GEMINI_STORAGE_KEY);
+            // If the failing key was the default or env key, flag it so we don't try it again
+            const envKey = await this.loadEnvApiKey();
+            if (apiKey === envKey || apiKey === DEFAULT_GEMINI_API_KEY) {
+              localStorage.setItem('cajs_default_gemini_key_invalid', 'true');
+            }
             throw new Error('Invalid or expired API key. Please try again with a valid Gemini API key.');
           }
           console.warn(`Gemini API error for model ${model}:`, errBody);
