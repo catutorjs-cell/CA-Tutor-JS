@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ca-tutor-js-v7';
+const CACHE_NAME = 'ca-tutor-js-v6';
 
 const ASSETS_TO_CACHE = [
   './',
@@ -7,24 +7,7 @@ const ASSETS_TO_CACHE = [
   './styles/main.css',
   './styles/auth.css',
   './styles/modules.css',
-  './js/app.js',
-  './js/auth.js',
-  './js/dashboard.js',
-  './js/seedData.js',
-  './js/state.js',
-  './js/config.js',
-  './js/modules/analytics.js',
-  './js/modules/decoder.js',
-  './js/modules/evaluator.js',
-  './js/modules/generator.js',
-  './js/modules/mistakes.js',
-  './js/modules/owner_console.js',
-  './js/modules/pomodoro.js',
-  './js/modules/profile.js',
-  './js/modules/pyq_mtp.js',
-  './js/modules/revision.js',
-  './js/modules/social.js',
-  './js/modules/syllabus.js',
+  './assets/logo.png',
 ];
 
 self.addEventListener('install', event => {
@@ -44,17 +27,17 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // ✅ Only handle GET requests
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
 
-  // ✅ Skip non-http requests
   if (!url.protocol.startsWith('http')) return;
 
-  // ✅ CRITICAL: Only intercept requests from our own origin
-  // All external API calls (Groq, Gemini, Telegram, EmailJS etc.) pass through freely
+  // ✅ Never intercept external API calls
   if (url.origin !== self.location.origin) return;
+
+  // ✅ Never cache JS files — always fetch fresh from network
+  if (url.pathname.endsWith('.js')) return;
 
   event.respondWith(
     caches.match(event.request, { ignoreSearch: true })
