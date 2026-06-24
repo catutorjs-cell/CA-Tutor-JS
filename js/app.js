@@ -15,6 +15,8 @@ import { GeneratorModule } from './modules/generator.js';
 import { AnalyticsModule } from './modules/analytics.js';
 import { ProfileModule } from './modules/profile.js';
 import { OwnerConsoleModule } from './modules/owner_console.js';
+import { McqPracticeModule } from './modules/mcq_practice.js';
+import { StudyLogModule } from './modules/study_log.js';
 
 // --- CUSTOM IN-PAGE ALERT POPUP ---
 window.cajsShowAlert = (title, message, type = 'info', onOk = null) => {
@@ -480,6 +482,12 @@ const Router = {
       case 'owner-console':
         OwnerConsoleModule.render(this.viewport);
         break;
+      case 'mcq-practice':
+        McqPracticeModule.render(this.viewport);
+        break;
+      case 'study-log':
+        StudyLogModule.render(this.viewport);
+        break;
       default:
         Dashboard.render(this.viewport);
     }
@@ -674,8 +682,51 @@ window.cajsUpdateLandingStudentCounter = updateLandingStudentCounter;
 const bootstrap = () => {
   window.cajsModuleLoaded = true;
   State.init();
+
+  // --- Theme Toggle Logic ---
+  const getTheme = () => SafeStorage.getItem('cajs_theme') || 'light';
+  const applyTheme = (theme) => {
+    document.documentElement.setAttribute('data-theme', theme);
+    const btns = [
+      document.getElementById('landing-theme-toggle-btn'),
+      document.getElementById('theme-toggle-btn'),
+      document.getElementById('mobile-theme-toggle-btn')
+    ];
+    btns.forEach(btn => {
+      if (btn) {
+        btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+      }
+    });
+  };
+
+  const toggleTheme = () => {
+    const nextTheme = getTheme() === 'dark' ? 'light' : 'dark';
+    SafeStorage.setItem('cajs_theme', nextTheme);
+    applyTheme(nextTheme);
+  };
+
+  // Initial apply
+  applyTheme(getTheme());
+
   Router.init();
   updateLandingStudentCounter();
+
+  // Bind clicks after init
+  const themeBtns = [
+    'landing-theme-toggle-btn',
+    'theme-toggle-btn',
+    'mobile-theme-toggle-btn'
+  ];
+  themeBtns.forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleTheme();
+      });
+    }
+  });
   
   Auth.init((loggedInUser) => {
     // On login success:

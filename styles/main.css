@@ -41,6 +41,197 @@
   --transition-bounce: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+[data-theme="dark"] {
+  /* Rich Dark Ambient Colors */
+  --bg-primary: hsl(222, 25%, 10%); 
+  --bg-gradient: linear-gradient(135deg, hsl(222, 25%, 10%) 0%, hsl(270, 30%, 8%) 50%, hsl(210, 30%, 9%) 100%);
+  
+  --pastel-blue: hsl(212, 35%, 20%);
+  --pastel-blue-dark: hsl(212, 95%, 70%);
+  --pastel-purple: hsl(268, 30%, 22%);
+  --pastel-purple-dark: hsl(268, 90%, 75%);
+  --pastel-green: hsl(140, 30%, 18%);
+  --pastel-green-dark: hsl(140, 85%, 65%);
+  --pastel-peach: hsl(24, 35%, 20%);
+  --pastel-peach-dark: hsl(24, 90%, 70%);
+  --pastel-rose: hsl(350, 30%, 22%);
+  --pastel-rose-dark: hsl(350, 90%, 70%);
+  --pastel-gold: hsl(42, 30%, 18%);
+  --pastel-gold-dark: hsl(42, 90%, 68%);
+
+  /* Text & Border Colors */
+  --text-main: hsl(210, 20%, 90%);
+  --text-muted: hsl(210, 10%, 65%);
+  --border-light: rgba(255, 255, 255, 0.08);
+  --border-dark: rgba(255, 255, 255, 0.12);
+
+  /* Glassmorphism Presets for Dark Mode */
+  --glass-bg: rgba(15, 22, 36, 0.65);
+  --glass-bg-hover: rgba(22, 30, 48, 0.85);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* Dark Mode Component Overrides */
+[data-theme="dark"] .form-input,
+[data-theme="dark"] .form-select,
+[data-theme="dark"] textarea {
+  background: rgba(15, 22, 36, 0.6);
+  color: var(--text-main);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .form-input:focus,
+[data-theme="dark"] .form-select:focus,
+[data-theme="dark"] textarea:focus {
+  background: rgba(22, 30, 48, 0.95);
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.35);
+  border-color: var(--pastel-purple-dark);
+}
+
+[data-theme="dark"] .sidebar-toggle-btn {
+  background: hsl(222, 25%, 12%);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+}
+[data-theme="dark"] .sidebar-toggle-btn:hover {
+  background: var(--pastel-purple);
+  color: var(--pastel-purple-dark);
+}
+
+/* Override modules.css white backgrounds */
+[data-theme="dark"] .calendar-cell {
+  background: rgba(15, 22, 36, 0.4) !important;
+}
+[data-theme="dark"] .calendar-cell.today {
+  background: linear-gradient(135deg, var(--pastel-purple), var(--pastel-blue)) !important;
+}
+[data-theme="dark"] .mistake-item,
+[data-theme="dark"] .syllabus-card,
+[data-theme="dark"] .paper-sheet,
+[data-theme="dark"] .about-image-showcase,
+[data-theme="dark"] .mock-id-card-preview,
+[data-theme="dark"] .student-card {
+  background: var(--glass-bg) !important;
+  border: var(--glass-border) !important;
+  color: var(--text-main) !important;
+}
+[data-theme="dark"] .student-card {
+  background: var(--glass-bg);
+}
+[data-theme="dark"] .cajs-alert-card,
+[data-theme="dark"] .glass-card {
+  background: var(--glass-bg);
+}
+[data-theme="dark"] .cajs-alert-card:hover,
+[data-theme="dark"] .glass-card:hover {
+  background: var(--glass-bg-hover);
+}
+
+/* auth.css overrides */
+[data-theme="dark"] .auth-card {
+  background: rgba(15, 22, 36, 0.85);
+  border: var(--glass-border);
+}
+
+/* custom answers modal and doc viewer modal */
+[data-theme="dark"] #cajs-custom-alert .cajs-alert-card,
+[data-theme="dark"] #cajs-custom-confirm .cajs-alert-card,
+[data-theme="dark"] #cajs-custom-prompt .cajs-alert-card,
+[data-theme="dark"] #cajs-feedback-modal .glass-card,
+[data-theme="dark"] #cajs-answers-modal .glass-card,
+[data-theme="dark"] #cajs-groq-key-modal .glass-card {
+  background: rgba(22, 30, 48, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+[data-theme="dark"] #cajs-custom-alert .cajs-alert-card div,
+[data-theme="dark"] #cajs-custom-confirm .cajs-alert-card div,
+[data-theme="dark"] #cajs-custom-prompt .cajs-alert-card div,
+[data-theme="dark"] #cajs-feedback-modal .glass-card div,
+[data-theme="dark"] #cajs-answers-modal .glass-card div {
+  background: transparent !important;
+}
+
+[data-theme="dark"] iframe,
+[data-theme="dark"] #cajs-prompt-input,
+[data-theme="dark"] #cajs-groq-key-input {
+  background: rgba(10, 15, 25, 0.8) !important;
+  color: var(--text-main) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] hr,
+[data-theme="dark"] .dropdown-divider {
+  border-top-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .dropdown-avatar {
+  border-color: var(--pastel-purple-dark) !important;
+}
+
+[data-theme="dark"] .profile-dropdown-card {
+  background: rgba(22, 30, 48, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Suggestion Box Dark Mode Contrast Override */
+[data-theme="dark"] .suggestion-box {
+  background: linear-gradient(135deg, hsl(268, 30%, 15%), hsl(212, 35%, 12%)) !important;
+  border-left-color: var(--pastel-purple-dark) !important;
+}
+
+/* Doubt Decoder AI Chat overrides */
+[data-theme="dark"] .chat-bubble.ai {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: var(--text-main) !important;
+}
+[data-theme="dark"] .chat-bubble.user {
+  background: linear-gradient(135deg, var(--pastel-purple-dark), var(--pastel-blue-dark)) !important;
+  color: #ffffff !important;
+}
+[data-theme="dark"] .chat-header, 
+[data-theme="dark"] .chat-input-bar {
+  background: rgba(15, 22, 36, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+[data-theme="dark"] .chat-input {
+  background: rgba(10, 15, 25, 0.8) !important;
+  color: var(--text-main) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+[data-theme="dark"] .typing-indicator {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+[data-theme="dark"] .typing-dot {
+  background: var(--text-muted) !important;
+}
+
+/* Study Drawer Overrides */
+[data-theme="dark"] .study-drawer {
+  background: hsl(222, 25%, 10%) !important;
+  border-left-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Pomodoro Modes & Room Tiles Overrides */
+[data-theme="dark"] .pomo-modes {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+[data-theme="dark"] .pomo-mode-btn.active {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: var(--text-main) !important;
+}
+[data-theme="dark"] .room-tile {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+[data-theme="dark"] .room-tile:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
 /* Base resets */
 * {
   margin: 0;
@@ -141,6 +332,10 @@ h1, h2, h3, h4, h5, h6 {
   flex-direction: column;
   gap: 8px;
   flex-grow: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  padding-right: 4px;
 }
 
 .nav-item a {
@@ -838,6 +1033,9 @@ input:checked + .slider:before {
     z-index: 1001 !important;
     transform: scale(0.85);
     transform-origin: top right;
+  }
+  #theme-toggle-btn {
+    display: none !important;
   }
 }
 

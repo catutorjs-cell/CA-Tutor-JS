@@ -410,9 +410,9 @@ export const GeneratorModule = {
                 <span style="font-size:12px;font-weight:700;color:var(--pastel-purple-dark);">Adaptive Weakness Focus</span>
                 <span style="font-size:9px;color:var(--text-muted);display:block;">Focus on chapters with mistakes</span>
               </div>
-              <label style="position:relative;display:inline-block;width:44px;height:24px;">
-                <input type="checkbox" id="gen-adaptive" style="opacity:0;width:0;height:0;">
-                <span style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#ccc;transition:.4s;border-radius:34px;"></span>
+              <label class="switch">
+                <input type="checkbox" id="gen-adaptive">
+                <span class="slider"></span>
               </label>
             </div>
             <button type="submit" class="btn btn-primary" style="width:100%;">🤖 Generate AI Question Paper</button>

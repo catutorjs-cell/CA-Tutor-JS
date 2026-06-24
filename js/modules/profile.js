@@ -654,8 +654,8 @@ export const ProfileModule = {
 
     // Phone / Email change listeners to prompt OTP section
     const checkContactDetailsChange = () => {
-      const phoneChanged = inputPhone.value.trim() !== user.phone;
-      const emailChanged = inputEmail.value.trim() !== user.email;
+      const phoneChanged = String(inputPhone.value).trim() !== String(user.phone).trim();
+      const emailChanged = String(inputEmail.value).trim().toLowerCase() !== String(user.email).trim().toLowerCase();
 
       if (phoneChanged || emailChanged) {
         otpSection.style.display = 'block';
@@ -902,7 +902,8 @@ export const ProfileModule = {
       }
 
       // 2. If phone or email changed, verify OTP is completed
-      const contactChanged = phoneVal !== user.phone || emailVal !== user.email;
+      const contactChanged = String(phoneVal).trim() !== String(user.phone).trim() || 
+                             String(emailVal).trim().toLowerCase() !== String(user.email).trim().toLowerCase();
       if (contactChanged && !this.isOtpVerified) {
         window.cajsShowAlert("Verification Missing", "You have updated phone or email coordinates. Please complete the OTP security verification.", "error");
         return;
@@ -921,7 +922,7 @@ export const ProfileModule = {
       }
 
       // 4. Check email unique (if email changes, it must not exist for another user)
-      if (emailVal !== user.email && State.users[emailVal]) {
+      if (String(emailVal).trim().toLowerCase() !== String(user.email).trim().toLowerCase() && State.users[emailVal]) {
         window.cajsShowAlert("Email In Use", "The new email ID is already registered to another account.", "error");
         return;
       }

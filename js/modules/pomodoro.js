@@ -189,10 +189,10 @@ export const PomodoroModule = {
     }
 
     const headerHtml = this.isRunning ? '' : `
-        <header class="app-header" style="background: rgba(255,255,255,0.6); backdrop-filter: blur(12px); border-radius: 16px; padding: 20px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+        <header class="app-header">
           <div class="header-title-container">
-            <h1 class="header-branding" style="font-size: 24px;">Pomodoro Study Hall</h1>
-            <span class="header-subtitle" style="font-weight: 500; color: #444;">Boost academic focus and earn study points under research-backed timers</span>
+            <h1 class="header-branding">Pomodoro Study Hall</h1>
+            <span class="header-subtitle">Boost academic focus and earn study points under research-backed timers</span>
           </div>
         </header>
     `;

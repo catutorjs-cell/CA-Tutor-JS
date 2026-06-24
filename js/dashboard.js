@@ -40,14 +40,16 @@ export const Dashboard = {
 
     container.innerHTML = `
       <!-- Header -->
-      <header class="app-header" style="display:flex; justify-content:space-between; align-items:center; width:100%; gap: 15px; flex-wrap: wrap;">
+      <header class="app-header">
         <div class="header-title-container">
-          <h1 class="header-branding">CA TUTOR JS</h1>
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px; flex-wrap: wrap;">
+            <h1 class="header-branding" style="margin: 0; line-height: 1.2;">CA TUTOR JS</h1>
+            <button class="btn btn-secondary" style="font-size:11px; padding:4px 10px; border-radius:8px; display:inline-flex; align-items:center; gap:4px; cursor:pointer; height:fit-content;" onclick="window.cajsStartOnboardingTour(true)">
+              📖 Platform Tour
+            </button>
+          </div>
           <span class="header-subtitle">Welcome back, <strong>${user.fullName}</strong>! Let's crush your studies today.</span>
         </div>
-        <button class="btn btn-secondary" style="font-size:11px; padding:6px 12px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="window.cajsStartOnboardingTour(true)">
-          📖 Platform Tour
-        </button>
       </header>
 
       <!-- Smart Suggestions Alert Box -->

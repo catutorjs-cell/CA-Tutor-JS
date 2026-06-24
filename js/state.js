@@ -57,6 +57,7 @@ export const State = {
   evaluations: [],
   papers: [],
   customPapers: [],
+  studyLogs: [],
   studyStats: {
     points: 100,
     streak: 0,
@@ -182,6 +183,9 @@ export const State = {
 
       const rawCustomPapers = localStorage.getItem('cajs_custom_papers_' + email);
       this.customPapers = (rawCustomPapers && JSON.parse(rawCustomPapers)) || [];
+
+      const rawLogs = localStorage.getItem('cajs_study_logs_' + email);
+      this.studyLogs = (rawLogs && JSON.parse(rawLogs)) || [];
     } catch (e) {
       console.error("Failed to load user data for:", email, e);
     }
@@ -206,6 +210,7 @@ export const State = {
     localStorage.setItem(STORAGE_KEYS.STUDY_STATS + userPrefix, JSON.stringify(this.studyStats));
     localStorage.setItem(STORAGE_KEYS.CALENDAR_DB + userPrefix, JSON.stringify(this.calendar));
     localStorage.setItem('cajs_custom_papers_' + email, JSON.stringify(this.customPapers));
+    localStorage.setItem('cajs_study_logs_' + email, JSON.stringify(this.studyLogs));
   },
 
   registerUser(fullName, email, phone, examLevel, password) {
@@ -330,6 +335,7 @@ export const State = {
     this.mistakes = [];
     this.papers = [];
     this.customPapers = [];
+    this.studyLogs = [];
     this.studyStats = { points: 0, streak: 0, totalMinutes: 0, dailyMinutes: {} };
     this.calendar = null;
     localStorage.removeItem(STORAGE_KEYS.USER_SESSION);
@@ -599,6 +605,37 @@ export const State = {
 
     const finalReadiness = (readPercent * 0.3) + (revsPercent * 0.3) + (testAvg * 0.2) + (studyPercent * 0.2);
     return Math.round(finalReadiness);
+  },
+
+  addStudyLog(date, subject, chapter, duration, category, notes) {
+    const newLog = {
+      id: "log_" + Date.now(),
+      date,
+      subject,
+      chapter,
+      duration: parseInt(duration),
+      category,
+      notes,
+      loggedAt: new Date().toISOString()
+    };
+    this.studyLogs.push(newLog);
+    this.addStudyTime(parseInt(duration));
+  },
+
+  deleteStudyLog(logId) {
+    const idx = this.studyLogs.findIndex(l => l.id === logId);
+    if (idx !== -1) {
+      const log = this.studyLogs[idx];
+      this.studyStats.totalMinutes = Math.max(0, this.studyStats.totalMinutes - log.duration);
+      const today = log.date;
+      if (this.studyStats.dailyMinutes[today]) {
+        this.studyStats.dailyMinutes[today] = Math.max(0, this.studyStats.dailyMinutes[today] - log.duration);
+      }
+      this.addPoints(-(log.duration * 2));
+      this.studyLogs.splice(idx, 1);
+      this.saveUserData();
+      this.notifyStateChange();
+    }
   },
 
   listeners: [],

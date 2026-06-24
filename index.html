@@ -91,6 +91,7 @@
       <nav class="landing-nav">
         <a href="#features" class="landing-nav-link">Features</a>
         <a href="#about" class="landing-nav-link">About</a>
+        <button id="landing-theme-toggle-btn" class="landing-theme-toggle" title="Toggle Theme" style="background:none; border:none; font-size:18px; cursor:pointer; padding: 0 10px; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; transition:var(--transition-smooth); margin-right:8px;">🌙</button>
         <button id="btn-landing-login" class="btn-login-pill">Login</button>
       </nav>
     </header>
@@ -555,7 +556,7 @@
         <span class="brand-title" style="font-family: var(--font-display); font-weight: 700; font-size: 16px;">CA TUTOR
           JS</span>
       </div>
-      <div style="width: 24px;"></div>
+      <button id="mobile-theme-toggle-btn" style="background: none; border: none; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;">🌙</button>
     </header>
 
     <!-- Floating Navigation Sidebar -->
@@ -633,6 +634,18 @@
             <span>Study Analytics</span>
           </a>
         </li>
+        <li class="nav-item" data-tab="mcq-practice">
+          <a href="#">
+            <span class="nav-icon-emoji">🎯</span>
+            <span>MCQ Practice</span>
+          </a>
+        </li>
+        <li class="nav-item" data-tab="study-log">
+          <a href="#">
+            <span class="nav-icon-emoji">📝</span>
+            <span>Study Log</span>
+          </a>
+        </li>
       </ul>
 
       <!-- User Information Widget inside Sidebar -->
@@ -669,6 +682,10 @@
       <!-- Dynamic modules will inject their views here -->
     </main>
 
+    <!-- Desktop Floating Theme Toggle -->
+    <button id="theme-toggle-btn" class="theme-toggle-floating" title="Toggle Theme" style="position: absolute; top: 38px; right: 230px; width: 44px; height: 44px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: var(--glass-border); display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; box-shadow: var(--glass-shadow); transition: var(--transition-smooth); z-index: 999;">
+      🌙
+    </button>
     <!-- Global Floating Top-Right Profile Widget -->
     <div class="floating-profile-widget" id="cajs-floating-profile">
       <div class="floating-profile-trigger" id="cajs-profile-trigger"

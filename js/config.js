@@ -11,7 +11,7 @@ export const CONFIG = {
   EMAILJS_TEMPLATE_ID: "template_yuw2suo",
 
   // Telegram Owner Notifications
-  TELEGRAM_TOKEN: "8967061142:AAFcdXYoco3XrTM1NMgF3vqmdYSUJQOeb3I",
+  TELEGRAM_TOKEN: "8967061142:AAHeL7utvWdrXRGwh1Y83ey-4My7vEbRbHA",
   TELEGRAM_CHAT_ID: "1192186015",
 
   // Google Sheets Sync
