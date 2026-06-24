@@ -1,8 +1,5 @@
 // CA JS Authentication Controller
-import { State, SafeStorage } from './state.js';
-import { CONFIG } from './config.js';
-
-const localStorage = SafeStorage;
+import { State } from './state.js';
 
 export const Auth = {
   activeTab: 'login',
@@ -19,7 +16,7 @@ export const Auth = {
     // Initialize EmailJS
     if (typeof emailjs !== 'undefined') {
       emailjs.init({
-        publicKey: CONFIG.EMAILJS_PUBLIC_KEY,
+        publicKey: "wwVVazJ7m9EB2dZUf",
       });
     }
   },
@@ -27,25 +24,21 @@ export const Auth = {
   resetState() {
     this.generatedOtp = null;
     this.isEmailVerified = false;
-    const regOtp = document.getElementById('reg-otp');
-    if (regOtp) {
-      regOtp.disabled = true;
-      regOtp.value = '';
-    }
+    document.getElementById('reg-otp').disabled = true;
+    document.getElementById('reg-otp').value = '';
     const sendOtpBtn = document.getElementById('btn-send-otp');
-    if (sendOtpBtn) {
-      sendOtpBtn.textContent = 'Send OTP';
-      sendOtpBtn.disabled = false;
-      sendOtpBtn.className = 'btn btn-secondary';
-    }
+    sendOtpBtn.textContent = 'Send OTP';
+    sendOtpBtn.disabled = false;
+    sendOtpBtn.className = 'btn btn-secondary';
     clearInterval(this.otpInterval);
   },
 
   bindEvents() {
-    // Toggle Password Visibility (Event Delegation)
+    // Toggle Password Visibility (Event Delegation for complete safety)
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('.password-toggle-btn');
       if (!btn) return;
+
       if (btn.hasAttribute('onclick')) return;
 
       e.preventDefault();
@@ -56,6 +49,7 @@ export const Auth = {
 
       const input = wrapper.querySelector('input');
       const prefixEmoji = wrapper.querySelector('.password-prefix-emoji');
+
       if (!input) return;
 
       if (input.type === 'password') {
@@ -76,29 +70,25 @@ export const Auth = {
     const authHeaderText = document.getElementById('auth-header-text');
 
     // Tab Switches
-    if (tabLogin) {
-      tabLogin.addEventListener('click', () => {
-        this.activeTab = 'login';
-        tabLogin.classList.add('active');
-        if (tabRegister) tabRegister.classList.remove('active');
-        if (loginForm) loginForm.style.display = 'flex';
-        if (registerForm) registerForm.style.display = 'none';
-        if (authHeaderText) authHeaderText.textContent = 'Login to access your study portal';
-        this.resetState();
-      });
-    }
+    tabLogin.addEventListener('click', () => {
+      this.activeTab = 'login';
+      tabLogin.classList.add('active');
+      tabRegister.classList.remove('active');
+      loginForm.style.display = 'flex';
+      registerForm.style.display = 'none';
+      authHeaderText.textContent = 'Login to access your study portal';
+      this.resetState();
+    });
 
-    if (tabRegister) {
-      tabRegister.addEventListener('click', () => {
-        this.activeTab = 'register';
-        tabRegister.classList.add('active');
-        if (tabLogin) tabLogin.classList.remove('active');
-        if (registerForm) registerForm.style.display = 'flex';
-        if (loginForm) loginForm.style.display = 'none';
-        if (authHeaderText) authHeaderText.textContent = 'Create your premium CA-JS student profile';
-        this.resetState();
-      });
-    }
+    tabRegister.addEventListener('click', () => {
+      this.activeTab = 'register';
+      tabRegister.classList.add('active');
+      tabLogin.classList.remove('active');
+      registerForm.style.display = 'flex';
+      loginForm.style.display = 'none';
+      authHeaderText.textContent = 'Create your premium CA-JS student profile';
+      this.resetState();
+    });
 
     // Password requirements validation (Register)
     const regPassword = document.getElementById('reg-password');
@@ -107,189 +97,155 @@ export const Auth = {
     const reqNum = document.getElementById('req-num');
     const passMatchLabel = document.getElementById('pass-match-label');
 
-    if (regPassword) {
-      regPassword.addEventListener('input', () => {
-        const val = regPassword.value;
-        if (reqLen) {
-          if (val.length >= 8) reqLen.classList.add('valid');
-          else reqLen.classList.remove('valid');
-        }
-        if (reqNum) {
-          if (/\d/.test(val)) reqNum.classList.add('valid');
-          else reqNum.classList.remove('valid');
-        }
-        this.checkPasswordMatch(regPassword, regConfirm, passMatchLabel);
-      });
-    }
+    regPassword.addEventListener('input', () => {
+      const val = regPassword.value;
+      if (val.length >= 8) {
+        reqLen.classList.add('valid');
+      } else {
+        reqLen.classList.remove('valid');
+      }
+      if (/\d/.test(val)) {
+        reqNum.classList.add('valid');
+      } else {
+        reqNum.classList.remove('valid');
+      }
+      this.checkPasswordMatch(regPassword, regConfirm, passMatchLabel);
+    });
 
-    if (regConfirm) {
-      regConfirm.addEventListener('input', () => {
-        this.checkPasswordMatch(regPassword, regConfirm, passMatchLabel);
-      });
-    }
+    regConfirm.addEventListener('input', () => {
+      this.checkPasswordMatch(regPassword, regConfirm, passMatchLabel);
+    });
 
     // Send OTP handler
     const btnSendOtp = document.getElementById('btn-send-otp');
     const regEmail = document.getElementById('reg-email');
 
-    if (btnSendOtp) {
-      btnSendOtp.addEventListener('click', () => {
-        if (regEmail) {
-          const emailVal = regEmail.value.trim();
-          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
-            alert("Please enter a valid email address.");
-            return;
-          }
-          this.sendOtp(emailVal);
-        }
-      });
-    }
+    btnSendOtp.addEventListener('click', () => {
+      const emailVal = regEmail.value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+        alert("Please enter a valid email address.");
+        return;
+      }
+      this.sendOtp(emailVal);
+    });
 
-    // Verify OTP input handler (Registration)
+    // Verify OTP input handler
     const regOtp = document.getElementById('reg-otp');
-    if (regOtp) {
-      regOtp.addEventListener('input', () => {
-        const otpVal = regOtp.value.trim();
-        if (otpVal.length === 6) {
-          if (otpVal === this.generatedOtp || otpVal === '123456') {
-            this.isEmailVerified = true;
-            regOtp.style.borderColor = 'var(--pastel-green-dark)';
-            regOtp.style.boxShadow = '0 0 0 3px var(--pastel-green)';
-            regOtp.disabled = true;
+    regOtp.addEventListener('input', () => {
+      const otpVal = regOtp.value.trim();
+      if (otpVal.length === 6) {
+        if (otpVal === this.generatedOtp) {  // ✅ Bypass removed
+          this.isEmailVerified = true;
+          regOtp.style.borderColor = 'var(--pastel-green-dark)';
+          regOtp.style.boxShadow = '0 0 0 3px var(--pastel-green)';
+          regOtp.disabled = true;
 
-            const sendOtpBtn = document.getElementById('btn-send-otp');
-            if (sendOtpBtn) {
-              sendOtpBtn.textContent = 'Verified ✓';
-              sendOtpBtn.disabled = true;
-              sendOtpBtn.className = 'btn btn-success';
-            }
-            clearInterval(this.otpInterval);
-          } else {
-            regOtp.style.borderColor = 'var(--pastel-rose-dark)';
-            regOtp.style.boxShadow = '0 0 0 3px var(--pastel-rose)';
-          }
+          const sendOtpBtn = document.getElementById('btn-send-otp');
+          sendOtpBtn.textContent = 'Verified!';
+          sendOtpBtn.disabled = true;
+          sendOtpBtn.className = 'btn btn-success';
+          clearInterval(this.otpInterval);
         } else {
-          regOtp.style.borderColor = '';
-          regOtp.style.boxShadow = '';
+          regOtp.style.borderColor = 'var(--pastel-rose-dark)';
+          regOtp.style.boxShadow = '0 0 0 3px var(--pastel-rose)';
         }
-      });
-    }
+      } else {
+        regOtp.style.borderColor = '';
+        regOtp.style.boxShadow = '';
+      }
+    });
 
-    // ✅ FIXED: Login Form Submit — now async to support cross-device login
-    if (loginForm) {
-      loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const emailEl = document.getElementById('login-email');
-        const passwordEl = document.getElementById('login-password');
-        if (!emailEl || !passwordEl) return;
-        const email = emailEl.value.trim();
-        const pass = passwordEl.value;
+    // Login Form Submit
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const pass = document.getElementById('login-password').value;
 
-        // Show loading state on button
-        const submitBtn = document.getElementById('btn-login-submit');
-        let originalText = 'Login';
-        if (submitBtn) {
-          originalText = submitBtn.textContent;
-          submitBtn.textContent = 'Logging in...';
-          submitBtn.disabled = true;
-        }
+      try {
+        const user = State.loginUser(email, pass);
+        const landing = document.getElementById('landing-page');
+        if (landing) landing.style.display = 'none';
 
-        try {
-          const user = await State.loginUser(email, pass);
+        const authPanel = document.getElementById('auth-panel');
+        if (authPanel) authPanel.classList.remove('open');
 
-          const landing = document.getElementById('landing-page');
-          if (landing) landing.style.display = 'none';
-
-          const authPanel = document.getElementById('auth-panel');
-          if (authPanel) authPanel.classList.remove('open');
-
-          const appShell = document.getElementById('app-shell');
-          if (appShell) appShell.style.display = 'flex';
-          this.onLoginSuccess(user);
-        } catch (err) {
-          alert(err.message);
-          if (submitBtn) {
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
-          }
-        }
-      });
-    }
+        document.getElementById('app-shell').style.display = 'flex';
+        this.onLoginSuccess(user);
+      } catch (err) {
+        alert(err.message);
+      }
+    });
 
     // Register Form Submit
-    if (registerForm) {
-      registerForm.addEventListener('submit', (e) => {
-        e.preventDefault();
+    registerForm.addEventListener('submit', (e) => {
+      e.preventDefault();
 
-        const nameEl = document.getElementById('reg-name');
-        const emailEl = document.getElementById('reg-email');
-        const phoneEl = document.getElementById('reg-phone');
-        const levelEl = document.getElementById('reg-level');
-        if (!nameEl || !emailEl || !phoneEl || !levelEl || !regPassword) return;
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const phone = document.getElementById('reg-phone').value.trim();
+      const level = document.getElementById('reg-level').value;
+      const pass = regPassword.value;
+      const confirmPass = regConfirm.value;
 
-        const name = nameEl.value.trim();
-        const email = emailEl.value.trim();
-        const phone = phoneEl.value.trim();
-        const level = levelEl.value;
-        const pass = regPassword.value;
-        const confirmPass = regConfirm ? regConfirm.value : '';
+      if (!this.isEmailVerified) {
+        alert("Please complete the Email OTP verification first.");
+        return;
+      }
 
-        if (!this.isEmailVerified) {
-          alert("Please complete the Email OTP verification first.");
-          return;
+      if (pass.length < 8 || !/\d/.test(pass)) {
+        alert("Password does not meet the complexity requirements.");
+        return;
+      }
+
+      if (pass !== confirmPass) {
+        alert("Passwords do not match.");
+        return;
+      }
+
+      try {
+        const newUser = State.registerUser(name, email, phone, level, pass);
+
+        // ✅ Admin Notifications on New Registration
+        Auth.notifyAdmin({ name, email, phone, level });
+
+        // ✅ Google Sheets Sync - Auto save new registration
+        const syncUrl = localStorage.getItem('cajs_database_sync_url');
+        if (syncUrl) {
+          fetch(syncUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'register',
+              user: {
+                fullName: name,
+                email: email,
+                phone: phone,
+                examLevel: level,
+                password: pass,
+                userId: newUser?.userId || 'CA-STUDENT',
+                registeredAt: new Date().toISOString()
+              }
+            })
+          }).then(() => {
+            console.log('✅ Registration synced to Google Sheets!');
+          }).catch(err => {
+            console.warn('⚠️ Google Sheets sync failed:', err);
+          });
         }
 
-        if (pass.length < 8 || !/\d/.test(pass)) {
-          alert("Password does not meet the complexity requirements.");
-          return;
+        alert("Registration Successful! Please login with your credentials.");
+
+        if (typeof window.cajsUpdateLandingStudentCounter === 'function') {
+          window.cajsUpdateLandingStudentCounter();
         }
 
-        if (pass !== confirmPass) {
-          alert("Passwords do not match.");
-          return;
-        }
-
-        try {
-          const newUser = State.registerUser(name, email, phone, level, pass);
-
-          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-          // Telegram Notification — only for mobile devices
-          if (isMobile) {
-            const telegramMessage = `🎉 New Student Registered!\n\n👤 Name: ${name}\n📧 Email: ${email}\n📞 Phone: ${phone}\n🎓 Level: ${level}\n🕐 Time: ${new Date().toLocaleString('en-IN')}`;
-            fetch(`https://api.telegram.org/bot${CONFIG.TELEGRAM_TOKEN}/sendMessage`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                chat_id: CONFIG.TELEGRAM_CHAT_ID,
-                text: telegramMessage,
-                parse_mode: 'HTML'
-              })
-            }).then(() => {
-              console.log('Telegram notification sent.');
-            }).catch(err => {
-              console.warn('Telegram notification failed:', err);
-            });
-          } else {
-            console.log('Laptop/desktop device detected. Skipping registration Telegram notification.');
-          }
-
-          alert("Registration Successful! Please login with your credentials.");
-
-          if (typeof window.cajsUpdateLandingStudentCounter === 'function') {
-            window.cajsUpdateLandingStudentCounter();
-          }
-
-          const loginEmailEl = document.getElementById('login-email');
-          const loginPasswordEl = document.getElementById('login-password');
-          if (loginEmailEl) loginEmailEl.value = email;
-          if (loginPasswordEl) loginPasswordEl.value = '';
-          if (tabLogin) tabLogin.click();
-        } catch (err) {
-          alert(err.message);
-        }
-      });
-    }
+        document.getElementById('login-email').value = email;
+        document.getElementById('login-password').value = '';
+        tabLogin.click();
+      } catch (err) {
+        alert(err.message);
+      }
+    });
 
     // --- Forgot Password Flow ---
     const linkForgotPassword = document.getElementById('link-forgot-password');
@@ -312,23 +268,17 @@ export const Auth = {
       isForgotOtpVerified = false;
       forgotOtpCountdown = 0;
       clearInterval(forgotOtpInterval);
-      if (btnForgotSendOtp) {
-        btnForgotSendOtp.textContent = 'Send OTP';
-        btnForgotSendOtp.disabled = false;
-        btnForgotSendOtp.className = 'btn btn-secondary';
-      }
-      if (inputForgotOtp) {
-        inputForgotOtp.value = '';
-        inputForgotOtp.disabled = true;
-        inputForgotOtp.style.borderColor = '';
-        inputForgotOtp.style.boxShadow = '';
-      }
-      if (inputForgotNewPass) {
-        inputForgotNewPass.value = '';
-        inputForgotNewPass.disabled = true;
-      }
-      if (forgotPassReqs) forgotPassReqs.style.display = 'none';
-      if (btnForgotSubmit) btnForgotSubmit.disabled = true;
+      btnForgotSendOtp.textContent = 'Send OTP';
+      btnForgotSendOtp.disabled = false;
+      btnForgotSendOtp.className = 'btn btn-secondary';
+      inputForgotOtp.value = '';
+      inputForgotOtp.disabled = true;
+      inputForgotOtp.style.borderColor = '';
+      inputForgotOtp.style.boxShadow = '';
+      inputForgotNewPass.value = '';
+      inputForgotNewPass.disabled = true;
+      forgotPassReqs.style.display = 'none';
+      btnForgotSubmit.disabled = true;
     };
 
     if (linkForgotPassword) {
@@ -336,69 +286,44 @@ export const Auth = {
         e.preventDefault();
         this.activeTab = 'forgot';
 
-        if (loginForm) loginForm.style.display = 'none';
-        if (registerForm) registerForm.style.display = 'none';
-        const authTabs = document.querySelector('.auth-tabs');
-        if (authTabs) authTabs.style.display = 'none';
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'none';
+        document.querySelector('.auth-tabs').style.display = 'none';
 
-        if (forgotForm) forgotForm.style.display = 'flex';
-        if (authHeaderText) authHeaderText.textContent = 'Reset your student profile password';
+        forgotForm.style.display = 'flex';
+        authHeaderText.textContent = 'Reset your student profile password';
 
         resetForgotFormState();
 
-        const loginEmailEl = document.getElementById('login-email');
-        const loginEmail = loginEmailEl ? loginEmailEl.value.trim() : '';
-        if (forgotEmailInput) forgotEmailInput.value = loginEmail || '';
+        const loginEmail = document.getElementById('login-email').value.trim();
+        if (loginEmail) {
+          forgotEmailInput.value = loginEmail;
+        } else {
+          forgotEmailInput.value = '';
+        }
       });
     }
 
     if (linkBackToLogin) {
       linkBackToLogin.addEventListener('click', (e) => {
         e.preventDefault();
-        const authTabs = document.querySelector('.auth-tabs');
-        if (authTabs) authTabs.style.display = 'flex';
-        if (forgotForm) forgotForm.style.display = 'none';
-        if (tabLogin) tabLogin.click();
+        document.querySelector('.auth-tabs').style.display = 'flex';
+        forgotForm.style.display = 'none';
+        tabLogin.click();
       });
     }
 
     if (btnForgotSendOtp) {
-      // ✅ FIXED: Forgot password OTP also checks Google Sheet for cross-device users
-      btnForgotSendOtp.addEventListener('click', async () => {
-        if (!forgotEmailInput) return;
+      btnForgotSendOtp.addEventListener('click', () => {
         const emailVal = forgotEmailInput.value.trim();
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
           alert("Please enter a valid email address.");
           return;
         }
 
-        // Check locally first
-        let userExists = !!State.users[emailVal];
-
-        // If not local, check Google Sheet
-        if (!userExists) {
-          btnForgotSendOtp.textContent = 'Checking...';
-          btnForgotSendOtp.disabled = true;
-          const sheetUsers = await State.fetchUsersFromSheet();
-          userExists = sheetUsers.some(u => u.email === emailVal);
-          btnForgotSendOtp.textContent = 'Send OTP';
-          btnForgotSendOtp.disabled = false;
-        }
-
-        if (!userExists) {
+        if (!State.users[emailVal]) {
           alert("This email is not registered with us.");
           return;
-        }
-
-        // If user found in sheet but not locally, add them locally (without password)
-        // so that after reset they can login on this device
-        if (!State.users[emailVal]) {
-          const sheetUsers = await State.fetchUsersFromSheet();
-          const sheetUser = sheetUsers.find(u => u.email === emailVal);
-          if (sheetUser) {
-            State.users[emailVal] = { ...sheetUser, password: null };
-            localStorage.setItem('cajs_users_db', JSON.stringify(State.users));
-          }
         }
 
         const otp = this.generateOTP().toString();
@@ -408,43 +333,56 @@ export const Auth = {
         const expiry = new Date(now.getTime() + 15 * 60 * 1000);
         const formattedExpiryTime = expiry.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+        const container = document.getElementById('sms-container');
+        container.innerHTML = `
+          <div class="sms-simulation-toast" style="min-width: 320px; background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border: var(--glass-border); border-radius: 18px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); display: flex; gap: 12px; align-items: start; animation: slideInRight 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);">
+            <div class="sms-avatar" style="width: 38px; height: 38px; border-radius: 50%; background: var(--pastel-purple); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--pastel-purple-dark); font-size:14px; flex-shrink:0;">✉️</div>
+            <div class="sms-content" style="display:flex; flex-direction:column; gap:4px; font-size:12px; text-align: left;">
+              <span class="sms-header" style="font-weight:700; color:var(--text-main);">🛡️ Password Reset OTP</span>
+              <span class="sms-body" style="color:var(--text-muted); line-height:1.4;">
+                Verification code sent to email 📧 <strong>${emailVal.charAt(0)}***@${emailVal.split('@')[1]}</strong>.
+              </span>
+            </div>
+          </div>
+        `;
+
         if (typeof emailjs !== 'undefined') {
-          emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
+          emailjs.send('service_snsqw0k', 'template_yuw2suo', {
             passcode: otp, time: formattedExpiryTime, otp: otp,
             otp_code: otp, otpCode: otp, code: otp,
             to_email: emailVal, user_email: emailVal, email: emailVal,
             to_name: emailVal.split('@')[0], name: emailVal.split('@')[0],
-            message: `Your CA TUTOR JS password reset verification code is ${otp}. Valid until ${formattedExpiryTime}.`
-          }).then(() => {
-            console.log('Reset OTP email dispatched.');
+            message: `Your CA TUTOR JS password reset verification code is ${otp}.`
+          }).then(r => {
+            console.log('Reset OTP Email Sent!', r.status, r.text);
           }).catch(err => {
-            console.error('EmailJS OTP send failed:', err);
-            alert('Failed to send OTP. For testing, please use the master verification code: 123456');
+            console.error('EmailJS OTP Send Failed:', err);
+            alert(`Failed to send OTP. Please try again.`);
           });
         } else {
-          alert('OTP service unavailable. For testing, please use the master verification code: 123456');
+          alert(`OTP service unavailable. Please try again later.`);
         }
 
-        if (inputForgotOtp) {
-          inputForgotOtp.disabled = false;
-          inputForgotOtp.placeholder = "Enter 6-digit OTP from email";
-          inputForgotOtp.focus();
-        }
+        setTimeout(() => {
+          const toast = container.querySelector('.sms-simulation-toast');
+          if (toast) toast.remove();
+        }, 8000);
+
+        inputForgotOtp.disabled = false;
+        inputForgotOtp.placeholder = "Enter 6-digit OTP";
+        inputForgotOtp.focus();
 
         btnForgotSendOtp.disabled = true;
         forgotOtpCountdown = 60;
         clearInterval(forgotOtpInterval);
         forgotOtpInterval = setInterval(() => {
           forgotOtpCountdown--;
-          const btnForgotSendOtpUpdate = document.getElementById('btn-forgot-send-otp');
-          if (btnForgotSendOtpUpdate) {
-            if (forgotOtpCountdown <= 0) {
-              btnForgotSendOtpUpdate.textContent = 'Resend OTP';
-              btnForgotSendOtpUpdate.disabled = false;
-              clearInterval(forgotOtpInterval);
-            } else {
-              btnForgotSendOtpUpdate.textContent = `Resend in ${forgotOtpCountdown}s`;
-            }
+          if (forgotOtpCountdown <= 0) {
+            btnForgotSendOtp.textContent = 'Resend OTP';
+            btnForgotSendOtp.disabled = false;
+            clearInterval(forgotOtpInterval);
+          } else {
+            btnForgotSendOtp.textContent = `Resend in ${forgotOtpCountdown}s`;
           }
         }, 1000);
       });
@@ -454,25 +392,20 @@ export const Auth = {
       inputForgotOtp.addEventListener('input', () => {
         const otpVal = inputForgotOtp.value.trim();
         if (otpVal.length === 6) {
-          if (otpVal === forgotGeneratedOtp || otpVal === '123456') {
+          if (otpVal === forgotGeneratedOtp) {  // ✅ Bypass removed
             isForgotOtpVerified = true;
             inputForgotOtp.style.borderColor = 'var(--pastel-green-dark)';
             inputForgotOtp.style.boxShadow = '0 0 0 3px var(--pastel-green)';
             inputForgotOtp.disabled = true;
 
-            const btnForgotSendOtpUpdate = document.getElementById('btn-forgot-send-otp');
-            if (btnForgotSendOtpUpdate) {
-              btnForgotSendOtpUpdate.textContent = 'Verified ✓';
-              btnForgotSendOtpUpdate.disabled = true;
-              btnForgotSendOtpUpdate.className = 'btn btn-success';
-            }
+            btnForgotSendOtp.textContent = 'Verified!';
+            btnForgotSendOtp.disabled = true;
+            btnForgotSendOtp.className = 'btn btn-success';
             clearInterval(forgotOtpInterval);
 
-            if (inputForgotNewPass) {
-              inputForgotNewPass.disabled = false;
-              if (forgotPassReqs) forgotPassReqs.style.display = 'grid';
-              inputForgotNewPass.focus();
-            }
+            inputForgotNewPass.disabled = false;
+            forgotPassReqs.style.display = 'grid';
+            inputForgotNewPass.focus();
           } else {
             inputForgotOtp.style.borderColor = 'var(--pastel-rose-dark)';
             inputForgotOtp.style.boxShadow = '0 0 0 3px var(--pastel-rose)';
@@ -490,20 +423,19 @@ export const Auth = {
 
       inputForgotNewPass.addEventListener('input', () => {
         const val = inputForgotNewPass.value;
-        const lenValid = val.length >= 8;
-        const numValid = /\d/.test(val);
+        let lenValid = val.length >= 8;
+        let numValid = /\d/.test(val);
 
-        if (forgotReqLen) {
-          if (lenValid) forgotReqLen.classList.add('valid');
-          else forgotReqLen.classList.remove('valid');
-        }
-        if (forgotReqNum) {
-          if (numValid) forgotReqNum.classList.add('valid');
-          else forgotReqNum.classList.remove('valid');
-        }
+        if (lenValid) forgotReqLen.classList.add('valid');
+        else forgotReqLen.classList.remove('valid');
 
-        if (btnForgotSubmit) {
-          btnForgotSubmit.disabled = !(lenValid && numValid && isForgotOtpVerified);
+        if (numValid) forgotReqNum.classList.add('valid');
+        else forgotReqNum.classList.remove('valid');
+
+        if (lenValid && numValid && isForgotOtpVerified) {
+          btnForgotSubmit.disabled = false;
+        } else {
+          btnForgotSubmit.disabled = true;
         }
       });
     }
@@ -511,8 +443,8 @@ export const Auth = {
     if (forgotForm) {
       forgotForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const email = forgotEmailInput ? forgotEmailInput.value.trim() : '';
-        const newPass = inputForgotNewPass ? inputForgotNewPass.value : '';
+        const email = forgotEmailInput.value.trim();
+        const newPass = inputForgotNewPass.value;
 
         if (!isForgotOtpVerified) {
           alert("Please complete the OTP verification first.");
@@ -528,18 +460,13 @@ export const Auth = {
           State.resetPassword(email, newPass);
           alert("Password Reset Successful! Please login with your new credentials.");
 
-          const authTabs = document.querySelector('.auth-tabs');
-          if (authTabs) authTabs.style.display = 'flex';
+          document.querySelector('.auth-tabs').style.display = 'flex';
           forgotForm.style.display = 'none';
-          if (tabLogin) tabLogin.click();
+          tabLogin.click();
 
-          const loginEmailEl = document.getElementById('login-email');
-          const loginPasswordEl = document.getElementById('login-password');
-          if (loginEmailEl) loginEmailEl.value = email;
-          if (loginPasswordEl) {
-            loginPasswordEl.value = '';
-            loginPasswordEl.focus();
-          }
+          document.getElementById('login-email').value = email;
+          document.getElementById('login-password').value = '';
+          document.getElementById('login-password').focus();
         } catch (err) {
           alert(err.message);
         }
@@ -547,31 +474,25 @@ export const Auth = {
     }
 
     // Logout
-    const btnLogout = document.getElementById('btn-logout');
-    if (btnLogout) {
-      btnLogout.addEventListener('click', () => {
-        State.logoutUser();
-        const appShell = document.getElementById('app-shell');
-        if (appShell) appShell.style.display = 'none';
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      State.logoutUser();
+      document.getElementById('app-shell').style.display = 'none';
 
-        const landing = document.getElementById('landing-page');
-        if (landing) landing.style.display = 'flex';
+      const landing = document.getElementById('landing-page');
+      if (landing) landing.style.display = 'flex';
 
-        const authPanel = document.getElementById('auth-panel');
-        if (authPanel) authPanel.classList.remove('open');
+      const authPanel = document.getElementById('auth-panel');
+      if (authPanel) authPanel.classList.remove('open');
 
-        this.resetState();
+      this.resetState();
 
-        if (typeof window.cajsUpdateLandingStudentCounter === 'function') {
-          window.cajsUpdateLandingStudentCounter();
-        }
+      if (typeof window.cajsUpdateLandingStudentCounter === 'function') {
+        window.cajsUpdateLandingStudentCounter();
+      }
 
-        const loginEmailEl = document.getElementById('login-email');
-        const loginPasswordEl = document.getElementById('login-password');
-        if (loginEmailEl) loginEmailEl.value = '';
-        if (loginPasswordEl) loginPasswordEl.value = '';
-      });
-    }
+      document.getElementById('login-email').value = '';
+      document.getElementById('login-password').value = '';
+    });
   },
 
   checkPasswordMatch(pass, confirm, label) {
@@ -581,7 +502,7 @@ export const Auth = {
     }
     label.style.display = 'block';
     if (pass.value === confirm.value) {
-      label.textContent = 'Passwords match ✓';
+      label.textContent = 'Passwords match!';
       label.style.color = 'var(--pastel-green-dark)';
       confirm.style.borderColor = 'var(--pastel-green-dark)';
     } else {
@@ -591,10 +512,123 @@ export const Auth = {
     }
   },
 
+  // ============================
+  // 🔔 Admin Notification System
+  // ============================
+
+  // Call this from browser console anytime: Auth.sendUserListToTelegram()
+  sendUserListToTelegram() {
+    const telegramToken = localStorage.getItem('cajs_telegram_bot_token');
+    const telegramChat  = localStorage.getItem('cajs_telegram_chat_id');
+
+    if (!telegramToken || !telegramChat) {
+      console.warn('⚠️ Telegram not configured.');
+      return;
+    }
+
+    const users = State.users || {};
+    const entries = Object.values(users);
+
+    if (entries.length === 0) {
+      fetch(`https://api.telegram.org/bot${telegramToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: telegramChat, text: '📋 No registered students yet.' })
+      });
+      return;
+    }
+
+    // Split into chunks of 20 users per message (Telegram 4096 char limit)
+    const chunkSize = 20;
+    for (let i = 0; i < entries.length; i += chunkSize) {
+      const chunk = entries.slice(i, i + chunkSize);
+      const lines = chunk.map((u, idx) => {
+        const num = i + idx + 1;
+        return `${num}. 👤 ${u.fullName || u.name || 'N/A'}\n   📧 ${u.email}\n   📱 ${u.phone || 'N/A'}\n   📚 ${u.examLevel || 'N/A'}\n   🕐 ${u.registeredAt ? new Date(u.registeredAt).toLocaleString() : 'N/A'}`;
+      }).join('\n\n');
+
+      const header = i === 0 ? `📋 *Registered Students (${entries.length} total)*\n${'─'.repeat(30)}\n\n` : `📋 *...continued (${i + 1}–${Math.min(i + chunkSize, entries.length)})*\n\n`;
+
+      fetch(`https://api.telegram.org/bot${telegramToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: telegramChat,
+          text: header + lines,
+          parse_mode: 'Markdown'
+        })
+      }).then(() => console.log(`✅ Sent chunk ${i / chunkSize + 1} to Telegram`))
+        .catch(err => console.warn('⚠️ Telegram send failed:', err));
+    }
+  },
+
+  notifyAdmin({ name, email, phone, level }) {
+    const adminEmail    = localStorage.getItem('cajs_admin_email');
+    const telegramToken = localStorage.getItem('cajs_telegram_bot_token');
+    const telegramChat  = localStorage.getItem('cajs_telegram_chat_id');
+    const registeredAt  = new Date().toLocaleString();
+    const msg = `🎓 New Student Registered!\n\n👤 Name: ${name}\n📧 Email: ${email}\n📱 Phone: ${phone}\n📚 Level: ${level}\n🕐 Time: ${registeredAt}`;
+
+    // 1️⃣ Email Notification via EmailJS
+    if (typeof emailjs !== 'undefined' && adminEmail) {
+      emailjs.send('service_snsqw0k', 'template_yuw2suo', {
+        to_email:  adminEmail,
+        to_name:   'Admin',
+        name:      'Admin',
+        email:     adminEmail,
+        user_email: adminEmail,
+        message:   msg,
+        passcode:  '—',
+        time:      registeredAt,
+        otp:       '—', otp_code: '—', otpCode: '—', code: '—'
+      }).then(() => {
+        console.log('✅ Admin email notification sent!');
+      }).catch(err => {
+        console.warn('⚠️ Admin email notification failed:', err);
+      });
+    } else {
+      console.warn('⚠️ Admin email not configured. Set cajs_admin_email in localStorage.');
+    }
+
+    // 2️⃣ Telegram Notification
+    if (telegramToken && telegramChat) {
+      fetch(`https://api.telegram.org/bot${telegramToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: telegramChat,
+          text: msg
+        })
+      }).then(() => {
+        console.log('✅ Telegram notification sent!');
+      }).catch(err => {
+        console.warn('⚠️ Telegram notification failed:', err);
+      });
+    } else {
+      console.warn('⚠️ Telegram not configured. Set cajs_telegram_bot_token & cajs_telegram_chat_id in localStorage.');
+    }
+
+    // 3️⃣ Browser Push Notification
+    if ('Notification' in window) {
+      const sendPush = () => {
+        new Notification('🎓 New Student Registered!', {
+          body: `${name} (${email}) just signed up for ${level}.`,
+          icon: '/favicon.ico'
+        });
+      };
+
+      if (Notification.permission === 'granted') {
+        sendPush();
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') sendPush();
+        });
+      }
+    }
+  },
+
   generateOTP() {
-    const array = new Uint32Array(1);
-    crypto.getRandomValues(array);
-    return 100000 + (array[0] % 900000);
+    return Math.floor(100000 + Math.random() * 900000);
   },
 
   sendOtp(email) {
@@ -605,48 +639,59 @@ export const Auth = {
     const expiry = new Date(now.getTime() + 15 * 60 * 1000);
     const formattedExpiryTime = expiry.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+    const container = document.getElementById('sms-container');
+    container.innerHTML = `
+      <div class="sms-simulation-toast" style="min-width: 320px; background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border: var(--glass-border); border-radius: 18px; padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); display: flex; gap: 12px; align-items: start; animation: slideInRight 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);">
+        <div class="sms-avatar" style="width: 38px; height: 38px; border-radius: 50%; background: var(--pastel-purple); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--pastel-purple-dark); font-size:14px; flex-shrink:0;">✉️</div>
+        <div class="sms-content" style="display:flex; flex-direction:column; gap:4px; font-size:12px; text-align: left;">
+          <span class="sms-header" style="font-weight:700; color:var(--text-main);">🛡️ OTP Verification Sent</span>
+          <span class="sms-body" style="color:var(--text-muted); line-height:1.4;">
+            Verification code sent to email 📧 <strong>${email.charAt(0)}***@${email.split('@')[1]}</strong>.
+          </span>
+        </div>
+      </div>
+    `;
+
     if (typeof emailjs !== 'undefined') {
-      emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
+      emailjs.send('service_snsqw0k', 'template_yuw2suo', {
         passcode: otp, time: formattedExpiryTime, otp: otp,
         otp_code: otp, otpCode: otp, code: otp,
         to_email: email, user_email: email, email: email,
         to_name: email.split('@')[0], name: email.split('@')[0],
-        message: `Your CA TUTOR JS verification code is ${otp}. Valid until ${formattedExpiryTime}.`
-      }).then(() => {
-        console.log('OTP email dispatched.');
+        message: `Your CA TUTOR JS verification code is ${otp}.`
+      }).then(r => {
+        console.log('OTP Email Sent!', r.status, r.text);
       }).catch(err => {
-        console.error('EmailJS OTP send failed:', err);
-        alert('Failed to send OTP email. For testing, please use the master verification code: 123456');
+        console.error('EmailJS OTP Send Failed:', err);
+        alert(`Failed to send OTP email. Please try again.`);
       });
     } else {
-      alert('OTP service unavailable. For testing, please use the master verification code: 123456');
+      alert(`OTP service unavailable. Please try again later.`);
     }
+
+    setTimeout(() => {
+      const toast = container.querySelector('.sms-simulation-toast');
+      if (toast) toast.remove();
+    }, 8000);
 
     const regOtp = document.getElementById('reg-otp');
-    if (regOtp) {
-      regOtp.disabled = false;
-      regOtp.placeholder = "Enter 6-digit OTP from email or use 123456";
-      regOtp.focus();
-    }
+    regOtp.disabled = false;
+    regOtp.placeholder = "Enter 6-digit OTP";
+    regOtp.focus();
 
     const btnSendOtp = document.getElementById('btn-send-otp');
-    if (btnSendOtp) {
-      btnSendOtp.disabled = true;
-    }
+    btnSendOtp.disabled = true;
     this.otpCountdown = 60;
 
     clearInterval(this.otpInterval);
     this.otpInterval = setInterval(() => {
       this.otpCountdown--;
-      const btnSendOtpUpdate = document.getElementById('btn-send-otp');
-      if (btnSendOtpUpdate) {
-        if (this.otpCountdown <= 0) {
-          btnSendOtpUpdate.textContent = 'Resend OTP';
-          btnSendOtpUpdate.disabled = false;
-          clearInterval(this.otpInterval);
-        } else {
-          btnSendOtpUpdate.textContent = `Resend in ${this.otpCountdown}s`;
-        }
+      if (this.otpCountdown <= 0) {
+        btnSendOtp.textContent = 'Resend OTP';
+        btnSendOtp.disabled = false;
+        clearInterval(this.otpInterval);
+      } else {
+        btnSendOtp.textContent = `Resend in ${this.otpCountdown}s`;
       }
     }, 1000);
   }
