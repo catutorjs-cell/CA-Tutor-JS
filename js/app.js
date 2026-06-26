@@ -514,7 +514,7 @@ const Router = {
     if (floatName) floatName.textContent = user.fullName;
 
     const floatId = document.getElementById('floating-user-id');
-    if (floatId) floatId.textContent = `${user.userId || 'CA-STUDENT'} ▾`;
+    if (floatId) floatId.textContent = '';
     
     const floatAvatar = document.getElementById('floating-user-avatar');
     if (floatAvatar) {

@@ -338,9 +338,7 @@ export const ProfileModule = {
                   <span class="badge" style="background: rgba(179,212,240,0.4); color: var(--pastel-blue-dark); font-size: 11px; font-weight: bold;">
                     CA ${user.examLevel} Candidate
                   </span>
-                  <div style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">
-                    ID: <strong>${user.userId}</strong>
-                  </div>
+
 
                   <hr style="border: 0; border-top: 1px solid rgba(0,0,0,0.05); margin: 20px 0;">
 
@@ -387,10 +385,7 @@ export const ProfileModule = {
                     </div>
 
                     <div class="id-card-details">
-                      <div class="id-card-row">
-                        <span class="id-card-lbl">STUDENT ID</span>
-                        <span class="id-card-val bold-val">${user.userId}</span>
-                      </div>
+
                       <div class="id-card-row">
                         <span class="id-card-lbl">FULL NAME</span>
                         <span class="id-card-val" style="font-weight: 700;">${user.fullName}</span>
@@ -409,7 +404,6 @@ export const ProfileModule = {
                   <!-- Barcode Section -->
                   <div class="id-card-barcode-container">
                     <div class="id-card-barcode-lines"></div>
-                    <span class="id-card-barcode-text">${user.userId}</span>
                   </div>
                 </div>
 

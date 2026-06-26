@@ -328,10 +328,6 @@
               <span class="stat-num">24/7</span>
               <span class="stat-label">AI Tutor Support</span>
             </div>
-            <div class="stat-item">
-              <span class="stat-num" id="landing-students-count">2</span>
-              <span class="stat-label">Registered Students</span>
-            </div>
           </div>
         </div>
         <div class="about-image-showcase">
@@ -682,12 +678,11 @@
           style="width: 44px; height: 44px; border-radius: 50%; background: var(--pastel-purple); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; color: var(--pastel-purple-dark); font-size: 16px; overflow: hidden; border: 1.5px solid white;">
           U
         </div>
-        <div style="display: flex; flex-direction: column;">
+        <div style="display: flex; align-items: center; gap: 6px;">
           <span id="floating-user-name"
             style="font-family: var(--font-display); font-weight: 600; font-size: 14px; color: var(--text-main); white-space: nowrap;">User</span>
-          <span id="floating-user-id"
-            style="font-size: 11px; color: var(--pastel-purple-dark); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">CA-STUDENT
-            ▾</span>
+          <span style="font-size: 11px; color: var(--pastel-purple-dark); font-weight: 700;">▾</span>
+          <span id="floating-user-id" style="display: none;"></span>
         </div>
       </div>
 
@@ -697,7 +692,7 @@
           <div id="dropdown-user-avatar" class="dropdown-avatar">U</div>
           <div class="dropdown-user-info">
             <h4 id="dropdown-user-name">User Name</h4>
-            <span class="dropdown-user-id-badge" id="dropdown-user-id">CA-12345</span>
+            <span class="dropdown-user-id-badge" id="dropdown-user-id" style="display: none;">CA-12345</span>
           </div>
         </div>
         <hr class="dropdown-divider">
