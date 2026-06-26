@@ -1,6 +1,6 @@
 // CA JS Single-Page Application Router & Bootstrap
 import { State, SafeStorage } from './state.js';
-import { Auth } from './auth.js';
+import { Auth } from './auth.js?v=11';
 window.Auth = Auth;  // ← ADD THIS LINE
 const localStorage = SafeStorage;
 import { Dashboard } from './dashboard.js';
@@ -14,7 +14,7 @@ import { SocialModule } from './modules/social.js';
 import { GeneratorModule } from './modules/generator.js';
 import { AnalyticsModule } from './modules/analytics.js';
 import { ProfileModule } from './modules/profile.js';
-import { OwnerConsoleModule } from './modules/owner_console.js';
+import { OwnerConsoleModule } from './modules/owner_console.js?v=11';
 import { McqPracticeModule } from './modules/mcq_practice.js';
 import { StudyLogModule } from './modules/study_log.js';
 

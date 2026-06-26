@@ -519,11 +519,7 @@ export const Auth = {
   // Call this from browser console anytime: Auth.sendUserListToTelegram()
   sendUserListToTelegram() {
     const telegramToken = localStorage.getItem('cajs_telegram_bot_token');
-<<<<<<< HEAD
     const telegramChat = localStorage.getItem('cajs_telegram_chat_id');
-=======
-    const telegramChat  = localStorage.getItem('cajs_telegram_chat_id');
->>>>>>> 885843b5aed07ff91f990b1fd08c1cdedd45aab4
 
     if (!telegramToken || !telegramChat) {
       console.warn('⚠️ Telegram not configured.');
@@ -567,23 +563,15 @@ export const Auth = {
   },
 
   notifyAdmin({ name, email, phone, level }) {
-<<<<<<< HEAD
     const adminEmail = localStorage.getItem('cajs_admin_email');
     const telegramToken = localStorage.getItem('cajs_telegram_bot_token');
     const telegramChat = localStorage.getItem('cajs_telegram_chat_id');
     const registeredAt = new Date().toLocaleString();
-=======
-    const adminEmail    = localStorage.getItem('cajs_admin_email');
-    const telegramToken = localStorage.getItem('cajs_telegram_bot_token');
-    const telegramChat  = localStorage.getItem('cajs_telegram_chat_id');
-    const registeredAt  = new Date().toLocaleString();
->>>>>>> 885843b5aed07ff91f990b1fd08c1cdedd45aab4
     const msg = `🎓 New Student Registered!\n\n👤 Name: ${name}\n📧 Email: ${email}\n📱 Phone: ${phone}\n📚 Level: ${level}\n🕐 Time: ${registeredAt}`;
 
     // 1️⃣ Email Notification via EmailJS
     if (typeof emailjs !== 'undefined' && adminEmail) {
       emailjs.send('service_snsqw0k', 'template_yuw2suo', {
-<<<<<<< HEAD
         to_email: adminEmail,
         to_name: 'Admin',
         name: 'Admin',
@@ -593,17 +581,6 @@ export const Auth = {
         passcode: '—',
         time: registeredAt,
         otp: '—', otp_code: '—', otpCode: '—', code: '—'
-=======
-        to_email:  adminEmail,
-        to_name:   'Admin',
-        name:      'Admin',
-        email:     adminEmail,
-        user_email: adminEmail,
-        message:   msg,
-        passcode:  '—',
-        time:      registeredAt,
-        otp:       '—', otp_code: '—', otpCode: '—', code: '—'
->>>>>>> 885843b5aed07ff91f990b1fd08c1cdedd45aab4
       }).then(() => {
         console.log('✅ Admin email notification sent!');
       }).catch(err => {
