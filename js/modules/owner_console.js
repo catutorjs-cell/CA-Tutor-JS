@@ -241,15 +241,23 @@ export const OwnerConsoleModule = {
           <div style="display:flex;align-items:center;gap:6px;">
             <span style="font-size:12px;font-weight:700;color:var(--text-muted);">Grade:</span>
             <select class="form-select" id="admin-filter-level" style="padding:8px 12px;font-size:12.5px;border-radius:10px;">
+<<<<<<< HEAD
               <option value="all" ${this.levelFilter === 'all' ? 'selected' : ''}>All Levels</option>
               <option value="final" ${this.levelFilter === 'final' ? 'selected' : ''}>CA Final</option>
               <option value="intermediate" ${this.levelFilter === 'intermediate' ? 'selected' : ''}>CA Intermediate</option>
               <option value="foundation" ${this.levelFilter === 'foundation' ? 'selected' : ''}>CA Foundation</option>
+=======
+              <option value="all" ${this.levelFilter==='all'?'selected':''}>All Levels</option>
+              <option value="final" ${this.levelFilter==='final'?'selected':''}>CA Final</option>
+              <option value="intermediate" ${this.levelFilter==='intermediate'?'selected':''}>CA Intermediate</option>
+              <option value="foundation" ${this.levelFilter==='foundation'?'selected':''}>CA Foundation</option>
+>>>>>>> 885843b5aed07ff91f990b1fd08c1cdedd45aab4
             </select>
           </div>
           <div style="display:flex;align-items:center;gap:6px;">
             <span style="font-size:12px;font-weight:700;color:var(--text-muted);">Registered:</span>
             <select class="form-select" id="admin-filter-date" style="padding:8px 12px;font-size:12.5px;border-radius:10px;">
+<<<<<<< HEAD
               <option value="all" ${this.datePreset === 'all' ? 'selected' : ''}>All Time</option>
               <option value="today" ${this.datePreset === 'today' ? 'selected' : ''}>Today</option>
               <option value="yesterday" ${this.datePreset === 'yesterday' ? 'selected' : ''}>Yesterday</option>
@@ -259,6 +267,17 @@ export const OwnerConsoleModule = {
             </select>
           </div>
           <div id="admin-custom-date-container" style="display:${this.datePreset === 'custom' ? 'flex' : 'none'};align-items:center;gap:8px;">
+=======
+              <option value="all" ${this.datePreset==='all'?'selected':''}>All Time</option>
+              <option value="today" ${this.datePreset==='today'?'selected':''}>Today</option>
+              <option value="yesterday" ${this.datePreset==='yesterday'?'selected':''}>Yesterday</option>
+              <option value="7days" ${this.datePreset==='7days'?'selected':''}>Last 7 Days</option>
+              <option value="30days" ${this.datePreset==='30days'?'selected':''}>Last 30 Days</option>
+              <option value="custom" ${this.datePreset==='custom'?'selected':''}>Custom Range...</option>
+            </select>
+          </div>
+          <div id="admin-custom-date-container" style="display:${this.datePreset==='custom'?'flex':'none'};align-items:center;gap:8px;">
+>>>>>>> 885843b5aed07ff91f990b1fd08c1cdedd45aab4
             <input class="form-input" type="date" id="admin-start-date" value="${this.startDateFilter}" style="padding:6px 10px;font-size:12px;border-radius:10px;width:130px;height:35px;">
             <span style="font-size:11px;color:var(--text-muted);">to</span>
             <input class="form-input" type="date" id="admin-end-date" value="${this.endDateFilter}" style="padding:6px 10px;font-size:12px;border-radius:10px;width:130px;height:35px;">
@@ -266,10 +285,17 @@ export const OwnerConsoleModule = {
           <div style="display:flex;align-items:center;gap:6px;">
             <span style="font-size:12px;font-weight:700;color:var(--text-muted);">Sort:</span>
             <select class="form-select" id="admin-sort-by" style="padding:8px 12px;font-size:12.5px;border-radius:10px;">
+<<<<<<< HEAD
               <option value="date-desc" ${this.sortBy === 'date-desc' ? 'selected' : ''}>Newest First</option>
               <option value="date-asc" ${this.sortBy === 'date-asc' ? 'selected' : ''}>Oldest First</option>
               <option value="name-asc" ${this.sortBy === 'name-asc' ? 'selected' : ''}>Name A-Z</option>
               <option value="points-desc" ${this.sortBy === 'points-desc' ? 'selected' : ''}>Points High-Low</option>
+=======
+              <option value="date-desc" ${this.sortBy==='date-desc'?'selected':''}>Newest First</option>
+              <option value="date-asc" ${this.sortBy==='date-asc'?'selected':''}>Oldest First</option>
+              <option value="name-asc" ${this.sortBy==='name-asc'?'selected':''}>Name A-Z</option>
+              <option value="points-desc" ${this.sortBy==='points-desc'?'selected':''}>Points High-Low</option>
+>>>>>>> 885843b5aed07ff91f990b1fd08c1cdedd45aab4
             </select>
           </div>
         </div>
@@ -296,6 +322,7 @@ export const OwnerConsoleModule = {
                   No users match your filters.
                 </td></tr>
               ` : filteredList.map(u => {
+<<<<<<< HEAD
       const isOwner = u.role === 'owner';
       const regDate = new Date(u.registeredAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
       const levelColor = u.examLevel === 'Final' ? 'var(--pastel-rose-dark)' : u.examLevel === 'Intermediate' ? 'var(--pastel-purple-dark)' : 'var(--pastel-blue-dark)';
@@ -306,6 +333,18 @@ export const OwnerConsoleModule = {
                     <td style="padding:16px 20px;">
                       <div style="display:flex;align-items:center;gap:12px;">
                         <div style="width:36px;height:36px;border-radius:50%;background:${isOwner ? 'var(--pastel-purple)' : 'var(--pastel-blue)'};color:${isOwner ? 'var(--pastel-purple-dark)' : 'var(--pastel-blue-dark)'};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;">${u.fullName.charAt(0).toUpperCase()}</div>
+=======
+                const isOwner = u.role === 'owner';
+                const regDate = new Date(u.registeredAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+                const levelColor = u.examLevel==='Final'?'var(--pastel-rose-dark)':u.examLevel==='Intermediate'?'var(--pastel-purple-dark)':'var(--pastel-blue-dark)';
+                const levelBg = u.examLevel==='Final'?'var(--pastel-rose)':u.examLevel==='Intermediate'?'var(--pastel-purple)':'var(--pastel-blue)';
+                const pwText = this.revealedPasswords[u.email] ? u.password : '••••••';
+                return `
+                  <tr style="border-bottom:1px solid rgba(0,0,0,0.04);vertical-align:middle;" class="admin-table-row">
+                    <td style="padding:16px 20px;">
+                      <div style="display:flex;align-items:center;gap:12px;">
+                        <div style="width:36px;height:36px;border-radius:50%;background:${isOwner?'var(--pastel-purple)':'var(--pastel-blue)'};color:${isOwner?'var(--pastel-purple-dark)':'var(--pastel-blue-dark)'};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;">${u.fullName.charAt(0).toUpperCase()}</div>
+>>>>>>> 885843b5aed07ff91f990b1fd08c1cdedd45aab4
                         <div>
                           <strong style="color:var(--text-main);font-size:13.5px;">${u.fullName}</strong>
                           <div style="display:flex;align-items:center;gap:6px;margin-top:3px;">
@@ -324,7 +363,11 @@ export const OwnerConsoleModule = {
                     <td style="padding:16px 20px;">
                       <div style="display:inline-flex;align-items:center;gap:8px;font-family:monospace;font-size:13px;background:rgba(0,0,0,0.03);padding:4px 8px;border-radius:6px;">
                         <span>${pwText}</span>
+<<<<<<< HEAD
                         <button style="border:none;background:transparent;font-size:12px;cursor:pointer;" onclick="window.cajsToggleAdminPassword('${u.email}')">${this.revealedPasswords[u.email] ? '👁️' : '👁️‍🗨️'}</button>
+=======
+                        <button style="border:none;background:transparent;font-size:12px;cursor:pointer;" onclick="window.cajsToggleAdminPassword('${u.email}')">${this.revealedPasswords[u.email]?'👁️':'👁️‍🗨️'}</button>
+>>>>>>> 885843b5aed07ff91f990b1fd08c1cdedd45aab4
                       </div>
                     </td>
                     <td style="padding:16px 20px;text-align:center;">
@@ -341,12 +384,16 @@ export const OwnerConsoleModule = {
                     <td style="padding:16px 20px;text-align:right;">
                       <div style="display:inline-flex;gap:8px;align-items:center;">
                         <button class="btn btn-success" style="padding:6px 12px;font-size:11px;border-radius:8px;" onclick="window.cajsAdminRewardPoints('${u.email}')">⚡ +500</button>
+<<<<<<< HEAD
                         <button class="btn btn-danger" style="padding:6px 12px;font-size:11px;border-radius:8px;${isOwner ? 'opacity:0.3;cursor:not-allowed;' : ''}" ${isOwner ? 'disabled' : ''} onclick="window.cajsAdminDeleteUser('${u.email}')">❌ Delete</button>
+=======
+                        <button class="btn btn-danger" style="padding:6px 12px;font-size:11px;border-radius:8px;${isOwner?'opacity:0.3;cursor:not-allowed;':''}" ${isOwner?'disabled':''} onclick="window.cajsAdminDeleteUser('${u.email}')">❌ Delete</button>
+>>>>>>> 885843b5aed07ff91f990b1fd08c1cdedd45aab4
                       </div>
                     </td>
                   </tr>
                 `;
-    }).join('')}
+              }).join('')}
             </tbody>
           </table>
         </div>
@@ -485,9 +532,15 @@ function doGet(e) {
       const chunkSize = 20;
       for (let i = 0; i < students.length; i += chunkSize) {
         const chunk = students.slice(i, i + chunkSize);
+<<<<<<< HEAD
         let msg = `📋 <b>CA TUTOR JS — Students (${i + 1}-${Math.min(i + chunkSize, students.length)} of ${students.length})</b>\n━━━━━━━━━━━━━━━\n\n`;
         chunk.forEach((u, j) => {
           msg += `${i + j + 1}. <b>${u.fullName}</b>\n`;
+=======
+        let msg = `📋 <b>CA TUTOR JS — Students (${i+1}-${Math.min(i+chunkSize, students.length)} of ${students.length})</b>\n━━━━━━━━━━━━━━━\n\n`;
+        chunk.forEach((u, j) => {
+          msg += `${i+j+1}. <b>${u.fullName}</b>\n`;
+>>>>>>> 885843b5aed07ff91f990b1fd08c1cdedd45aab4
           msg += `📧 ${u.email}\n`;
           msg += `📞 ${u.phone}\n`;
           msg += `🎓 CA ${u.examLevel} | 🆔 ${u.userId}\n`;
@@ -515,11 +568,19 @@ function doGet(e) {
         window.cajsShowAlert("No Data", "No students to export.", "info");
         return;
       }
+<<<<<<< HEAD
       const rows = [['Name', 'Email', 'Phone', 'Level', 'UserID', 'Registered', 'Points', 'Streak', 'Chapters']];
       students.forEach(u => {
         rows.push([u.fullName, u.email, u.phone, u.examLevel, u.userId,
         new Date(u.registeredAt).toLocaleDateString('en-IN'),
         u.points, u.streak, u.completedCount]);
+=======
+      const rows = [['Name','Email','Phone','Level','UserID','Registered','Points','Streak','Chapters']];
+      students.forEach(u => {
+        rows.push([u.fullName, u.email, u.phone, u.examLevel, u.userId,
+          new Date(u.registeredAt).toLocaleDateString('en-IN'),
+          u.points, u.streak, u.completedCount]);
+>>>>>>> 885843b5aed07ff91f990b1fd08c1cdedd45aab4
       });
       const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
       const blob = new Blob([csv], { type: 'text/csv' });

@@ -1,7 +1,7 @@
 // CA JS Single-Page Application Router & Bootstrap
 import { State, SafeStorage } from './state.js';
 import { Auth } from './auth.js';
-
+window.Auth = Auth;  // ← ADD THIS LINE
 const localStorage = SafeStorage;
 import { Dashboard } from './dashboard.js';
 import { SyllabusModule } from './modules/syllabus.js';
