@@ -461,22 +461,28 @@ const onboardingSteps = [
     tab: "dashboard"
   },
   {
-    title: "📚 Syllabus Tracker",
-    desc: "Manage every single chapter of your CA Level. Click on chapters to read summaries, download official ICAI textbook PDFs, and log your **3 Revision Passes (R1, R2, R3)** to guarantee full exam readiness!",
+    title: "📚 Syllabus Explorer",
+    desc: "Manage every single chapter of your CA Level. Click on chapters to read summaries, download official ICAI textbook PDFs, and log your study progress to stay on track!",
     badge: "SYLLABUS",
     tab: "syllabus"
   },
   {
-    title: "📝 Timed Written Exam Solver",
+    title: "📝 Past Papers & Mock Exams",
     desc: "Simulate real exam pressures inside our **Written Exam Arena**. Attempt official PYQs, MTPs, and RTPs with active countdown timers, enter draft answers directly, and view suggested answers instantly!",
     badge: "PAST PAPERS",
     tab: "pyq-mtp"
   },
   {
-    title: "⚙️ Custom Question Generator",
-    desc: "Need custom tests? Generate custom practice papers from preloaded MTP/RTP/PYQ assets tailored to specific subjects and marks! View saved generated papers and their answer keys directly in the panel.",
-    badge: "GENERATOR",
-    tab: "generator"
+    title: "📅 Revision Timetable Planner",
+    desc: "Generate a dynamic study schedule based on your target exam date. Include custom subjects, mix chapter topics to prevent monotony, and track your checklist progress over 3 distinct revision passes (R1, R2, R3)!",
+    badge: "REVISION PLANNER",
+    tab: "revision"
+  },
+  {
+    title: "🚨 Mistakes Tracker",
+    desc: "Every mistake is a stepping stone to success! Automatically log and flag wrong illustrations, classify errors by severity, and get custom revisions to turn weak chapters into your strongest areas.",
+    badge: "MISTAKES",
+    tab: "mistakes"
   },
   {
     title: "🔍 AI Doubt Decoder",
@@ -485,16 +491,40 @@ const onboardingSteps = [
     tab: "doubt-decoder"
   },
   {
-    title: "⚠️ Mistakes Tracker",
-    desc: "Every mistake is a stepping stone to success! Automatically log and flag wrong illustrations, classify errors by severity, and get custom revisions to turn weak chapters into your strongest areas.",
-    badge: "MISTAKES",
-    tab: "mistakes"
-  },
-  {
     title: "⏳ Pomodoro Study Hall",
     desc: "Supercharge your productivity! Set session goals, study alongside customizable focus timers, and listen to immersive, premium ambient soundscapes (like Rainy Library, Lofi Cafe, and Deep Focus).",
     badge: "STUDY HALL",
     tab: "pomodoro"
+  },
+  {
+    title: "🏆 Leaderboard & Community",
+    desc: "Connect with fellow CA aspirants! Search and follow peers by their Student IDs, compare study stats (progress, tests, streak, points), and climb the leaderboard rank to stay motivated.",
+    badge: "LEADERBOARD",
+    tab: "social"
+  },
+  {
+    title: "⚡ Custom Question Generator",
+    desc: "Need custom tests? Generate custom practice papers from preloaded MTP/RTP/PYQ assets tailored to specific subjects and marks! View saved generated papers and their answer keys directly in the panel.",
+    badge: "GENERATOR",
+    tab: "generator"
+  },
+  {
+    title: "📈 Performance Analytics",
+    desc: "Gain deep insights into your study habits. Review your diagnostic exam readiness, mock test score trends, consistency grids, and detailed subject strength ratios calculated from your activity.",
+    badge: "ANALYTICS",
+    tab: "analytics"
+  },
+  {
+    title: "🎯 Syllabus MCQ Practice",
+    desc: "Test your knowledge with chapter-wise multiple choice questions. Correct answers award points to your profile, while wrong selections are automatically logged into your Mistakes Tracker for future review.",
+    badge: "MCQ PRACTICE",
+    tab: "mcq-practice"
+  },
+  {
+    title: "📝 Manual Study Log",
+    desc: "Keep an accurate daily timeline of your manual study sessions. Specify date, subject, category (like reading notes or writing answers), and duration to build a complete learning history.",
+    badge: "STUDY LOG",
+    tab: "study-log"
   },
   {
     title: "✍️ Profile & Student Feedback",
