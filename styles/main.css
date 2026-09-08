@@ -521,7 +521,7 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 30px;
-  padding-right: 210px; /* Prevent header buttons/widgets from overlapping with floating profile widget */
+  padding-right: 290px; /* Prevent header buttons/widgets from overlapping with floating profile widget AND the floating theme toggle button */
 }
 
 .header-title-container {
