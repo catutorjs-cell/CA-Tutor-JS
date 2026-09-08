@@ -144,7 +144,7 @@ export const Dashboard = {
                 </div>
               </div>
             ` : `
-               <div class="flip-card-back glass-card stat-card" style="margin: 0; display: flex !important; flex-direction: column !important; background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 245, 240, 0.96)) !important; border: var(--glass-border); justify-content: center; align-items: center; text-align: center; padding: 15px;">
+               <div class="flip-card-back glass-card stat-card" style="margin: 0; display: flex !important; flex-direction: column !important; gap: 2px !important; background: ...; justify-content: center; align-items: center; text-align: center; padding: 15px;">
                 <div style="font-size: 20px; margin-bottom: 2px;">📅</div>
                 <span style="font-size: 10px; font-weight: 800; color: var(--pastel-peach-dark); text-transform: uppercase; letter-spacing: 0.5px;">Planner Inactive</span>
                 <span style="font-size: 9px; color: var(--text-muted); line-height: 1.3; margin-top: 2px; display: block;">
