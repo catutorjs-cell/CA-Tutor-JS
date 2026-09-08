@@ -189,16 +189,15 @@ export const PyqMtpModule = {
       ` : '';
 
       const suggestedAnswerUrl = this.getAnswerUrl(paper);
-      const hasAttempted = State.papers.some(p => p.id === paper.id);
-      const isAvailable = suggestedAnswerUrl && hasAttempted && !(this.activeTab === 'PYQ' && paper.year === 2026 && paper.month === "May") && !(State.customPapers || []).some(p => p.id === paper.id);
+      const isAvailable = suggestedAnswerUrl && !(this.activeTab === 'PYQ' && paper.year === 2026 && paper.month === "May") && !(State.customPapers || []).some(p => p.id === paper.id);
 
       const suggestedBtn = `
         <a href="${isAvailable ? suggestedAnswerUrl : 'javascript:void(0)'}" 
            ${isAvailable ? 'target="_blank"' : ''} 
            class="btn btn-secondary" 
-           style="padding: 6px 12px; font-size: 11px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; ${!hasAttempted ? 'opacity:0.5; cursor:not-allowed;' : ''}" 
-           onclick="event.stopPropagation(); ${isAvailable ? '' : hasAttempted ? 'window.cajsShowSuggestedAnswer();' : "window.cajsShowAlert('Attempt Required', 'write the test first', 'error');"}">
-          💡 Suggested Answer${!hasAttempted ? ' 🔒' : ''}
+           style="padding: 6px 12px; font-size: 11px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" 
+           onclick="event.stopPropagation(); ${isAvailable ? '' : 'window.cajsShowSuggestedAnswer();'}">
+          💡 Suggested Answer
         </a>
       `;
 
@@ -526,13 +525,8 @@ export const PyqMtpModule = {
                 oninput="window.cajsSaveCustomTextAnswer('${q.id}', this.value)">${uAns}</textarea>
             </div>
             
-            <div class="rubric-accordion" id="rubric-accordion-${q.id}" style="margin-top: 10px;">
-              <button type="button" class="btn btn-secondary rubric-toggle-btn" 
-                style="font-size:11px; padding:6px 12px; background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.06); border-radius: 8px; color: var(--text-main); font-weight: 600; cursor: pointer; transition: all 0.2s;"
-                onclick="window.cajsToggleCustomRubric('${q.id}')">
-                ✨ Reveal Suggested Rubric Key
-              </button>
-              <div class="rubric-content glass-card" id="rubric-content-${q.id}" style="display: none; margin-top: 8px; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.04); font-size: 12px; line-height: 1.5;">
+            <div class="rubric-static" id="rubric-accordion-${q.id}" style="margin-top: 10px;">
+              <div class="rubric-content glass-card" id="rubric-content-${q.id}" style="margin-top: 8px; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.04); font-size: 12px; line-height: 1.5;">
                 <strong style="color: var(--pastel-purple-dark); display: block; margin-bottom: 4px;">🎯 Official Suggested Answer:</strong>
                 <p style="color: #6c5dd3; font-weight: 550; margin: 0; white-space: pre-wrap;">${q.answer}</p>
               </div>
@@ -648,18 +642,6 @@ export const PyqMtpModule = {
     // Global action links specifically for custom solver
     window.cajsSaveCustomTextAnswer = (qId, val) => {
       this.userAnswers[qId] = val;
-    };
-
-    window.cajsToggleCustomRubric = (qId) => {
-      const element = document.getElementById(`rubric-content-${qId}`);
-      if (element) {
-        const isHidden = element.style.display === 'none';
-        element.style.display = isHidden ? 'block' : 'none';
-        const btn = document.querySelector(`#rubric-accordion-${qId} .rubric-toggle-btn`);
-        if (btn) {
-          btn.innerHTML = isHidden ? '🔒 Hide Suggested Rubric Key' : '✨ Reveal Suggested Rubric Key';
-        }
-      }
     };
 
     window.cajsSubmitCustomSelfGrade = () => {
@@ -1080,4 +1062,3 @@ export const PyqMtpModule = {
     };
   }
 };
-
