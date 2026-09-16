@@ -207,6 +207,9 @@ export const State = {
 
       const rawLogs = localStorage.getItem('cajs_study_logs_' + email);
       this.studyLogs = (rawLogs && JSON.parse(rawLogs)) || [];
+
+      // Auto-check daily streak and claim daily check-in bonus upon loading user session
+      this.checkAndUpdateStreak();
     } catch (e) {
       console.error("Failed to load user data for:", email, e);
     }
@@ -516,7 +519,20 @@ export const State = {
   },
 
   getTodayStr() {
-    return new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  },
+
+  getYesterdayStr() {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const year = yesterday.getFullYear();
+    const month = String(yesterday.getMonth() + 1).padStart(2, '0');
+    const day = String(yesterday.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   },
 
   getTodayPoints() {
@@ -560,11 +576,10 @@ export const State = {
     if (!lastDate) {
       this.studyStats.streak = 1;
       this.studyStats.lastStudyDate = todayStr;
+      this.saveUserData();
       this.claimDailyCheckinBonus();
     } else if (lastDate !== todayStr) {
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      const yesterdayStr = this.getYesterdayStr();
 
       if (lastDate === yesterdayStr) {
         this.studyStats.streak += 1;
@@ -572,6 +587,7 @@ export const State = {
         this.studyStats.streak = 1;
       }
       this.studyStats.lastStudyDate = todayStr;
+      this.saveUserData();
       this.claimDailyCheckinBonus();
     }
   },
@@ -582,6 +598,7 @@ export const State = {
       this.studyStats.lastDailyBonusDate = todayStr;
       const bonusPoints = 25;
       this.addPoints(bonusPoints);
+      this.saveUserData();
       setTimeout(() => {
         if (window.cajsShowAlert) {
           window.cajsShowAlert("🎁 Daily Check-in Bonus!", `You earned +${bonusPoints} Study Points for logging in today! Keep your ${this.studyStats.streak}-day streak going! 🔥`, "success");

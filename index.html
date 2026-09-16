@@ -673,11 +673,13 @@
             style="width: 44px; height: 44px; border-radius: 50%; background: var(--pastel-purple); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; color: var(--pastel-purple-dark); font-size: 16px; overflow: hidden; border: 1.5px solid white;">
             U
           </div>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span id="floating-user-name"
-              style="font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--text-main); white-space: nowrap;">User</span>
-            <span style="font-size: 11px; color: var(--pastel-purple-dark); font-weight: 700;">▾</span>
-            <span id="floating-user-id" style="font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--pastel-blue-dark); white-space: nowrap; margin-left: 4px;">CA-1003</span>
+          <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <span id="floating-user-name"
+                style="font-family: var(--font-display); font-weight: 700; font-size: 14px; color: var(--text-main); white-space: nowrap;">User</span>
+              <span style="font-size: 10px; color: var(--pastel-purple-dark); font-weight: 700; line-height: 1;">▾</span>
+            </div>
+            <span id="floating-user-id" class="ca-id-badge">CA-1003</span>
           </div>
         </div>
 
@@ -687,7 +689,7 @@
           <div id="dropdown-user-avatar" class="dropdown-avatar">U</div>
           <div class="dropdown-user-info">
             <h4 id="dropdown-user-name">User Name</h4>
-            <span class="dropdown-user-id-badge" id="dropdown-user-id" style="display: inline-block; font-family: monospace; font-weight: 700; color: var(--pastel-blue-dark); background: rgba(179,212,240,0.3); padding: 2px 8px; border-radius: 6px; font-size: 11px; margin-top: 3px;">CA-1001</span>
+            <span class="ca-id-badge" id="dropdown-user-id">CA-1001</span>
           </div>
         </div>
         <hr class="dropdown-divider">
