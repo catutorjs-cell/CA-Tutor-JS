@@ -4,10 +4,29 @@ import { State } from '../state.js';
 export const SocialModule = {
   leaderboardMode: 'points', // points, streaks
   searchQuery: '',
+  isSyncing: false,
 
   render(container) {
     // 1. Gather all users list from State
     const list = State.getAllLeaderboardUsers();
+
+    // Live sync all registered students from Google Sheet database
+    if (!this.isSyncing) {
+      this.isSyncing = true;
+      State.syncUsersFromSheet().then(users => {
+        this.isSyncing = false;
+        if (users && users.length > 0 && container && document.body.contains(container)) {
+          // Re-render leaderboard view with full 55+ students
+          const newList = State.getAllLeaderboardUsers();
+          if (newList.length !== list.length) {
+            this.render(container);
+          }
+        }
+      }).catch(err => {
+        this.isSyncing = false;
+        console.warn("Leaderboard sync note:", err);
+      });
+    }
 
     // 2. Sort depending on active mode
     if (this.leaderboardMode === 'points') {
