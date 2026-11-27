@@ -180,7 +180,7 @@ export const State = {
     }
   },
 
-  loadUserData(email) {
+  loadUserData(email, opts = {}) {
     const userPrefix = `_${email}`;
 
     try {
@@ -221,11 +221,120 @@ export const State = {
       const rawLogs = localStorage.getItem('cajs_study_logs_' + email);
       this.studyLogs = (rawLogs && JSON.parse(rawLogs)) || [];
 
-      // Auto-check daily streak and claim daily check-in bonus upon loading user session
-      this.checkAndUpdateStreak();
+      if (!opts.skipStreakCheck) {
+        // Auto-check daily streak and claim daily check-in bonus upon loading user session
+        this.checkAndUpdateStreak();
+      }
     } catch (e) {
       console.error("Failed to load user data for:", email, e);
     }
+  },
+
+  buildAccountSnapshot(email) {
+    const userPrefix = `_${email}`;
+    const isCurrent = this.user && this.user.email === email;
+    const readJson = (key, fallback) => {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    };
+
+    const updatedAt = Number(localStorage.getItem('cajs_account_updated_' + email) || Date.now());
+    const u = this.users?.[email] || {};
+    const snapshot = {
+      updatedAt,
+      avatar: (isCurrent ? this.user?.avatar : u.avatar) || 'letter',
+      completedChapters: isCurrent ? this.completedChapters : readJson(STORAGE_KEYS.COMPLETED_CHAPTERS + userPrefix, {}),
+      revisions: isCurrent ? this.revisions : readJson(STORAGE_KEYS.REVISIONS + userPrefix, {}),
+      mistakes: (isCurrent ? this.mistakes : readJson(STORAGE_KEYS.MISTAKES_DB + userPrefix, [])).slice(-50),
+      papers: (isCurrent ? this.papers : readJson(STORAGE_KEYS.PAPERS_DB + userPrefix, [])).slice(-50),
+      customPapers: (isCurrent ? this.customPapers : readJson('cajs_custom_papers_' + email, [])).slice(-15),
+      studyLogs: (isCurrent ? this.studyLogs : readJson('cajs_study_logs_' + email, [])).slice(-60),
+      studyStats: isCurrent ? this.studyStats : readJson(STORAGE_KEYS.STUDY_STATS + userPrefix, { points: u.points ?? 100, streak: u.streak ?? 0, totalMinutes: u.totalMinutes ?? 0, dailyMinutes: {} }),
+      calendar: isCurrent ? this.calendar : readJson(STORAGE_KEYS.CALENDAR_DB + userPrefix, null),
+      evaluations: (isCurrent ? this.evaluations : readJson(STORAGE_KEYS.EVALUATIONS + userPrefix, [])).slice(-20),
+      followedIds: readJson(`cajs_followed_${email}`, [])
+    };
+
+    let serialized = JSON.stringify(snapshot);
+    if (serialized.length > 42000) {
+      snapshot.evaluations = [];
+      snapshot.customPapers = [];
+      serialized = JSON.stringify(snapshot);
+    }
+    if (serialized.length > 42000) {
+      snapshot.studyLogs = snapshot.studyLogs.slice(-20);
+      snapshot.mistakes = snapshot.mistakes.slice(-20);
+      serialized = JSON.stringify(snapshot);
+    }
+    return serialized;
+  },
+
+  applyAccountSnapshot(email, sheetUser) {
+    if (!sheetUser || !email) return false;
+    const userPrefix = `_${email}`;
+    const localUpdatedAt = Number(localStorage.getItem('cajs_account_updated_' + email) || 0);
+    let applied = false;
+
+    if (sheetUser.accountData) {
+      try {
+        const snap = typeof sheetUser.accountData === 'string'
+          ? JSON.parse(sheetUser.accountData)
+          : sheetUser.accountData;
+
+        if (snap && typeof snap === 'object') {
+          const remoteUpdatedAt = Number(snap.updatedAt || 0);
+          if (!localUpdatedAt || remoteUpdatedAt >= localUpdatedAt) {
+            if (snap.completedChapters) localStorage.setItem(STORAGE_KEYS.COMPLETED_CHAPTERS + userPrefix, JSON.stringify(snap.completedChapters));
+            if (snap.revisions) localStorage.setItem(STORAGE_KEYS.REVISIONS + userPrefix, JSON.stringify(snap.revisions));
+            if (snap.mistakes) localStorage.setItem(STORAGE_KEYS.MISTAKES_DB + userPrefix, JSON.stringify(snap.mistakes));
+            if (snap.papers) localStorage.setItem(STORAGE_KEYS.PAPERS_DB + userPrefix, JSON.stringify(snap.papers));
+            if (snap.customPapers) localStorage.setItem('cajs_custom_papers_' + email, JSON.stringify(snap.customPapers));
+            if (snap.studyLogs) localStorage.setItem('cajs_study_logs_' + email, JSON.stringify(snap.studyLogs));
+            if (snap.studyStats) localStorage.setItem(STORAGE_KEYS.STUDY_STATS + userPrefix, JSON.stringify(snap.studyStats));
+            if (snap.calendar !== undefined) localStorage.setItem(STORAGE_KEYS.CALENDAR_DB + userPrefix, JSON.stringify(snap.calendar));
+            if (snap.evaluations) localStorage.setItem(STORAGE_KEYS.EVALUATIONS + userPrefix, JSON.stringify(snap.evaluations));
+            if (snap.followedIds) localStorage.setItem(`cajs_followed_${email}`, JSON.stringify(snap.followedIds));
+            if (snap.avatar && this.users?.[email]) this.users[email].avatar = snap.avatar;
+            if (remoteUpdatedAt) localStorage.setItem('cajs_account_updated_' + email, String(remoteUpdatedAt));
+            applied = true;
+          }
+        }
+      } catch (e) {
+        console.warn("Could not parse remote accountData:", e);
+      }
+    }
+
+    // Fallback: even if accountData column isn't present, sync flat points/streak/minutes onto new device
+    if (!applied && (sheetUser.points !== undefined && sheetUser.points !== '')) {
+      const sheetPts = Number(sheetUser.points);
+      if (!Number.isNaN(sheetPts)) {
+        let localStats = null;
+        try {
+          const raw = localStorage.getItem(STORAGE_KEYS.STUDY_STATS + userPrefix);
+          if (raw) localStats = JSON.parse(raw);
+        } catch {}
+        if (!localStats || sheetPts > (localStats.points ?? 0)) {
+          const merged = {
+            points: sheetPts,
+            streak: Number(sheetUser.streak) || localStats?.streak || 0,
+            weeklyStreak: localStats?.weeklyStreak || 0,
+            lastStudyDate: localStats?.lastStudyDate || null,
+            lastDailyBonusDate: localStats?.lastDailyBonusDate || null,
+            totalMinutes: Number(sheetUser.totalMinutes) || localStats?.totalMinutes || 0,
+            dailyMinutes: localStats?.dailyMinutes || {},
+            dailyPoints: localStats?.dailyPoints || {}
+          };
+          localStorage.setItem(STORAGE_KEYS.STUDY_STATS + userPrefix, JSON.stringify(merged));
+          applied = true;
+        }
+      }
+    }
+
+    return applied;
   },
 
   saveUserData() {
@@ -248,6 +357,67 @@ export const State = {
     localStorage.setItem(STORAGE_KEYS.CALENDAR_DB + userPrefix, JSON.stringify(this.calendar));
     localStorage.setItem('cajs_custom_papers_' + email, JSON.stringify(this.customPapers));
     localStorage.setItem('cajs_study_logs_' + email, JSON.stringify(this.studyLogs));
+    localStorage.setItem('cajs_account_updated_' + email, String(Date.now()));
+
+    if (this.users && this.users[email]) {
+      this.users[email].points = this.studyStats?.points ?? 100;
+      this.users[email].streak = this.studyStats?.streak ?? 0;
+      this.users[email].completedCount = Object.keys(this.completedChapters || {}).length;
+      this.users[email].totalMinutes = this.studyStats?.totalMinutes ?? 0;
+      localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
+    }
+
+    if (!this._suppressSync) {
+      this.scheduleStatsSync(email);
+    }
+  },
+
+  _statsSyncTimer: null,
+  _suppressSync: false,
+
+  scheduleStatsSync(email) {
+    if (!email) return;
+    if (this._statsSyncTimer) clearTimeout(this._statsSyncTimer);
+    this._statsSyncTimer = setTimeout(() => {
+      this.syncUserStatsToSheet(email);
+    }, 1500);
+  },
+
+  syncUserStatsToSheet(email, statsOverride = null) {
+    const syncUrl = localStorage.getItem('cajs_database_sync_url') || CONFIG.DEFAULT_SYNC_URL;
+    if (!syncUrl || !email) return;
+
+    const u = this.users?.[email] || {};
+    const isCurrent = this.user && this.user.email === email;
+    const points = statsOverride?.points ?? (isCurrent ? this.studyStats?.points : u.points) ?? 100;
+    const streak = statsOverride?.streak ?? (isCurrent ? this.studyStats?.streak : u.streak) ?? 0;
+    const totalMinutes = statsOverride?.totalMinutes ?? (isCurrent ? this.studyStats?.totalMinutes : u.totalMinutes) ?? 0;
+    const completedCount = statsOverride?.completedCount ?? (isCurrent ? Object.keys(this.completedChapters || {}).length : u.completedCount) ?? 0;
+    const accountData = this.buildAccountSnapshot(email);
+
+    fetch(syncUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'updateStats',
+        user: {
+          email,
+          fullName: (isCurrent ? this.user?.fullName : u.fullName) || u.fullName || '',
+          phone: (isCurrent ? this.user?.phone : u.phone) || u.phone || '',
+          examLevel: (isCurrent ? this.user?.examLevel : u.examLevel) || u.examLevel || '',
+          userId: u.userId || '',
+          password: u.password || '',
+          points,
+          streak,
+          completedCount,
+          totalMinutes,
+          accountData
+        }
+      })
+    }).catch(e => {
+      console.warn("Google Sheet stats sync failed:", e);
+    });
   },
 
   registerUser(fullName, email, phone, examLevel, password) {
@@ -265,6 +435,10 @@ export const State = {
       examLevel,
       password,
       userId,
+      points: 100,
+      streak: 0,
+      completedCount: 0,
+      totalMinutes: 0,
       registeredAt: new Date().toISOString()
     };
 
@@ -272,15 +446,14 @@ export const State = {
     this.users[email] = newUser;
     localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
 
-    // Sync to Google Sheet (without password)
+    // Sync to Google Sheet (including password and initial points for Owner Console)
     const syncUrl = localStorage.getItem('cajs_database_sync_url') || CONFIG.DEFAULT_SYNC_URL;
     if (syncUrl) {
-      const { password: _omit, ...safeUser } = newUser;
       fetch(syncUrl, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'register', user: safeUser })
+        body: JSON.stringify({ action: 'register', user: newUser })
       }).then(() => {
         console.log("Registration synced to Google Sheet.");
       }).catch(e => {
@@ -291,12 +464,14 @@ export const State = {
     return newUser;
   },
 
-  // ✅ Fetch all users from Google Sheet for cross-device login
+  // ✅ Fetch all users from Google Sheet for cross-device login (with fast timeout)
   async fetchUsersFromSheet() {
     const syncUrl = localStorage.getItem('cajs_database_sync_url') || CONFIG.DEFAULT_SYNC_URL;
     if (!syncUrl) return [];
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timer = controller ? setTimeout(() => controller.abort(), 4500) : null;
     try {
-      const response = await fetch(syncUrl);
+      const response = await fetch(syncUrl, controller ? { signal: controller.signal } : undefined);
       if (!response.ok) return [];
       const data = await response.json();
       if (Array.isArray(data)) return data;
@@ -304,14 +479,18 @@ export const State = {
     } catch (e) {
       console.warn("Could not fetch users from Google Sheet:", e);
       return [];
+    } finally {
+      if (timer) clearTimeout(timer);
     }
   },
 
-  // ✅ NEW: Sync live registered users from Google Sheet into State.users
+  // ✅ Sync live registered users and active session data from Google Sheet into State
   async syncUsersFromSheet() {
     const data = await this.fetchUsersFromSheet();
     if (Array.isArray(data) && data.length > 0) {
       let updated = false;
+      let activeSessionHydrated = false;
+
       data.forEach(u => {
         if (u && u.email) {
           if (!this.users[u.email]) {
@@ -320,29 +499,71 @@ export const State = {
               email: u.email,
               phone: u.phone || 'N/A',
               examLevel: u.examLevel || 'Intermediate',
+              password: u.password || '',
               userId: u.userId || '',
+              points: u.points !== undefined && u.points !== '' ? Number(u.points) : 100,
+              streak: u.streak !== undefined && u.streak !== '' ? Number(u.streak) : 0,
+              completedCount: u.completedCount !== undefined && u.completedCount !== '' ? Number(u.completedCount) : 0,
+              totalMinutes: u.totalMinutes !== undefined && u.totalMinutes !== '' ? Number(u.totalMinutes) : 0,
               registeredAt: u.registeredAt || new Date().toISOString(),
               role: u.email === 'owner@cajs.com' ? 'owner' : 'student'
             };
             updated = true;
           } else {
-            if (u.fullName && (!this.users[u.email].fullName || this.users[u.email].fullName === 'Anonymous')) {
+            if (u.fullName && u.fullName !== 'Anonymous' && u.fullName !== this.users[u.email].fullName) {
               this.users[u.email].fullName = u.fullName;
+              updated = true;
+            }
+            if (u.phone && u.phone !== 'N/A' && !this.users[u.email].phone) {
+              this.users[u.email].phone = u.phone;
+              updated = true;
+            }
+            if (u.password && u.password !== this.users[u.email].password) {
+              this.users[u.email].password = u.password;
               updated = true;
             }
             if (u.userId && !this.users[u.email].userId) {
               this.users[u.email].userId = u.userId;
               updated = true;
             }
-            if (u.examLevel && !this.users[u.email].examLevel) {
+            if (u.examLevel && u.examLevel !== this.users[u.email].examLevel) {
               this.users[u.email].examLevel = u.examLevel;
               updated = true;
             }
+            if (u.points !== undefined && u.points !== '') {
+              const sheetPts = Number(u.points);
+              if (!Number.isNaN(sheetPts) && sheetPts !== this.users[u.email].points) {
+                this.users[u.email].points = sheetPts;
+                updated = true;
+              }
+            }
+            if (u.streak !== undefined && u.streak !== '') {
+              this.users[u.email].streak = Number(u.streak) || 0;
+              updated = true;
+            }
+            if (u.completedCount !== undefined && u.completedCount !== '') {
+              this.users[u.email].completedCount = Number(u.completedCount) || 0;
+              updated = true;
+            }
+            if (u.totalMinutes !== undefined && u.totalMinutes !== '') {
+              this.users[u.email].totalMinutes = Number(u.totalMinutes) || 0;
+              updated = true;
+            }
+          }
+
+          if (this.applyAccountSnapshot(u.email, u) && this.user && this.user.email === u.email) {
+            activeSessionHydrated = true;
           }
         }
       });
 
       this.ensureSequentialUserIds();
+
+      if (activeSessionHydrated && this.user) {
+        this.user = this.users[this.user.email] || this.user;
+        this.loadUserData(this.user.email, { skipStreakCheck: true });
+        updated = true;
+      }
 
       if (updated) {
         localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
@@ -352,48 +573,67 @@ export const State = {
     return data;
   },
 
-  // ✅ FIXED: loginUser now supports cross-device login
+  // ✅ Cross-device login: verifies credentials and pulls latest account state from Google Sheet
   async loginUser(email, password) {
-    // 1. Try local login first (fast)
-    const localUser = this.users[email];
-    if (localUser && localUser.password === password) {
-      this.user = localUser;
-      localStorage.setItem(STORAGE_KEYS.USER_SESSION, JSON.stringify(email));
-      this.loadUserData(email);
-      this.checkAndUpdateStreak();
-      return localUser;
-    }
+    const cleanEmail = String(email || '').trim();
+    const localKey = Object.keys(this.users || {}).find(k => k.toLowerCase() === cleanEmail.toLowerCase()) || cleanEmail;
+    const localUser = this.users[localKey];
 
-    // 2. If not found locally, check Google Sheet
-    // (This handles users who registered on a different device)
+    // Fetch latest accounts & snapshots from Google Sheet so logging in on another system syncs everything
     const sheetUsers = await this.fetchUsersFromSheet();
-
-    if (sheetUsers.length === 0 && !localUser) {
-      throw new Error("No user found with this Email/Username.");
-    }
-
-    const sheetUser = sheetUsers.find(u => u.email === email);
+    const sheetUser = sheetUsers.find(u => u && u.email && u.email.toLowerCase() === cleanEmail.toLowerCase());
 
     if (!sheetUser && !localUser) {
       throw new Error("No user found with this Email/Username.");
     }
 
-    if (localUser && !localUser.password) {
-      // User exists locally but has no password (edge case) — can't verify
-      throw new Error("Incorrect password.");
-    }
     if (sheetUser) {
-      // User found in Google Sheet — save to local device and log them in
-      this.users[email] = { ...sheetUser, password: password };
+      const targetEmail = sheetUser.email;
+      const expectedPassword = sheetUser.password || localUser?.password || '';
+      if (expectedPassword && expectedPassword !== password) {
+        throw new Error("Incorrect password.");
+      }
+      if (!expectedPassword && localUser && !localUser.password) {
+        throw new Error("Incorrect password.");
+      }
+
+      const mergedUser = {
+        ...(localUser || {}),
+        fullName: sheetUser.fullName || localUser?.fullName || 'Student',
+        email: targetEmail,
+        phone: sheetUser.phone || localUser?.phone || 'N/A',
+        examLevel: sheetUser.examLevel || localUser?.examLevel || 'Intermediate',
+        userId: sheetUser.userId || localUser?.userId || '',
+        password: expectedPassword || password,
+        points: sheetUser.points !== undefined && sheetUser.points !== '' ? Number(sheetUser.points) : (localUser?.points ?? 100),
+        streak: sheetUser.streak !== undefined && sheetUser.streak !== '' ? Number(sheetUser.streak) : (localUser?.streak ?? 0),
+        completedCount: sheetUser.completedCount !== undefined && sheetUser.completedCount !== '' ? Number(sheetUser.completedCount) : (localUser?.completedCount ?? 0),
+        totalMinutes: sheetUser.totalMinutes !== undefined && sheetUser.totalMinutes !== '' ? Number(sheetUser.totalMinutes) : (localUser?.totalMinutes ?? 0),
+        registeredAt: sheetUser.registeredAt || localUser?.registeredAt || new Date().toISOString(),
+        role: targetEmail === 'owner@cajs.com' ? 'owner' : (localUser?.role || 'student')
+      };
+
+      this.users[targetEmail] = mergedUser;
+      this.ensureSequentialUserIds();
+      this._suppressSync = true;
+      this.applyAccountSnapshot(targetEmail, sheetUser);
       localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
 
-      this.user = this.users[email];
-      localStorage.setItem(STORAGE_KEYS.USER_SESSION, JSON.stringify(email));
-      this.loadUserData(email);
-      this.checkAndUpdateStreak();
-      return this.users[email];
+      this.user = this.users[targetEmail];
+      localStorage.setItem(STORAGE_KEYS.USER_SESSION, JSON.stringify(targetEmail));
+      this.loadUserData(targetEmail);
+      this._suppressSync = false;
+      return this.user;
     }
-    // Local user exists but wrong password
+
+    // Offline / local fallback when Google Sheet is unreachable or account only exists locally
+    if (localUser && localUser.password === password) {
+      this.user = localUser;
+      localStorage.setItem(STORAGE_KEYS.USER_SESSION, JSON.stringify(localKey));
+      this.loadUserData(localKey);
+      return localUser;
+    }
+
     throw new Error("Incorrect password.");
   },
 
@@ -407,6 +647,8 @@ export const State = {
     if (this.user && this.user.email === email) {
       this.user.password = newPassword;
     }
+    this.syncUserStatsToSheet(email);
+    this.notifyStateChange();
     return matchedUser;
   },
 
@@ -428,19 +670,24 @@ export const State = {
   adminAddPointsToUser(email, pointsToAdd) {
     if (!this.users[email]) return;
     const statsKey = `${STORAGE_KEYS.STUDY_STATS}_${email}`;
-    let stats = { points: 100, streak: 0, weeklyStreak: 0, lastStudyDate: null, totalMinutes: 0, dailyMinutes: {} };
+    let stats = { points: this.users[email].points ?? 100, streak: this.users[email].streak ?? 0, weeklyStreak: 0, lastStudyDate: null, totalMinutes: this.users[email].totalMinutes ?? 0, dailyMinutes: {} };
     try {
       const rawStats = localStorage.getItem(statsKey);
       if (rawStats) stats = JSON.parse(rawStats);
     } catch (e) {
       console.error(e);
     }
-    stats.points = (stats.points || 0) + pointsToAdd;
+    const basePoints = (stats.points !== undefined && stats.points !== null) ? Number(stats.points) : (this.users[email].points ?? 100);
+    stats.points = Math.max(0, basePoints + pointsToAdd);
     localStorage.setItem(statsKey, JSON.stringify(stats));
+
+    this.users[email].points = stats.points;
+    localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(this.users));
 
     if (this.user && this.user.email === email) {
       this.studyStats.points = stats.points;
     }
+    this.syncUserStatsToSheet(email, { points: stats.points });
     this.notifyStateChange();
   },
 
@@ -500,18 +747,22 @@ export const State = {
     this.notifyStateChange();
   },
 
-  addUploadedMaterial(chapterId, fileName, fileSize) {
+  addUploadedMaterial(chapterId, fileName, fileSize, extractedText = '') {
     if (!this.uploadedMaterials[chapterId]) {
       this.uploadedMaterials[chapterId] = [];
     }
     this.uploadedMaterials[chapterId].push({
       name: fileName,
       size: fileSize,
-      date: new Date().toLocaleDateString('en-US')
+      date: new Date().toLocaleDateString('en-US'),
+      text: extractedText ? String(extractedText).slice(0, 60000) : ''
     });
     this.addPoints(15);
     this.saveUserData();
     this.notifyStateChange();
+    if (typeof window !== 'undefined' && window.cajsResetDecoderCache) {
+      window.cajsResetDecoderCache();
+    }
   },
 
   addEvaluation(evalObj) {
@@ -708,7 +959,7 @@ export const State = {
       isNowFollowed = true;
     }
     localStorage.setItem(`cajs_followed_${this.user.email}`, JSON.stringify(followed));
-    
+
     // Legacy compatibility with friends array
     let friend = this.friends.find(f => f.id === targetUserId);
     if (!friend) {
@@ -736,7 +987,7 @@ export const State = {
 
   getAllLeaderboardUsers() {
     this.ensureSequentialUserIds();
-    
+
     const listMap = new Map();
 
     // Add all original registered users from State.users ONLY
@@ -747,7 +998,7 @@ export const State = {
 
         const isMe = this.user && this.user.email === email;
         const uid = u.userId || "CA-1001";
-        
+
         let pts = 100;
         let streakVal = 0;
         if (isMe) {
@@ -766,7 +1017,7 @@ export const State = {
               pts = 120 + (charSum % 35) * 40;
               streakVal = (charSum % 9) + 1;
             }
-          } catch(e) {}
+          } catch (e) { }
         }
 
         listMap.set(uid, {

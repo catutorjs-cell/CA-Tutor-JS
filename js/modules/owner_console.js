@@ -1,6 +1,8 @@
 // CA JS Platform Owner Database Management Console
-import { State } from '../state.js';
+import { State, SafeStorage } from '../state.js';
 import { CONFIG } from '../config.js';
+
+const localStorage = SafeStorage;
 
 export const OwnerConsoleModule = {
   searchQuery: '',
@@ -13,6 +15,7 @@ export const OwnerConsoleModule = {
   revealedPasswords: {},
   liveUsers: null,
   isLoadingLive: false,
+  lastLiveFetchAt: 0,
 
   async loadLiveUsers() {
     const syncUrl = localStorage.getItem('cajs_database_sync_url') || CONFIG.DEFAULT_SYNC_URL;
@@ -29,10 +32,12 @@ export const OwnerConsoleModule = {
 
   render(container) {
     const syncUrl = localStorage.getItem('cajs_database_sync_url') || CONFIG.DEFAULT_SYNC_URL;
-    if (syncUrl && !this.liveUsers && !this.isLoadingLive) {
+    const isLiveStale = Date.now() - this.lastLiveFetchAt > 15000;
+    if (syncUrl && (!this.liveUsers || isLiveStale) && !this.isLoadingLive) {
       this.isLoadingLive = true;
+      this.lastLiveFetchAt = Date.now();
       this.loadLiveUsers().then(users => {
-        this.liveUsers = users;
+        if (users) this.liveUsers = users;
         this.isLoadingLive = false;
         this.render(container);
       });
@@ -47,18 +52,64 @@ export const OwnerConsoleModule = {
     }
 
     const allUsers = { ...State.users };
+    let mergedUsersUpdated = false;
 
-    // Merge live Google Sheets users
+    // Merge live Google Sheets users (including updates to points, progress, and passwords)
     if (this.liveUsers && this.liveUsers.length > 0) {
       this.liveUsers.forEach(u => {
-        if (u.email && !allUsers[u.email]) {
+        if (!u || !u.email) return;
+        const existing = allUsers[u.email];
+        const parseNum = (val, fallback) => (val !== undefined && val !== null && val !== '' && !Number.isNaN(Number(val))) ? Number(val) : fallback;
+
+        if (!existing) {
           allUsers[u.email] = {
-            fullName: u.fullName, email: u.email, phone: u.phone,
-            examLevel: u.examLevel, password: u.password,
-            userId: u.userId, registeredAt: u.registeredAt, role: 'student'
+            fullName: u.fullName || 'Student',
+            email: u.email,
+            phone: u.phone || 'N/A',
+            examLevel: u.examLevel || 'Intermediate',
+            password: u.password || '',
+            userId: u.userId || '',
+            points: parseNum(u.points, 100),
+            streak: parseNum(u.streak, 0),
+            completedCount: parseNum(u.completedCount, 0),
+            totalMinutes: parseNum(u.totalMinutes, 0),
+            registeredAt: u.registeredAt || new Date().toISOString(),
+            role: u.email === 'owner@cajs.com' ? 'owner' : 'student'
           };
+          mergedUsersUpdated = true;
+        } else {
+          if (u.password && !existing.password) {
+            existing.password = u.password;
+            mergedUsersUpdated = true;
+          }
+          if (u.phone && (!existing.phone || existing.phone === 'N/A')) {
+            existing.phone = u.phone;
+            mergedUsersUpdated = true;
+          }
+          if (u.points !== undefined && u.points !== '') {
+            const sheetPts = parseNum(u.points, existing.points);
+            if (sheetPts !== existing.points) {
+              existing.points = sheetPts;
+              mergedUsersUpdated = true;
+            }
+          }
+          if (u.streak !== undefined && u.streak !== '') {
+            existing.streak = parseNum(u.streak, existing.streak ?? 0);
+          }
+          if (u.completedCount !== undefined && u.completedCount !== '') {
+            existing.completedCount = parseNum(u.completedCount, existing.completedCount ?? 0);
+          }
+          if (u.totalMinutes !== undefined && u.totalMinutes !== '') {
+            existing.totalMinutes = parseNum(u.totalMinutes, existing.totalMinutes ?? 0);
+          }
         }
       });
+
+      if (mergedUsersUpdated) {
+        State.users = allUsers;
+        State.ensureSequentialUserIds();
+        localStorage.setItem('cajs_users_db', JSON.stringify(State.users));
+      }
     }
 
     const formatTimeSpent = (mins) => {
@@ -73,25 +124,42 @@ export const OwnerConsoleModule = {
     const userList = [];
     for (const email in allUsers) {
       const u = allUsers[email];
-      let points = 100, streak = 0, completedCount = 0, totalMinutes = 0;
-      try {
-        const rawStats = localStorage.getItem(`cajs_study_stats_${email}`);
-        if (rawStats) {
-          const stats = JSON.parse(rawStats);
-          points = stats.points || 100;
-          streak = stats.streak || 0;
-          totalMinutes = stats.totalMinutes || 0;
-        }
-        const rawChapters = localStorage.getItem(`cajs_completed_chapters_${email}`);
-        if (rawChapters) completedCount = Object.keys(JSON.parse(rawChapters)).length;
-      } catch (e) { console.error("Stats read error for", email, e); }
+      if (!u) continue;
+      const isActiveUser = State.user && State.user.email === email;
+
+      let points = u.points ?? 100;
+      let streak = u.streak ?? 0;
+      let completedCount = u.completedCount ?? 0;
+      let totalMinutes = u.totalMinutes ?? 0;
+
+      if (isActiveUser) {
+        points = State.studyStats?.points ?? points;
+        streak = State.studyStats?.streak ?? streak;
+        totalMinutes = State.studyStats?.totalMinutes ?? totalMinutes;
+        completedCount = Object.keys(State.completedChapters || {}).length || completedCount;
+      } else {
+        try {
+          const rawStats = localStorage.getItem(`cajs_study_stats_${email}`);
+          if (rawStats) {
+            const stats = JSON.parse(rawStats);
+            if (stats.points !== undefined && stats.points !== null) points = Number(stats.points);
+            if (stats.streak !== undefined && stats.streak !== null) streak = Number(stats.streak);
+            if (stats.totalMinutes !== undefined && stats.totalMinutes !== null) totalMinutes = Number(stats.totalMinutes);
+          }
+          const rawChapters = localStorage.getItem(`cajs_completed_chapters_${email}`);
+          if (rawChapters) {
+            const chCount = Object.keys(JSON.parse(rawChapters)).length;
+            if (chCount > completedCount) completedCount = chCount;
+          }
+        } catch (e) { console.error("Stats read error for", email, e); }
+      }
 
       userList.push({
         fullName: u.fullName || 'Anonymous',
         email: u.email,
         phone: u.phone || 'N/A',
         examLevel: u.examLevel || 'Intermediate',
-        password: u.password || '••••••',
+        password: u.password || '',
         userId: u.userId || 'CA-STUDENT',
         role: u.role || 'student',
         registeredAt: u.registeredAt || new Date().toISOString(),
@@ -296,12 +364,14 @@ export const OwnerConsoleModule = {
                   No users match your filters.
                 </td></tr>
               ` : filteredList.map(u => {
-                const isOwner = u.role === 'owner';
-                const regDate = new Date(u.registeredAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-                const levelColor = u.examLevel === 'Final' ? 'var(--pastel-rose-dark)' : u.examLevel === 'Intermediate' ? 'var(--pastel-purple-dark)' : 'var(--pastel-blue-dark)';
-                const levelBg = u.examLevel === 'Final' ? 'var(--pastel-rose)' : u.examLevel === 'Intermediate' ? 'var(--pastel-purple)' : 'var(--pastel-blue)';
-                const pwText = this.revealedPasswords[u.email] ? u.password : '••••••';
-                return `
+      const isOwner = u.role === 'owner';
+      const regDate = new Date(u.registeredAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+      const levelColor = u.examLevel === 'Final' ? 'var(--pastel-rose-dark)' : u.examLevel === 'Intermediate' ? 'var(--pastel-purple-dark)' : 'var(--pastel-blue-dark)';
+      const levelBg = u.examLevel === 'Final' ? 'var(--pastel-rose)' : u.examLevel === 'Intermediate' ? 'var(--pastel-purple)' : 'var(--pastel-blue)';
+      const pwText = this.revealedPasswords[u.email]
+        ? (u.password ? u.password : '<span style="color:var(--text-muted);font-style:italic;font-size:11px;">Not synced</span>')
+        : (u.password ? '••••••' : '<span style="color:var(--text-muted);font-style:italic;font-size:11px;">Not synced</span>');
+      return `
                   <tr style="border-bottom:1px solid rgba(0,0,0,0.04);vertical-align:middle;" class="admin-table-row">
                     <td style="padding:16px 20px;">
                       <div style="display:flex;align-items:center;gap:12px;">
@@ -322,9 +392,10 @@ export const OwnerConsoleModule = {
                       </div>
                     </td>
                     <td style="padding:16px 20px;">
-                      <div style="display:inline-flex;align-items:center;gap:8px;font-family:monospace;font-size:13px;background:rgba(0,0,0,0.03);padding:4px 8px;border-radius:6px;">
+                      <div style="display:inline-flex;align-items:center;gap:6px;font-family:monospace;font-size:13px;background:rgba(0,0,0,0.03);padding:4px 8px;border-radius:6px;">
                         <span>${pwText}</span>
-                        <button style="border:none;background:transparent;font-size:12px;cursor:pointer;" onclick="window.cajsToggleAdminPassword('${u.email}')">${this.revealedPasswords[u.email] ? '👁️' : '👁️‍🗨️'}</button>
+                        ${u.password ? `<button style="border:none;background:transparent;font-size:12px;cursor:pointer;" title="Show / Hide Password" onclick="window.cajsToggleAdminPassword('${u.email}')">${this.revealedPasswords[u.email] ? '👁️' : '👁️‍🗨️'}</button>` : ''}
+                        <button style="border:none;background:transparent;font-size:11px;cursor:pointer;color:var(--pastel-purple-dark);font-weight:700;" title="Set / Update Password" onclick="window.cajsAdminSetPassword('${u.email}')">🔑</button>
                       </div>
                     </td>
                     <td style="padding:16px 20px;text-align:center;">
@@ -346,7 +417,7 @@ export const OwnerConsoleModule = {
                     </td>
                   </tr>
                 `;
-              }).join('')}
+    }).join('')}
             </tbody>
           </table>
         </div>
@@ -387,6 +458,7 @@ export const OwnerConsoleModule = {
 
     container.querySelector('#btn-refresh-live')?.addEventListener('click', () => {
       this.liveUsers = null;
+      this.lastLiveFetchAt = 0;
       this.render(container);
     });
 
@@ -418,8 +490,26 @@ export const OwnerConsoleModule = {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var data = JSON.parse(e.postData.contents);
   if (data.action === 'register') {
-    sheet.appendRow([data.user.registeredAt, data.user.fullName, data.user.email, data.user.phone, data.user.examLevel, data.user.userId]);
+    sheet.appendRow([data.user.registeredAt, data.user.fullName, data.user.email, data.user.phone, data.user.examLevel, data.user.userId, data.user.password || '', data.user.points || 100, data.user.streak || 0, data.user.completedCount || 0, data.user.totalMinutes || 0, data.user.accountData || '']);
     return ContentService.createTextOutput(JSON.stringify({status:'success'})).setMimeType(ContentService.MimeType.JSON);
+  }
+  if (data.action === 'updateStats' && data.user && data.user.email) {
+    var rows = sheet.getDataRange().getValues();
+    for (var i = 1; i < rows.length; i++) {
+      if (String(rows[i][2]).toLowerCase() === String(data.user.email).toLowerCase()) {
+        if (data.user.fullName) sheet.getRange(i + 1, 2).setValue(data.user.fullName);
+        if (data.user.phone) sheet.getRange(i + 1, 4).setValue(data.user.phone);
+        if (data.user.examLevel) sheet.getRange(i + 1, 5).setValue(data.user.examLevel);
+        if (data.user.password) sheet.getRange(i + 1, 7).setValue(data.user.password);
+        if (data.user.points !== undefined) sheet.getRange(i + 1, 8).setValue(data.user.points);
+        if (data.user.streak !== undefined) sheet.getRange(i + 1, 9).setValue(data.user.streak);
+        if (data.user.completedCount !== undefined) sheet.getRange(i + 1, 10).setValue(data.user.completedCount);
+        if (data.user.totalMinutes !== undefined) sheet.getRange(i + 1, 11).setValue(data.user.totalMinutes);
+        if (data.user.accountData) sheet.getRange(i + 1, 12).setValue(data.user.accountData);
+        break;
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify({status:'updated'})).setMimeType(ContentService.MimeType.JSON);
   }
 }
 function doGet(e) {
@@ -427,7 +517,7 @@ function doGet(e) {
   var rows = sheet.getDataRange().getValues();
   var users = [];
   for (var i = 1; i < rows.length; i++) {
-    users.push({registeredAt:rows[i][0],fullName:rows[i][1],email:rows[i][2],phone:rows[i][3],examLevel:rows[i][4],userId:rows[i][5]});
+    users.push({registeredAt:rows[i][0],fullName:rows[i][1],email:rows[i][2],phone:rows[i][3],examLevel:rows[i][4],userId:rows[i][5],password:rows[i][6]||'',points:rows[i][7],streak:rows[i][8],completedCount:rows[i][9],totalMinutes:rows[i][10],accountData:rows[i][11]||''});
   }
   return ContentService.createTextOutput(JSON.stringify(users)).setMimeType(ContentService.MimeType.JSON);
 }`;
@@ -518,8 +608,8 @@ function doGet(e) {
       const rows = [['Name', 'Email', 'Phone', 'Level', 'UserID', 'Registered', 'Points', 'Streak', 'Chapters']];
       students.forEach(u => {
         rows.push([u.fullName, u.email, u.phone, u.examLevel, u.userId,
-          new Date(u.registeredAt).toLocaleDateString('en-IN'),
-          u.points, u.streak, u.completedCount]);
+        new Date(u.registeredAt).toLocaleDateString('en-IN'),
+        u.points, u.streak, u.completedCount]);
       });
       const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
       const blob = new Blob([csv], { type: 'text/csv' });
@@ -536,9 +626,34 @@ function doGet(e) {
       this.render(container);
     };
 
-    window.cajsAdminRewardPoints = (email) => {
+    window.cajsAdminSetPassword = (email) => {
       const u = State.users[email];
       if (!u) return;
+      const runUpdate = (newPass) => {
+        if (!newPass || newPass.trim().length < 4) {
+          window.cajsShowAlert?.("⚠️ Invalid Password", "Password must be at least 4 characters.", "error");
+          return;
+        }
+        State.resetPassword(email, newPass.trim());
+        this.revealedPasswords[email] = true;
+        window.cajsShowAlert?.("🔑 Password Updated", `Password updated for <strong>${u.fullName}</strong>!`, "success");
+        this.render(container);
+      };
+      if (window.cajsShowPrompt) {
+        window.cajsShowPrompt("🔑 Set Student Password", `Enter password for ${u.fullName} (${email}):`, runUpdate, u.password || '');
+      } else {
+        const val = prompt(`Enter password for ${u.fullName}:`, u.password || '');
+        if (val !== null) runUpdate(val);
+      }
+    };
+
+    window.cajsAdminRewardPoints = (email) => {
+      const u = State.users[email] || allUsers[email];
+      if (!u) return;
+      if (!State.users[email]) {
+        State.users[email] = u;
+        localStorage.setItem('cajs_users_db', JSON.stringify(State.users));
+      }
       State.adminAddPointsToUser(email, 500);
       window.cajsShowAlert("✅ Rewarded", `+500 points added to <strong>${u.fullName}</strong>!`, "success");
       this.render(container);

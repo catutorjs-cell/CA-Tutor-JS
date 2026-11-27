@@ -8,7 +8,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_acc_c1",
         "name": "Chapter 1: Theoretical Framework",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "<strong>CHAPTER 1: THEORETICAL FRAMEWORK (COMPREHENSIVE ICAI STUDY MATERIAL SUMMARY)</strong><br><br>\n\n1. <strong>Meaning & Scope of Accounting (Unit 1):</strong><br>\nAccounting is the art of recording, classifying, summarizing in a significant manner and in terms of money, transactions and events which are of financial character, and interpreting the results thereof.<br>\n• <strong>Sub-fields:</strong> Financial Accounting, Cost Accounting, Management Accounting, Social Responsibility Accounting, and Human Resource Accounting.<br>\n• <strong>Objectives:</strong> Systematic recording, ascertainment of financial performance (Profit & Loss Account), determination of financial position (Balance Sheet), and communicating key financial reports to internal and external stakeholders.<br><br>\n\n2. <strong>Accounting Concepts, Principles & Conventions (Unit 2):</strong><br>\n• <strong>Going Concern Concept:</strong> Assumes the enterprise will continue operational existence for the foreseeable future without intention or necessity of liquidation.<br>\n• <strong>Accrual Concept:</strong> Revenues and expenses are recognized as they are earned or incurred, regardless of cash receipt or payment timing.<br>\n• <strong>Consistency Concept:</strong> Accounting policies are applied consistently period-to-period to ensure comparability.<br>\n• <strong>Entity Concept:</strong> Business entity is treated as a distinct legal person separate from its owners.<br>\n• <strong>Money Measurement Concept:</strong> Only events quantifiable in monetary terms are recorded in accounting books.<br>\n• <strong>Prudence (Conservatism):</strong> Anticipate all potential future losses, but do not anticipate unrealized profits.<br>\n• <strong>Matching Concept:</strong> Expenses incurred in an accounting period must be matched against revenues generated during that same period.<br><br>\n\n3. <strong>Capital and Revenue Expenditures & Receipts (Unit 3):</strong><br>\n• <strong>Capital Expenditure:</strong> Incurred to acquire fixed assets, increase asset capacity, or provide enduring benefits across multiple accounting periods (e.g., machinery purchase, legal fees for title deed). Carried to the Balance Sheet.<br>\n• <strong>Revenue Expenditure:</strong> Incurred to maintain daily business operations, preserve earning capacity, or repair existing assets (e.g., salaries, rent, routine repairs). Debited to Trading/P&L Account.<br>\n• <strong>Capital Receipt:</strong> Non-recurring receipts from owner capital contributions, borrowings, or sale of fixed assets.<br>\n• <strong>Revenue Receipt:</strong> Recurring operational proceeds from sale of goods, performance of services, or interest/dividends earned.<br><br>\n\n4. <strong>Contingent Liabilities & Contingent Assets (Unit 4):</strong><br>\n• <strong>Contingent Liability:</strong> A possible obligation from past events whose existence is confirmed only by future uncertain events (e.g., pending court lawsuits, claims against firm not acknowledged as debts, bank guarantees given). Disclosed in Notes to Accounts, NOT recognized in Balance Sheet.<br>\n• <strong>Provision:</strong> A present obligation arising from past events involving probable economic outflow where a reliable estimate can be made (e.g., Provision for Doubtful Debts). Recognized in Financial Statements.<br>\n• <strong>Contingent Asset:</strong> A possible asset from past events; disclosed in Director's report when inflow of economic benefits becomes probable.<br><br>\n\n5. <strong>Accounting Policies & Valuation Principles (Units 5 & 6):</strong><br>\n• <strong>Selection Criteria:</strong> Governed by Prudence, Substance over Form, and Materiality.<br>\n• <strong>Valuation Bases:</strong> Historical Cost (acquisition price), Current Cost (replacement cost), Realizable Value (net sale proceeds), Present Value (discounted future net cash flows).<br><br>\n\n6. <strong>Accounting Standards Framework (Unit 7):</strong><br>\nAccounting Standards (AS) and Ind AS issued by the ICAI Council harmonize accounting policies, ensure statutory transparency, remove variations in financial reporting, and comply with the Companies Act, 2013.<br><br>\n\n💡 <strong>EXAM TIP:</strong> Distinguishing Capital vs Revenue expenditure and identifying Contingent Liabilities are compulsory 2-4 mark questions in ICAI Foundation Paper 1.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88093bos-aps2240-ch1u1.pdf",
@@ -236,7 +236,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_acc_c4",
         "name": "Chapter 4: Inventories",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "🔥 <strong>EXAM WEIGHTAGE BREAKDOWN:</strong> 25–30% (25–30 Marks) Core Accounting Process Block<br><br><strong>CHAPTER 4: INVENTORIES (COMPREHENSIVE ICAI STUDY MATERIAL SUMMARY)</strong><br><br>\n\n1. <strong>Definition & Valuation Standard (AS 2 / Ind AS 2):</strong><br>\nInventories are assets held for sale in ordinary course of business, in process of production (WIP), or materials/supplies to be consumed.<br>\n• <strong>Core Rule:</strong> Inventories are valued at the <strong>Lower of Cost or Net Realizable Value (NRV)</strong>.<br>\n• <strong>Cost of Inventory:</strong> Purchase price + Duties/Taxes (non-refundable) + Freight inward + Direct labor & manufacturing overheads - Trade discounts/rebates.<br>\n• <strong>NRV Definition:</strong> Estimated selling price in ordinary course of business less estimated cost of completion and estimated selling costs.<br><br>\n\n2. <strong>Inventory Valuation Methods:</strong><br>\n• <strong>FIFO (First-In, First-Out):</strong> Assumes items purchased first are issued first. Closing inventory reflects latest market prices.<br>\n• <strong>Weighted Average Cost:</strong> Computes average cost per unit after every new purchase receipt.<br><br>\n\n3. <strong>Inventory Systems:</strong><br>\n• <strong>Periodic Inventory System:</strong> Physical stocktaking done at period end. Cost of Goods Sold = Opening Stock + Purchases - Closing Stock.<br>\n• <strong>Perpetual Inventory System:</strong> Continuous recording of stock movements using Store Ledgers and Bin Cards.<br><br>\n\n💡 <strong>EXAM TIP:</strong> Abnormal waste is EXCLUDED from inventory cost and charged directly to Profit & Loss Account.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88107bos-aps2240-ch4.pdf"
@@ -257,7 +257,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_acc_c5",
         "name": "Chapter 5: Depreciation and Amortisation",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "🔥 <strong>EXAM WEIGHTAGE BREAKDOWN:</strong> 25–30% (25–30 Marks) Core Accounting Process Block<br><br><strong>CHAPTER 5: DEPRECIATION AND AMORTISATION (COMPREHENSIVE ICAI STUDY MATERIAL SUMMARY)</strong><br><br>\n\n1. <strong>Concepts & AS 10 (PPE Framework):</strong><br>\nDepreciation is a systematic allocation of the depreciable amount of Property, Plant & Equipment (PPE) over its estimated useful life.<br>\n• <strong>Depreciable Amount:</strong> Historical Cost - Estimated Residual (Scrap) Value.<br><br>\n\n2. <strong>Depreciation Computation Methods:</strong><br>\n• <strong>Straight Line Method (SLM):</strong> Equal annual depreciation charge. Annual Depreciation = (Cost - Scrap Value) / Useful Life.<br>\n• <strong>Written Down Value Method (WDV):</strong> Decreasing depreciation charge calculated at a fixed percentage on opening book value each year.<br>\n• <strong>Units of Production / Sum-of-Years'-Digits Methods:</strong> Allocates cost based on actual asset output or accelerated early usage.<br><br>\n\n3. <strong>Accounting & Method Changes:</strong><br>\n• <strong>Change in Method/Useful Life:</strong> Treated as a change in accounting estimate (prospectively under AS 10) by allocating remaining WDV over revised useful life.<br>\n• <strong>Revaluation of PPE:</strong> Increase credited to Revaluation Reserve; decrease charged to P&L Account.<br><br>\n\n💡 <strong>EXAM TIP:</strong> Profit or loss on sale of PPE = Net Sale Proceeds - WDV on date of sale.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88108bos-aps2240-ch5.pdf"
@@ -469,7 +469,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_acc_c12",
         "name": "Accounting Terminology Glossary",
-        "weightage": "Medium",
+        "weightage": "Low",
         "notes": "Glossary notes defining standard accounting terms used in Board of Studies materials.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88114bos-aps2240-gloss.pdf"
@@ -496,7 +496,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_law_c1",
         "name": "Chapter 1: Indian Regulatory Framework",
-        "weightage": "Medium",
+        "weightage": "Low",
         "notes": "Understand the structure of the Indian legal system, sources of law, the process of legislative formulation, and primary regulatory bodies such as ICAI, SEBI, and RBI.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88015bos-aps2231-ch1.pdf"
@@ -645,7 +645,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_law_c5",
         "name": "Chapter 5: The Limited Liability Partnership Act, 2008",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "🔥 <strong>EXAM WEIGHTAGE BREAKDOWN:</strong> 30–40% (30–40 Marks) Primary Subjective Numerical Block<br><br>Learn limited liability partnership key traits, differences from partnerships and companies, incorporation process, and designated partner roles.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88033bos-aps2231-ch5.pdf"
@@ -687,7 +687,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_law_c7",
         "name": "Chapter 7: The Negotiable Instruments Act, 1881",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Study negotiable instruments definition, promissory notes, bills of exchange, cheques characteristics, negotiation, Holder in Due Course (HIDC) privileges, and dishonour implications.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88035bos-aps2231-ch7.pdf"
@@ -714,7 +714,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_qa_c1",
         "name": "Chapter 1: Ratio and Proportion, Indices, Logarithms",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Learn laws of indices, properties of logarithms, and ratio-proportion calculations essential for financial mathematics.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88037bos-aps2232-ch1.pdf"
@@ -735,7 +735,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_qa_c2",
         "name": "Chapter 2: Equations",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Solve linear equations (up to three variables), quadratic equations, and cubic equations in business situations.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88038bos-aps2232-ch2.pdf"
@@ -819,7 +819,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_qa_c6",
         "name": "Chapter 6: Sequence and Series &ndash; AP & GP",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Arithmetic Progression (AP) and Geometric Progression (GP), sum of series, mean calculations.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88042bos-aps2232-ch6.pdf"
@@ -840,7 +840,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_qa_c7",
         "name": "Chapter 7: Sets, Relations and Functions, Limits & Continuity",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Set theory operations, Venn diagrams, Cartesian product, relations, domain/range of functions, limits, and continuity.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88043bos-aps2232-ch7.pdf"
@@ -861,7 +861,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_qa_c8",
         "name": "Chapter 8: Basic Applications of Differential and Integral Calculus",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Derivative rules, marginal cost/revenue applications, optimization, basic integration methods, and consumer/producer surplus.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88045bos-aps2232-ch8u2.pdf"
@@ -966,7 +966,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_qa_c13",
         "name": "Chapter 13: Statistical Description of Data & Sampling",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Data collection methods, primary vs secondary, frequency distributions, graphics (histogram, ogive), and sampling methodologies.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88050bos-aps2232-ch13u1.pdf",
@@ -1060,7 +1060,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_qa_c17",
         "name": "Chapter 17: Correlation and Regression",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Karl Pearson's correlation coefficient, Spearman's rank correlation, regression equations, and standard error.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88055bos-aps2232-ch17.pdf"
@@ -1108,7 +1108,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_eco_c1",
         "name": "Chapter 1: Nature & Scope of Business Economics",
-        "weightage": "Medium",
+        "weightage": "Low",
         "notes": "Understand micro and macro economics differences, key central problems of an economy, and price mechanism functions in different economic systems.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88059bos-aps2233-ch1u1.pdf",
@@ -1134,7 +1134,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_eco_c2",
         "name": "Chapter 2: Theory of Demand and Supply",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "🔥 <strong>EXAM WEIGHTAGE BREAKDOWN:</strong> 35–40% (35–40 Marks) Microeconomics Core<br><br>Master key principles of demand (determinants, elasticity types, forecasting) and supply (determinants, elasticity), alongside consumer behavior theories (utility, indifference curves).",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88061bos-aps2233-ch2u1.pdf",
@@ -1165,7 +1165,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_eco_c3",
         "name": "Chapter 3: Theory of Production and Cost",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "🔥 <strong>EXAM WEIGHTAGE BREAKDOWN:</strong> 35–40% (35–40 Marks) Microeconomics Core<br><br>Examine production laws (returns to a variable factor, returns to scale), Isoquants, short-run vs long-run cost functions, and economies of scale.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88064bos-aps2233-ch3u1.pdf",
@@ -1222,7 +1222,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_eco_c5",
         "name": "Chapter 5: Business Cycles",
-        "weightage": "Medium",
+        "weightage": "Low",
         "notes": "Study macroeconomic fluctuation phases: expansion, peak, contraction, and trough, alongside their internal/external causes.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88069bos-aps2233-ch5.pdf"
@@ -1269,7 +1269,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_eco_c7",
         "name": "Chapter 7: Public Finance",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "🔥 <strong>EXAM WEIGHTAGE BREAKDOWN:</strong> 15 Marks Macroeconomics Core<br><br>Study center/state fiscal roles, government intervention policies to address market failures, budget-making steps, and fiscal policies.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88072bos-aps2233-ch7u1.pdf",
@@ -1305,7 +1305,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_eco_c8",
         "name": "Chapter 8: Money Market",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Important theories of money demand (Classical, Keynesian, Friedman), components of money supply (M1, M2, M3, M4), and RBI monetary policy instruments.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88076bos-aps2233-ch8u1.pdf",
@@ -1336,7 +1336,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_eco_c9",
         "name": "Chapter 9: International Trade",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Theories of trade (Mercantilism, Ricardo, Heckscher-Ohlin), trade instruments (tariffs, quotas), trade agreements, exchange rates, and international capital flows.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88079bos-aps2233-ch9u1.pdf",
@@ -1398,7 +1398,7 @@ export const Foundation_May2026_Data = [
       {
         "id": "f_eco_c11",
         "name": "Business Economics Glossary",
-        "weightage": "Medium",
+        "weightage": "Low",
         "notes": "Glossary of high-yield economic definitions, terms, and key acronyms utilized in Board of Studies study guides.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88085bos-aps2233-gloss.pdf"
@@ -1428,7 +1428,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_acc_c1",
         "name": "Chapter 1: Theoretical Framework",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "<strong>CHAPTER 1: THEORETICAL FRAMEWORK (COMPREHENSIVE ICAI STUDY MATERIAL SUMMARY)</strong><br><br>\n\n1. <strong>Meaning & Scope of Accounting (Unit 1):</strong><br>\nAccounting is the art of recording, classifying, summarizing in a significant manner and in terms of money, transactions and events which are of financial character, and interpreting the results thereof.<br>\n• <strong>Sub-fields:</strong> Financial Accounting, Cost Accounting, Management Accounting, Social Responsibility Accounting, and Human Resource Accounting.<br>\n• <strong>Objectives:</strong> Systematic recording, ascertainment of financial performance (Profit & Loss Account), determination of financial position (Balance Sheet), and communicating key financial reports to internal and external stakeholders.<br><br>\n\n2. <strong>Accounting Concepts, Principles & Conventions (Unit 2):</strong><br>\n• <strong>Going Concern Concept:</strong> Assumes the enterprise will continue operational existence for the foreseeable future without intention or necessity of liquidation.<br>\n• <strong>Accrual Concept:</strong> Revenues and expenses are recognized as they are earned or incurred, regardless of cash receipt or payment timing.<br>\n• <strong>Consistency Concept:</strong> Accounting policies are applied consistently period-to-period to ensure comparability.<br>\n• <strong>Entity Concept:</strong> Business entity is treated as a distinct legal person separate from its owners.<br>\n• <strong>Money Measurement Concept:</strong> Only events quantifiable in monetary terms are recorded in accounting books.<br>\n• <strong>Prudence (Conservatism):</strong> Anticipate all potential future losses, but do not anticipate unrealized profits.<br>\n• <strong>Matching Concept:</strong> Expenses incurred in an accounting period must be matched against revenues generated during that same period.<br><br>\n\n3. <strong>Capital and Revenue Expenditures & Receipts (Unit 3):</strong><br>\n• <strong>Capital Expenditure:</strong> Incurred to acquire fixed assets, increase asset capacity, or provide enduring benefits across multiple accounting periods (e.g., machinery purchase, legal fees for title deed). Carried to the Balance Sheet.<br>\n• <strong>Revenue Expenditure:</strong> Incurred to maintain daily business operations, preserve earning capacity, or repair existing assets (e.g., salaries, rent, routine repairs). Debited to Trading/P&L Account.<br>\n• <strong>Capital Receipt:</strong> Non-recurring receipts from owner capital contributions, borrowings, or sale of fixed assets.<br>\n• <strong>Revenue Receipt:</strong> Recurring operational proceeds from sale of goods, performance of services, or interest/dividends earned.<br><br>\n\n4. <strong>Contingent Liabilities & Contingent Assets (Unit 4):</strong><br>\n• <strong>Contingent Liability:</strong> A possible obligation from past events whose existence is confirmed only by future uncertain events (e.g., pending court lawsuits, claims against firm not acknowledged as debts, bank guarantees given). Disclosed in Notes to Accounts, NOT recognized in Balance Sheet.<br>\n• <strong>Provision:</strong> A present obligation arising from past events involving probable economic outflow where a reliable estimate can be made (e.g., Provision for Doubtful Debts). Recognized in Financial Statements.<br>\n• <strong>Contingent Asset:</strong> A possible asset from past events; disclosed in Director's report when inflow of economic benefits becomes probable.<br><br>\n\n5. <strong>Accounting Policies & Valuation Principles (Units 5 & 6):</strong><br>\n• <strong>Selection Criteria:</strong> Governed by Prudence, Substance over Form, and Materiality.<br>\n• <strong>Valuation Bases:</strong> Historical Cost (acquisition price), Current Cost (replacement cost), Realizable Value (net sale proceeds), Present Value (discounted future net cash flows).<br><br>\n\n6. <strong>Accounting Standards Framework (Unit 7):</strong><br>\nAccounting Standards (AS) and Ind AS issued by the ICAI Council harmonize accounting policies, ensure statutory transparency, remove variations in financial reporting, and comply with the Companies Act, 2013.<br><br>\n\n💡 <strong>EXAM TIP:</strong> Distinguishing Capital vs Revenue expenditure and identifying Contingent Liabilities are compulsory 2-4 mark questions in ICAI Foundation Paper 1.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93935bos-aps6170-ch1u1.pdf",
@@ -1646,7 +1646,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_acc_c4",
         "name": "Chapter 4: Inventories",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "🔥 <strong>EXAM WEIGHTAGE BREAKDOWN:</strong> 25–30% (25–30 Marks) Core Accounting Process Block<br><br><strong>CHAPTER 4: INVENTORIES (COMPREHENSIVE ICAI STUDY MATERIAL SUMMARY)</strong><br><br>\n\n1. <strong>Definition & Valuation Standard (AS 2 / Ind AS 2):</strong><br>\nInventories are assets held for sale in ordinary course of business, in process of production (WIP), or materials/supplies to be consumed.<br>\n• <strong>Core Rule:</strong> Inventories are valued at the <strong>Lower of Cost or Net Realizable Value (NRV)</strong>.<br>\n• <strong>Cost of Inventory:</strong> Purchase price + Duties/Taxes (non-refundable) + Freight inward + Direct labor & manufacturing overheads - Trade discounts/rebates.<br>\n• <strong>NRV Definition:</strong> Estimated selling price in ordinary course of business less estimated cost of completion and estimated selling costs.<br><br>\n\n2. <strong>Inventory Valuation Methods:</strong><br>\n• <strong>FIFO (First-In, First-Out):</strong> Assumes items purchased first are issued first. Closing inventory reflects latest market prices.<br>\n• <strong>Weighted Average Cost:</strong> Computes average cost per unit after every new purchase receipt.<br><br>\n\n3. <strong>Inventory Systems:</strong><br>\n• <strong>Periodic Inventory System:</strong> Physical stocktaking done at period end. Cost of Goods Sold = Opening Stock + Purchases - Closing Stock.<br>\n• <strong>Perpetual Inventory System:</strong> Continuous recording of stock movements using Store Ledgers and Bin Cards.<br><br>\n\n💡 <strong>EXAM TIP:</strong> Abnormal waste is EXCLUDED from inventory cost and charged directly to Profit & Loss Account.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88107bos-aps2240-ch4.pdf"
@@ -1667,7 +1667,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_acc_c5",
         "name": "Chapter 5: Property, Plant and Equipment and Depreciable Assets",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "🔥 <strong>EXAM WEIGHTAGE BREAKDOWN:</strong> 25–30% (25–30 Marks) Core Accounting Process Block<br><br><strong>CHAPTER 5: DEPRECIATION AND AMORTISATION (COMPREHENSIVE ICAI STUDY MATERIAL SUMMARY)</strong><br><br>\n\n1. <strong>Concepts & AS 10 (PPE Framework):</strong><br>\nDepreciation is a systematic allocation of the depreciable amount of Property, Plant & Equipment (PPE) over its estimated useful life.<br>\n• <strong>Depreciable Amount:</strong> Historical Cost - Estimated Residual (Scrap) Value.<br><br>\n\n2. <strong>Depreciation Computation Methods:</strong><br>\n• <strong>Straight Line Method (SLM):</strong> Equal annual depreciation charge. Annual Depreciation = (Cost - Scrap Value) / Useful Life.<br>\n• <strong>Written Down Value Method (WDV):</strong> Decreasing depreciation charge calculated at a fixed percentage on opening book value each year.<br>\n• <strong>Units of Production / Sum-of-Years'-Digits Methods:</strong> Allocates cost based on actual asset output or accelerated early usage.<br><br>\n\n3. <strong>Accounting & Method Changes:</strong><br>\n• <strong>Change in Method/Useful Life:</strong> Treated as a change in accounting estimate (prospectively under AS 10) by allocating remaining WDV over revised useful life.<br>\n• <strong>Revaluation of PPE:</strong> Increase credited to Revaluation Reserve; decrease charged to P&L Account.<br><br>\n\n💡 <strong>EXAM TIP:</strong> Profit or loss on sale of PPE = Net Sale Proceeds - WDV on date of sale.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88108bos-aps2240-ch5.pdf"
@@ -1876,7 +1876,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_law_c1",
         "name": "Chapter 1: Indian Regulatory Framework",
-        "weightage": "Medium",
+        "weightage": "Low",
         "notes": "Structure of Indian legal system, sources of law, law-making process, and judicial hierarchy.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93742bos-aps6083-p2-ch1.pdf"
@@ -2025,7 +2025,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_law_c5",
         "name": "Chapter 5: The Limited Liability Partnership Act, 2008",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "🔥 <strong>EXAM WEIGHTAGE BREAKDOWN:</strong> 30–40% (30–40 Marks) Primary Subjective Numerical Block<br><br>Salient features of LLP, difference between LLP and Partnership/Company, incorporation procedure.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93759bos-aps6083-p2-ch5.pdf"
@@ -2094,7 +2094,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_qa_c1",
         "name": "Part A - Chapter 1: Ratio and Proportion, Indices, Logarithms",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Ratios, proportions, laws of indices, properties of logarithms and financial calculations.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93822bos-aps6110-p3-ch1.pdf"
@@ -2115,7 +2115,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_qa_c2",
         "name": "Part A - Chapter 2: Equations",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Linear, quadratic, and cubic equations, simultaneous equations and practical word problems.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93823bos-aps6110-p3-ch2.pdf"
@@ -2220,7 +2220,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_qa_c7",
         "name": "Part A - Chapter 7: Sets, Relations and Functions",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Set operations, Venn diagrams, Cartesian product, relations, domain, range, functions.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93828bos-aps6110-p3-ch7.pdf"
@@ -2241,7 +2241,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_qa_c8",
         "name": "Part A - Chapter 8: Basic Applications of Differential and Integral Calculus",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Derivative concept, marginal cost & revenue, maxima & minima, integration basics.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93829bos-aps6110-p3-ch8.pdf"
@@ -2440,7 +2440,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_qa_c17",
         "name": "Part C - Chapter 17: Correlation and Regression",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Karl Pearson coefficient, Spearman rank correlation, regression lines and coefficients.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93840bos-aps6110-p3-ch17.pdf"
@@ -2461,7 +2461,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_qa_c18",
         "name": "Part C - Chapter 18: Index Numbers",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Laspeyres, Paasche, Fisher ideal index, Consumer Price Index, purchasing power of money.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93841bos-aps6110-p3-ch18.pdf"
@@ -2488,7 +2488,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_eco_c1",
         "name": "Chapter 1: Nature and Scope of Business Economics",
-        "weightage": "High",
+        "weightage": "Low",
         "notes": "Micro vs Macro economics, central economic problems, market economy, socialist economy, mixed economy.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93845bos-aps6111-p4-ch1u1.pdf",
@@ -2514,7 +2514,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_eco_c2",
         "name": "Chapter 2: Utility, Demand and Supply Analysis",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "🔥 <strong>EXAM WEIGHTAGE BREAKDOWN:</strong> 35–40% (35–40 Marks) Microeconomics Core<br><br>Cardinal and Ordinal utility analysis, law of demand, elasticity of demand, law of supply, equilibrium.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93847bos-aps6111-p4-ch2u1.pdf",
@@ -2545,7 +2545,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_eco_c3",
         "name": "Chapter 3: Production and Cost Analysis",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "🔥 <strong>EXAM WEIGHTAGE BREAKDOWN:</strong> 35–40% (35–40 Marks) Microeconomics Core<br><br>Production function, law of variable proportions, returns to scale, short run & long run cost curves.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93850bos-aps6111-p4-ch3u1.pdf",
@@ -2602,7 +2602,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_eco_c5",
         "name": "Chapter 5: Business Cycles",
-        "weightage": "Medium",
+        "weightage": "Low",
         "notes": "Phases of business cycles (expansion, peak, contraction, trough), indicators and economic impact.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88069bos-aps2233-ch5.pdf"
@@ -2654,7 +2654,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_eco_c7",
         "name": "Chapter 7: Public Finance",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "🔥 <strong>EXAM WEIGHTAGE BREAKDOWN:</strong> 15 Marks Macroeconomics Core<br><br>Fiscal functions, market failure, government intervention remedies, fiscal policy & budget deficit.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93859bos-aps6111-p4-ch7u1.pdf",
@@ -2690,7 +2690,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_eco_c8",
         "name": "Chapter 8: Money Market",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Money demand theories, money supply measures (M1, M2, M3, M4), RBI monetary policy tools.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93863bos-aps6111-p4-ch8u1.pdf",
@@ -2721,7 +2721,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_eco_c9",
         "name": "Chapter 9: International Trade",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Theories of international trade, trade policy instruments (tariffs, quotas), WTO, exchange rate systems.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93866bos-aps6111-p4-ch9u1.pdf",
@@ -2762,7 +2762,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_eco_c10",
         "name": "Chapter 10: Indian Economy",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Overview of Indian economy post-independence, economic reforms (1991 LPG), sector performance & growth challenges.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93871bos-aps6111-p4-ch10.pdf"
@@ -2783,7 +2783,7 @@ export const Foundation_May2027_Data = [
       {
         "id": "f27_eco_extra",
         "name": "Practice Questions & Business Economics Glossary",
-        "weightage": "Medium",
+        "weightage": "Low",
         "notes": "Official ICAI practice questions compilation and economics terminology glossary for May 2027 preparation.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93844bos-aps6111-p4-qp.pdf",
@@ -2818,7 +2818,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_acc_c1",
         "name": "Chapter 1: Introduction to Accounting Standards",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Understand the purpose and process of formulating accounting standards, their integration, and transition rules.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87688bos-aps2158-ch1.pdf"
@@ -2839,7 +2839,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_acc_c2",
         "name": "Chapter 2: Framework for Preparation and Presentation of Financial Statements",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Study qualitative characteristics, elements of financial statements, measurement bases, and capital maintenance concepts.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87689bos-aps2158-ch2.pdf"
@@ -2860,7 +2860,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_acc_c3",
         "name": "Chapter 3: Applicability of Accounting Standards",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Check applicability to corporate and non-corporate entities, criteria for classification of entities, and exemptions/relaxations.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87690bos-aps2158-ch3.pdf"
@@ -2983,7 +2983,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_acc_c6",
         "name": "Chapter 6: Liabilities Based Accounting Standards",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Study liabilities standards: AS-15 (Employee Benefits) and AS-29 (Provisions, Contingent Liabilities and Contingent Assets).",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87709bos-aps2158-ch6u1.pdf",
@@ -3009,7 +3009,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_acc_c7",
         "name": "Chapter 7: Accounting Standards Based on Items Impacting Financial Statement",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Covers AS-4 (Contingencies and Events Occurring After Balance Sheet Date), AS-5 (Net Profit or Loss, Prior Period Items and Changes in Policies), AS-11 (Effects of Changes in Foreign Exchange Rates), and AS-22 (Accounting for Taxes on Income).",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87711bos-aps2158-ch7u1.pdf",
@@ -3071,7 +3071,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_acc_c9",
         "name": "Chapter 9: Other Accounting Standards",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Study AS-12 (Accounting for Government Grants) and AS-14 (Accounting for Amalgamations).",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87717bos-aps2158-ch9u1.pdf",
@@ -3222,7 +3222,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_acc_c15",
         "name": "Chapter 15: Accounting for Branches including Foreign Branches",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Study independent and dependent branches, branch adjustments, reconciliation, and foreign branch translation techniques under AS-11.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87728bos-aps2158-ch15.pdf"
@@ -3249,7 +3249,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_law_c1",
         "name": "Chapter 1: Preliminary",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Study key statutory definitions under Section 2, the concept of a company, and classification of companies (public, private, one person company, small company, holding/subsidiary, associate, etc.).",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87769bos-aps2160-ch1.pdf"
@@ -3396,7 +3396,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_law_c8",
         "name": "Chapter 8: Declaration and Payment of Dividend",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Study source of dividends, declaration out of reserves, interim dividend, Unpaid Dividend Account (UDA) rules, and transfer of shares/funds to the Investor Education and Protection Fund (IEPF).",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87777bos-aps2160-ch8.pdf"
@@ -3522,7 +3522,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_law_c14",
         "name": "Chapter 14: Interpretation of Statutes",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Understand the primary rules of interpretation (literal, reasonable, harmonious construction, mischief rule, golden rule), secondary rules, internal aids to construction (preamble, definitions, headings), and external aids (dictionaries, parliamentary history).",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87785bos-aps2160-p2-ch2.pdf"
@@ -3570,7 +3570,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_tax_c1",
         "name": "Chapter 1: Basic Concepts",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Income tax chargeability, assessment year vs previous year, slab rates, surcharge, health and education cess.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87284bos-aps1794-m1-ch1.pdf"
@@ -3633,7 +3633,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_tax_c4",
         "name": "Chapter 3: Heads of Income - Unit 2: Income from House Property",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Determine annual value, self-occupied vs let out properties, deductions under Section 24 (standard deduction of 30% and interest on borrowed capital).",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87287bos-aps1794-m1-ch3u2.pdf"
@@ -3696,7 +3696,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_tax_c7",
         "name": "Chapter 3: Heads of Income - Unit 5: Income from Other Sources",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Covers residual incomes: dividend income, casual incomes (lotteries, betting), gift taxation rules under Section 56(2)(x), and interest on securities.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87290bos-aps1794-m1-ch3u5.pdf"
@@ -3801,7 +3801,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_tax_c12",
         "name": "Chapter 8: Provisions for filing Return of Income and Self Assessment",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Due dates for filing returns under Section 139(1), permanent account number (PAN), Aadhaar linking, belated return, revised return, and tax return preparers.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87175bos-aps1794-ch8.pdf"
@@ -3933,7 +3933,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_tax_c18",
         "name": "Chapter 5: Exemptions from GST",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Understand power to grant exemptions, charitable services, governmental services, healthcare, agricultural, and educational exemptions.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87070bos-aps1530-p2b-m1-may2026-ch5.pdf"
@@ -4017,7 +4017,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_tax_c22",
         "name": "Chapter 9: Registration",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Study registration thresholds, compulsory registration (Sec 24), procedure for registration (Sec 25), amendment, cancellation, and revocation.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87270bos-aps1530-p2b-m2-may2026-ch9.pdf"
@@ -4059,7 +4059,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_tax_c24",
         "name": "Chapter 11: Accounts and Records",
-        "weightage": "Medium",
+        "weightage": "Low",
         "notes": "Understand provisions relating to maintenance of accounts, records, and period of retention under GST.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87278bos-aps1530-p2b-m2-may2026-ch11.pdf"
@@ -4080,7 +4080,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_tax_c25",
         "name": "Chapter 12: E-Way Bill",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Detailed review of E-Way Bill generation rules, thresholds, and cancellation rules.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87279bos-aps1530-p2b-m2-may2026-ch12.pdf"
@@ -4101,7 +4101,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_tax_c26",
         "name": "Chapter 13: Payment of Tax",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Electronic ledgers (cash, credit, liability), payment procedure, interest on delayed payment.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87280bos-aps1530-p2b-m2-may2026-ch13.pdf"
@@ -4143,7 +4143,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_tax_c28",
         "name": "Chapter 15: Returns",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "GSTR-1, GSTR-3B, QRMP scheme, and late fee/interest on delayed filing of returns.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87282bos-aps1530-p2b-m2-may2026-ch15.pdf"
@@ -4317,7 +4317,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_cost_c8",
         "name": "Chapter 8: Unit & Batch Costing",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Cost unit definition, batch costing application, Economic Batch Quantity (EBQ) formula.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87797bos-aps2161-ch8.pdf"
@@ -4596,7 +4596,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_audit_c6",
         "name": "Chapter 6: Audit Documentation",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Nature and purpose of documentation, working papers assembly, ownership and confidentiality of audit documents (SQC 1).",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87762bos280825-ch6a.pdf"
@@ -4680,7 +4680,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_audit_c10",
         "name": "Chapter 10: Audit of Banks",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Banking business, internal control evaluation in banks, auditing advances, non-performing assets (NPA) classification, provisioning norms.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87766bos280825-ch10a.pdf"
@@ -4749,7 +4749,7 @@ export const Intermediate_May2026_Data = [
       {
         "id": "i_fm_c2",
         "name": "Chapter 2: Types of Financing",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Equity, debt, hybrid financing, venture capital, angel investment, securitization, international financing (ADRs, GDRs).",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87738bos280825-ch2.pdf"
@@ -5062,7 +5062,7 @@ export const Intermediate_May2027_Data = [
       {
         "id": "i27_acc_c1",
         "name": "Chapter 1: Introduction to Accounting Standards",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Purpose, formulation process, convergence with IFRS, and structure of AS issued by ICAI.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93350bos-aps5886-ch1.pdf"
@@ -5083,7 +5083,7 @@ export const Intermediate_May2027_Data = [
       {
         "id": "i27_acc_c2",
         "name": "Chapter 2: Framework for Preparation and Presentation of Financial Statements",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Qualitative characteristics, elements of financial statements, measurement bases, and capital maintenance concepts.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93351bos-aps5886-ch2.pdf"
@@ -5104,7 +5104,7 @@ export const Intermediate_May2027_Data = [
       {
         "id": "i27_acc_c3",
         "name": "Chapter 3: Applicability of Accounting Standards",
-        "weightage": "Low",
+        "weightage": "High",
         "notes": "Classification of entities into Level I, II, III, IV and corporate vs non-corporate entity AS applicability rules.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93352bos-aps5886-ch3.pdf"
@@ -5315,7 +5315,7 @@ export const Intermediate_May2027_Data = [
       {
         "id": "i27_acc_c9",
         "name": "Chapter 9: Other Accounting Standards",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "AS 12 (Government Grants) & AS 14 (Amalgamations).",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93662bos-aps5886-ch9u1.pdf",
@@ -5466,7 +5466,7 @@ export const Intermediate_May2027_Data = [
       {
         "id": "i27_acc_c15",
         "name": "Chapter 15: Accounting for Branches including Foreign Branches",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Dependent branches (Debtors method, Stock & Debtors method), Independent branches, Foreign Branch translation rules under AS 11.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93490bos-aps5886-ch15.pdf"
@@ -5493,7 +5493,7 @@ export const Intermediate_May2027_Data = [
       {
         "id": "i27_law_c1",
         "name": "Part I - Chapter 1: Preliminary",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Short title, extent, commencement, key definitions under Sec 2 (Private Co, Public Co, One Person Co, Small Co, Holding Co, Subsidiary Co).",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93466bos-aps5940-p2-ch1.pdf"
@@ -5640,7 +5640,7 @@ export const Intermediate_May2027_Data = [
       {
         "id": "i27_law_c8",
         "name": "Part I - Chapter 8: Declaration and Payment of Dividend",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Sec 123 to 127, Sources of dividend, Unpaid Dividend Account (Sec 124), IEPF (Sec 125), interim dividend.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93473bos-aps5940-p2-ch8.pdf"
@@ -5766,7 +5766,7 @@ export const Intermediate_May2027_Data = [
       {
         "id": "i27_law_c14",
         "name": "Part II - Chapter 2: Interpretation of Statutes",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Rules of statutory interpretation (Literal, Mischief, Golden, Harmonious), Internal & External aids to interpretation.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93482bos-aps5940-p2-olc2.pdf"
@@ -6153,7 +6153,7 @@ export const Intermediate_May2027_Data = [
       {
         "id": "i27_gst_c9",
         "name": "Chapter 9: Registration",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Sec 22 to 30 CGST Act, Threshold limits for registration (₹10/20/40 Lakhs), compulsory registration (Sec 24), cancellation & revocation.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93798bos-aps6021-p3b-may2027-ch9.pdf"
@@ -6174,7 +6174,7 @@ export const Intermediate_May2027_Data = [
       {
         "id": "i27_gst_c10",
         "name": "Chapter 10: Tax Invoice; Credit and Debit Notes",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Sec 31 to 34 CGST Act, Tax invoice requirements, time limit for issuing invoice, E-Invoicing rules, Credit Notes and Debit Notes.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93799bos-aps6021-p3b-may2027-ch10.pdf"
@@ -6195,7 +6195,7 @@ export const Intermediate_May2027_Data = [
       {
         "id": "i27_gst_c11",
         "name": "Chapter 11: Accounts and Records",
-        "weightage": "Medium",
+        "weightage": "Low",
         "notes": "Sec 35 & 36 CGST Act, Maintenance of accounts by registered persons, retention period (72 months).",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93800bos-aps6021-p3b-may2027-ch11.pdf"
@@ -6216,7 +6216,7 @@ export const Intermediate_May2027_Data = [
       {
         "id": "i27_gst_c12",
         "name": "Chapter 12: E-Way Bill",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Rule 138 CGST Rules, E-Way bill generation threshold (₹50,000), validity period based on distance, exceptions.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93801bos-aps6021-p3b-may2027-ch12.pdf"
@@ -6237,7 +6237,7 @@ export const Intermediate_May2027_Data = [
       {
         "id": "i27_gst_c13",
         "name": "Chapter 13: Payment of Tax",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Sec 49, 50, Electronic Cash Ledger, Electronic Credit Ledger, Electronic Liability Register, utilization order of ITC (IGST -> CGST/SGST), interest on delayed payment (18%).",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93802bos-aps6021-p3b-may2027-ch13.pdf"
@@ -6279,7 +6279,7 @@ export const Intermediate_May2027_Data = [
       {
         "id": "i27_gst_c15",
         "name": "Chapter 15: Returns",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Sec 37 to 48, GSTR-1 (Outward supplies), GSTR-3B (Summary return), QRMP Scheme, GSTR-9 (Annual return).",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93804bos-aps6021-p3b-may2027-ch15.pdf"
@@ -6390,7 +6390,7 @@ export const Intermediate_May2027_Data = [
       {
         "id": "i27_cma_c5",
         "name": "Chapter 5: Activity Based Costing",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Cost pools, cost drivers, 2-stage allocation process under ABC vs traditional volume-based absorption.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93308bos-aps5870-ch5.pdf"
@@ -6453,7 +6453,7 @@ export const Intermediate_May2027_Data = [
       {
         "id": "i27_cma_c8",
         "name": "Chapter 8: Unit & Batch Costing",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Costing for single product units, Economic Batch Quantity (EBQ) formula and applications.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93311bos-aps5870-ch8.pdf"
@@ -6516,7 +6516,7 @@ export const Intermediate_May2027_Data = [
       {
         "id": "i27_cma_c11",
         "name": "Chapter 11: Joint Products and By Products",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Apportionment of joint costs at split-off point (Physical units, Sales value at split-off, NRV method), By-product accounting.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93314bos-aps5870-ch11.pdf"
@@ -6627,7 +6627,7 @@ export const Intermediate_May2027_Data = [
       {
         "id": "i27_audit_c1",
         "name": "Chapter 1: Nature, Objective and Scope of Audit",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "SA 200 (Overall Objectives), Inherent limitations of audit, Professional skepticism, Professional judgment, Ethics.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93332bos-aps5884-ch1.pdf"
@@ -7011,7 +7011,7 @@ export const Intermediate_May2027_Data = [
       {
         "id": "i27_fm_c8",
         "name": "Chapter 8: Dividend Decisions",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Walter Model, Gordon Model, MM Dividend Irrelevance Hypothesis, Linter Model, Determinants of dividend policy.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87746bos280825-ch8.pdf"
@@ -7358,7 +7358,7 @@ export const Final_May2026_Data = [
       {
         "id": "fn_fr_c6",
         "name": "Chapter 6: Ind AS on Liabilities of the Financial Statements",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Examines provisions, contingent liabilities, and employee benefits (Ind AS 19 and 37).",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87833bos-280825-final-ch6-u1.pdf",
@@ -7384,7 +7384,7 @@ export const Final_May2026_Data = [
       {
         "id": "fn_fr_c7",
         "name": "Chapter 7: Ind AS on Items impacting the Financial Statements",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Covers accounting for income taxes (Ind AS 12) and effects of foreign exchange fluctuations (Ind AS 21).",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87835bos-280825-final-ch7-u1.pdf",
@@ -7663,7 +7663,7 @@ export const Final_May2026_Data = [
       {
         "id": "fn_fr_c16",
         "name": "Chapter 16: Professional and Ethical Duty of a Chartered Accountant",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Ethical standards, code of conduct, and professional responsibilities of CAs.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87886bos-290825-ch16.pdf"
@@ -7732,7 +7732,7 @@ export const Final_May2026_Data = [
       {
         "id": "fn_sfm_c2",
         "name": "Chapter 2: Risk Management",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Focuses on identification, measurement, and control of risk. Covers types of risks (credit, market, operational), Value at Risk (VaR), and risk mitigation strategies.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87843bos-aps2163-ch2.pdf"
@@ -8284,7 +8284,7 @@ export const Final_May2026_Data = [
       {
         "id": "fn_aud_c13",
         "name": "Chapter 13: Group Audits",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "SA 600: using the work of another auditor, group auditor's responsibilities.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87919bos-aps2168-ch13.pdf"
@@ -8373,7 +8373,7 @@ export const Final_May2026_Data = [
       {
         "id": "fn_aud_c17",
         "name": "Chapter 17: Due Diligence, Investigation & Forensic Accounting",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Investigating corporate frauds, transaction reviews, forensic auditing tools.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87924bos-aps2168-ch17.pdf"
@@ -8841,7 +8841,7 @@ export const Final_May2026_Data = [
       {
         "id": "fn_dt_c20",
         "name": "Chapter 20: Tax Audit and Ethical Compliances",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Form 3CD audit reports, thresholds under Section 44AB, and ethical duties of CAs.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88902bos-aps2299-m3-ch20.pdf"
@@ -9099,7 +9099,7 @@ export const Final_May2026_Data = [
       {
         "id": "fn_idt_c4",
         "name": "Chapter 4: Exemptions from GST",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Exemptions for healthcare, education, agricultural activities, governmental, and charitable services.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87622bos-aps2102-p5u4.pdf"
@@ -9183,7 +9183,7 @@ export const Final_May2026_Data = [
       {
         "id": "fn_idt_c8",
         "name": "Chapter 8: Registration",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Compulsory registration thresholds, procedures, amendment, and cancellation rules.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88887bos-aps2102-m2-p8.pdf"
@@ -9225,7 +9225,7 @@ export const Final_May2026_Data = [
       {
         "id": "fn_idt_c10",
         "name": "Chapter 10: Accounts and Records; E-way Bill",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "E-way bill generation rules, rules for maintaining accounts and registers under GST.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88889bos-aps2102-m2-p10.pdf"
@@ -9309,7 +9309,7 @@ export const Final_May2026_Data = [
       {
         "id": "fn_idt_c14",
         "name": "Chapter 14: Import and Export Under GST",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Zero-rated supplies, LUT/bond rules, and IGST treatment of imports/exports.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88819bos-aps2102-m3-ch14.pdf"
@@ -9330,7 +9330,7 @@ export const Final_May2026_Data = [
       {
         "id": "fn_idt_c15",
         "name": "Chapter 15: Refunds",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Refund mechanisms, inverted duty structure, and export refunds under Section 54.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88820bos-aps2102-m3-ch15.pdf"
@@ -9393,7 +9393,7 @@ export const Final_May2026_Data = [
       {
         "id": "fn_idt_c18",
         "name": "Chapter 18: Inspection, Search, Seizure and Arrest",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Statutory powers under Section 67 to 69, search warrants, and bail provisions.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88823bos-aps2102-m3-ch18.pdf"
@@ -9414,7 +9414,7 @@ export const Final_May2026_Data = [
       {
         "id": "fn_idt_c19",
         "name": "Chapter 19: Demands and Recovery",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Show Cause Notices (SCNs) under Sections 73 and 74, penalties, and modes of recovery.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88824bos-aps2102-m3-ch19.pdf"
@@ -9456,7 +9456,7 @@ export const Final_May2026_Data = [
       {
         "id": "fn_idt_c21",
         "name": "Chapter 21: Offences and Penalties and Ethical Aspects under GST",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "Cognizable and non-cognizable offences, prosecution limits, compounding of offences, and ethical compliances.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/88826bos-aps2102-m3-ch21.pdf"
@@ -9566,7 +9566,7 @@ export const Final_May2026_Data = [
       {
         "id": "fn_idt_c26",
         "name": "Chapter 26: Types of Duty",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Basic customs duty, IGST on imports, protective duties, anti-dumping duty, and safeguard duty.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87896bos-aps2102-m4-ch2.pdf"
@@ -9629,7 +9629,7 @@ export const Final_May2026_Data = [
       {
         "id": "fn_idt_c29",
         "name": "Chapter 29: Importation and Exportation of Goods",
-        "weightage": "Medium",
+        "weightage": "High",
         "notes": "Bill of Entry, Shipping Bill, clearance procedures for home consumption/warehousing, and self-assessment.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87899bos-aps2102-m4-ch5.pdf"
@@ -9850,7 +9850,7 @@ export const Final_May2027_Data = [
       {
         "id": "fn27_aud_c1",
         "name": "Chapter 1: Quality Control and Engagement Standards",
-        "weightage": "High",
+        "weightage": "Medium",
         "notes": "SQC 1, SA 220, leadership responsibilities, ethical requirements, client acceptance and continuance.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/87848bos-280825-final-p3ch1.pdf"
@@ -9898,7 +9898,7 @@ export const Final_May2027_Data = [
       {
         "id": "fn27_dt_c2",
         "name": "Chapter 2: Incomes which do not form part of Total Income",
-        "weightage": "Medium",
+        "weightage": "Low",
         "notes": "Exempted incomes under Section 10: agricultural income, SEZ unit profits, partnership firm share, political party income.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/93463bos-aps5939-ch2.pdf"
@@ -9982,7 +9982,7 @@ export const Final_May2027_Data = [
       {
         "id": "fn27_dt_c6",
         "name": "Chapter 6: Income of Other Persons included in Assessee’s Total Income",
-        "weightage": "Medium",
+        "weightage": "Low",
         "notes": "Clubbing of income provisions (Sec 60 to 64), transfer of income without transfer of asset, spouse/minor child clubbing rules.",
         "pdfUrls": [
           "https://resource.cdn.icai.org/94130bos-aps5939-ch6.pdf"
@@ -10535,12 +10535,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "intermediate_pyq_Jan_25_Cost_accounts_PYQ",
-      "title": "Jan 2025 PYQ - Paper-1: Advanced Accounting",
+      "title": "Jan 2025 PYQ - Paper-4: Cost and Management Accounting",
       "level": "Intermediate",
       "year": "2025",
       "month": "Jan",
       "type": "PYQ",
-      "subject": "Paper-1: Advanced Accounting",
+      "subject": "Paper-4: Cost and Management Accounting",
       "pdfUrl": "./pdfs/intermediate/pyq/Jan 25_Cost accounts_PYQ.pdf"
     },
     {
@@ -10595,12 +10595,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "intermediate_pyq_Jan_26_Cost_accounts_PYQ",
-      "title": "Jan 2026 PYQ - Paper-1: Advanced Accounting",
+      "title": "Jan 2026 PYQ - Paper-4: Cost and Management Accounting",
       "level": "Intermediate",
       "year": "2026",
       "month": "Jan",
       "type": "PYQ",
-      "subject": "Paper-1: Advanced Accounting",
+      "subject": "Paper-4: Cost and Management Accounting",
       "pdfUrl": "./pdfs/intermediate/pyq/Jan 26_Cost accounts_PYQ.pdf"
     },
     {
@@ -10655,12 +10655,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "intermediate_pyq_May_24_Cost_accounts_PYQ",
-      "title": "May 2024 PYQ - Paper-1: Advanced Accounting",
+      "title": "May 2024 PYQ - Paper-4: Cost and Management Accounting",
       "level": "Intermediate",
       "year": "2024",
       "month": "May",
       "type": "PYQ",
-      "subject": "Paper-1: Advanced Accounting",
+      "subject": "Paper-4: Cost and Management Accounting",
       "pdfUrl": "./pdfs/intermediate/pyq/May 24_Cost accounts_PYQ.pdf"
     },
     {
@@ -10715,12 +10715,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "intermediate_pyq_May_25_Cost_accounts_PYQ",
-      "title": "May 2025 PYQ - Paper-1: Advanced Accounting",
+      "title": "May 2025 PYQ - Paper-4: Cost and Management Accounting",
       "level": "Intermediate",
       "year": "2025",
       "month": "May",
       "type": "PYQ",
-      "subject": "Paper-1: Advanced Accounting",
+      "subject": "Paper-4: Cost and Management Accounting",
       "pdfUrl": "./pdfs/intermediate/pyq/May 25_Cost accounts_PYQ.pdf"
     },
     {
@@ -10775,12 +10775,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "intermediate_pyq_May_26_Cost_accounts_PYQ",
-      "title": "May 2026 PYQ - Paper-1: Advanced Accounting",
+      "title": "May 2026 PYQ - Paper-4: Cost and Management Accounting",
       "level": "Intermediate",
       "year": "2026",
       "month": "May",
       "type": "PYQ",
-      "subject": "Paper-1: Advanced Accounting",
+      "subject": "Paper-4: Cost and Management Accounting",
       "pdfUrl": "./pdfs/intermediate/pyq/May 26_Cost accounts_PYQ.pdf"
     },
     {
@@ -10835,12 +10835,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "intermediate_pyq_Sep_24_Cost_accounts_PYQ",
-      "title": "Sep 2024 PYQ - Paper-1: Advanced Accounting",
+      "title": "Sep 2024 PYQ - Paper-4: Cost and Management Accounting",
       "level": "Intermediate",
       "year": "2024",
       "month": "Sep",
       "type": "PYQ",
-      "subject": "Paper-1: Advanced Accounting",
+      "subject": "Paper-4: Cost and Management Accounting",
       "pdfUrl": "./pdfs/intermediate/pyq/Sep 24_Cost accounts_PYQ.pdf"
     },
     {
@@ -10895,12 +10895,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "intermediate_pyq_Sep_25_Cost_accounts_PYQ",
-      "title": "Sep 2025 PYQ - Paper-1: Advanced Accounting",
+      "title": "Sep 2025 PYQ - Paper-4: Cost and Management Accounting",
       "level": "Intermediate",
       "year": "2025",
       "month": "Sep",
       "type": "PYQ",
-      "subject": "Paper-1: Advanced Accounting",
+      "subject": "Paper-4: Cost and Management Accounting",
       "pdfUrl": "./pdfs/intermediate/pyq/Sep 25_Cost accounts_PYQ.pdf"
     },
     {
@@ -11025,12 +11025,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "final_pyq_Jan_26_Indirect_Tax_PYQ",
-      "title": "Jan 2026 PYQ - Paper-4: Direct Tax Laws and International Taxation",
+      "title": "Jan 2026 PYQ - Paper-5: Indirect Tax Laws",
       "level": "Final",
       "year": "2026",
       "month": "Jan",
       "type": "PYQ",
-      "subject": "Paper-4: Direct Tax Laws and International Taxation",
+      "subject": "Paper-5: Indirect Tax Laws",
       "pdfUrl": "./pdfs/final/pyq/Jan 26_Indirect Tax_PYQ.pdf"
     },
     {
@@ -11085,12 +11085,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "final_pyq_May_24_Indirect_Tax_PYQ",
-      "title": "May 2024 PYQ - Paper-4: Direct Tax Laws and International Taxation",
+      "title": "May 2024 PYQ - Paper-5: Indirect Tax Laws",
       "level": "Final",
       "year": "2024",
       "month": "May",
       "type": "PYQ",
-      "subject": "Paper-4: Direct Tax Laws and International Taxation",
+      "subject": "Paper-5: Indirect Tax Laws",
       "pdfUrl": "./pdfs/final/pyq/May 24_Indirect Tax_PYQ.pdf"
     },
     {
@@ -11145,12 +11145,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "final_pyq_May_25_Indirect_Tax_PYQ",
-      "title": "May 2025 PYQ - Paper-4: Direct Tax Laws and International Taxation",
+      "title": "May 2025 PYQ - Paper-5: Indirect Tax Laws",
       "level": "Final",
       "year": "2025",
       "month": "May",
       "type": "PYQ",
-      "subject": "Paper-4: Direct Tax Laws and International Taxation",
+      "subject": "Paper-5: Indirect Tax Laws",
       "pdfUrl": "./pdfs/final/pyq/May 25_Indirect Tax_PYQ.pdf"
     },
     {
@@ -11205,12 +11205,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "final_pyq_May_26_Indirect_Tax_PYQ",
-      "title": "May 2026 PYQ - Paper-4: Direct Tax Laws and International Taxation",
+      "title": "May 2026 PYQ - Paper-5: Indirect Tax Laws",
       "level": "Final",
       "year": "2026",
       "month": "May",
       "type": "PYQ",
-      "subject": "Paper-4: Direct Tax Laws and International Taxation",
+      "subject": "Paper-5: Indirect Tax Laws",
       "pdfUrl": "./pdfs/final/pyq/May 26_Indirect Tax_PYQ.pdf"
     },
     {
@@ -11265,12 +11265,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "final_pyq_Nov_24_Indirect_Tax_PYQ",
-      "title": "Nov 2024 PYQ - Paper-4: Direct Tax Laws and International Taxation",
+      "title": "Nov 2024 PYQ - Paper-5: Indirect Tax Laws",
       "level": "Final",
       "year": "2024",
       "month": "Nov",
       "type": "PYQ",
-      "subject": "Paper-4: Direct Tax Laws and International Taxation",
+      "subject": "Paper-5: Indirect Tax Laws",
       "pdfUrl": "./pdfs/final/pyq/Nov 24_Indirect Tax_PYQ.pdf"
     },
     {
@@ -11325,12 +11325,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "final_pyq_Sep_25_Indirect_Tax_PYQ",
-      "title": "Sep 2025 PYQ - Paper-4: Direct Tax Laws and International Taxation",
+      "title": "Sep 2025 PYQ - Paper-5: Indirect Tax Laws",
       "level": "Final",
       "year": "2025",
       "month": "Sep",
       "type": "PYQ",
-      "subject": "Paper-4: Direct Tax Laws and International Taxation",
+      "subject": "Paper-5: Indirect Tax Laws",
       "pdfUrl": "./pdfs/final/pyq/Sep 25_Indirect Tax_PYQ.pdf"
     },
     {
@@ -12087,12 +12087,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "intermediate_rtp_SEP_26_COST_ACCOUNTS_RTP",
-      "title": "Sep 2026 RTP - Paper-1: Advanced Accounting",
+      "title": "Sep 2026 RTP - Paper-4: Cost and Management Accounting",
       "level": "Intermediate",
       "year": "2026",
       "month": "Sep",
       "type": "RTP",
-      "subject": "Paper-1: Advanced Accounting",
+      "subject": "Paper-4: Cost and Management Accounting",
       "pdfUrl": "./pdfs/intermediate/rtpmtp/rtp/SEP 26 COST ACCOUNTS_RTP.pdf"
     },
     {
@@ -12187,12 +12187,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "final_rtp_Jan_26_Indirect_Tax_RTP",
-      "title": "Jan 2026 RTP - Paper-4: Direct Tax Laws and International Taxation",
+      "title": "Jan 2026 RTP - Paper-5: Indirect Tax Laws",
       "level": "Final",
       "year": "2026",
       "month": "Jan",
       "type": "RTP",
-      "subject": "Paper-4: Direct Tax Laws and International Taxation",
+      "subject": "Paper-5: Indirect Tax Laws",
       "pdfUrl": "./pdfs/final/rtpmtp/rtp/Jan 26_Indirect Tax_RTP.pdf"
     },
     {
@@ -12247,12 +12247,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "final_rtp_May_24_Indirect_Tax_RTP",
-      "title": "May 2024 RTP - Paper-4: Direct Tax Laws and International Taxation",
+      "title": "May 2024 RTP - Paper-5: Indirect Tax Laws",
       "level": "Final",
       "year": "2024",
       "month": "May",
       "type": "RTP",
-      "subject": "Paper-4: Direct Tax Laws and International Taxation",
+      "subject": "Paper-5: Indirect Tax Laws",
       "pdfUrl": "./pdfs/final/rtpmtp/rtp/May 24_Indirect Tax_RTP.pdf"
     },
     {
@@ -12307,12 +12307,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "final_rtp_May_25_Indirect_Tax_RTP",
-      "title": "May 2025 RTP - Paper-4: Direct Tax Laws and International Taxation",
+      "title": "May 2025 RTP - Paper-5: Indirect Tax Laws",
       "level": "Final",
       "year": "2025",
       "month": "May",
       "type": "RTP",
-      "subject": "Paper-4: Direct Tax Laws and International Taxation",
+      "subject": "Paper-5: Indirect Tax Laws",
       "pdfUrl": "./pdfs/final/rtpmtp/rtp/May 25_Indirect Tax_RTP.pdf"
     },
     {
@@ -12367,12 +12367,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "final_rtp_May_26_Indirect_Tax_RTP",
-      "title": "May 2026 RTP - Paper-4: Direct Tax Laws and International Taxation",
+      "title": "May 2026 RTP - Paper-5: Indirect Tax Laws",
       "level": "Final",
       "year": "2026",
       "month": "May",
       "type": "RTP",
-      "subject": "Paper-4: Direct Tax Laws and International Taxation",
+      "subject": "Paper-5: Indirect Tax Laws",
       "pdfUrl": "./pdfs/final/rtpmtp/rtp/May 26_Indirect Tax_RTP.pdf"
     },
     {
@@ -12427,12 +12427,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "final_rtp_Nov_24_Indirect_Tax_RTP",
-      "title": "Nov 2024 RTP - Paper-4: Direct Tax Laws and International Taxation",
+      "title": "Nov 2024 RTP - Paper-5: Indirect Tax Laws",
       "level": "Final",
       "year": "2024",
       "month": "Nov",
       "type": "RTP",
-      "subject": "Paper-4: Direct Tax Laws and International Taxation",
+      "subject": "Paper-5: Indirect Tax Laws",
       "pdfUrl": "./pdfs/final/rtpmtp/rtp/Nov 24_Indirect Tax_RTP.pdf"
     },
     {
@@ -12487,12 +12487,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "final_rtp_Nov_26_Indirect_tax_RTP",
-      "title": "Nov 2026 RTP - Paper-4: Direct Tax Laws and International Taxation",
+      "title": "Nov 2026 RTP - Paper-5: Indirect Tax Laws",
       "level": "Final",
       "year": "2026",
       "month": "Nov",
       "type": "RTP",
-      "subject": "Paper-4: Direct Tax Laws and International Taxation",
+      "subject": "Paper-5: Indirect Tax Laws",
       "pdfUrl": "./pdfs/final/rtpmtp/rtp/Nov 26_Indirect tax_RTP.pdf"
     },
     {
@@ -12547,12 +12547,12 @@ export const MOCK_PAPERS = {
     },
     {
       "id": "final_rtp_Sep_25_Indirect_Tax_RTP",
-      "title": "Sep 2025 RTP - Paper-4: Direct Tax Laws and International Taxation",
+      "title": "Sep 2025 RTP - Paper-5: Indirect Tax Laws",
       "level": "Final",
       "year": "2025",
       "month": "Sep",
       "type": "RTP",
-      "subject": "Paper-4: Direct Tax Laws and International Taxation",
+      "subject": "Paper-5: Indirect Tax Laws",
       "pdfUrl": "./pdfs/final/rtpmtp/rtp/Sep 25_Indirect Tax_RTP.pdf"
     },
     {

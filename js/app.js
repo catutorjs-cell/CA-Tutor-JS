@@ -1,23 +1,23 @@
 // CA JS Single-Page Application Router & Bootstrap
 import { State, SafeStorage } from './state.js';
-import { Auth } from './auth.js?v=23';
+import { Auth } from './auth.js?v=35';
 window.Auth = Auth;  // ← ADD THIS LINE
 const localStorage = SafeStorage;
-import { SYLLABUS_DATA } from './seedData.js?v=23';
-import { Dashboard } from './dashboard.js?v=23';
-import { SyllabusModule } from './modules/syllabus.js?v=23';
-import { PyqMtpModule } from './modules/pyq_mtp.js?v=23';
-import { RevisionModule } from './modules/revision.js?v=23';
-import { MistakesModule } from './modules/mistakes.js?v=23';
-import { DoubtDecoderModule } from './modules/decoder.js?v=23';
-import { PomodoroModule } from './modules/pomodoro.js?v=23';
-import { SocialModule } from './modules/social.js?v=23';
-import { GeneratorModule } from './modules/generator.js?v=23';
-import { AnalyticsModule } from './modules/analytics.js?v=23';
-import { ProfileModule } from './modules/profile.js?v=23';
-import { OwnerConsoleModule } from './modules/owner_console.js?v=23';
-import { McqPracticeModule } from './modules/mcq_practice.js?v=23';
-import { StudyLogModule } from './modules/study_log.js?v=23';
+import { SYLLABUS_DATA } from './seedData.js';
+import { Dashboard } from './dashboard.js?v=24';
+import { SyllabusModule } from './modules/syllabus.js?v=29';
+import { PyqMtpModule } from './modules/pyq_mtp.js?v=27';
+import { RevisionModule } from './modules/revision.js?v=26';
+import { MistakesModule } from './modules/mistakes.js?v=26';
+import { DoubtDecoderModule } from './modules/decoder.js?v=32';
+import { PomodoroModule } from './modules/pomodoro.js?v=24';
+import { SocialModule } from './modules/social.js?v=24';
+import { GeneratorModule } from './modules/generator.js?v=33';
+import { AnalyticsModule } from './modules/analytics.js?v=24';
+import { ProfileModule } from './modules/profile.js?v=24';
+import { OwnerConsoleModule } from './modules/owner_console.js?v=35';
+import { McqPracticeModule } from './modules/mcq_practice.js?v=24';
+import { StudyLogModule } from './modules/study_log.js?v=24';
 
 // --- CUSTOM IN-PAGE ALERT POPUP ---
 window.cajsShowAlert = (title, message, type = 'info', onOk = null) => {
@@ -629,21 +629,24 @@ const Router = {
     const user = State.user;
     if (!user) return;
 
+    const displayName = user.fullName || user.email || 'Student';
+    const displayLevel = user.examLevel || 'Foundation';
+
     // Update Sidebar Profile Widget
-    document.getElementById('sw-user-name').textContent = user.fullName;
-    document.getElementById('sw-user-level').textContent = `CA ${user.examLevel} • ${user.userId || 'CA-1001'}`;
+    document.getElementById('sw-user-name').textContent = displayName;
+    document.getElementById('sw-user-level').textContent = `CA ${displayLevel} • ${user.userId || 'CA-1001'}`;
     
     const avatarEl = document.getElementById('sw-user-avatar');
     if (user.avatar && user.avatar !== 'letter') {
       avatarEl.innerHTML = `<img src="${user.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
     } else {
       avatarEl.innerHTML = '';
-      avatarEl.textContent = user.fullName.charAt(0).toUpperCase();
+      avatarEl.textContent = displayName.charAt(0).toUpperCase();
     }
 
     // Update Global Floating Top-Right Profile Widget
     const floatName = document.getElementById('floating-user-name');
-    if (floatName) floatName.textContent = user.fullName;
+    if (floatName) floatName.textContent = displayName;
 
     const floatId = document.getElementById('floating-user-id');
     if (floatId) {
@@ -657,13 +660,13 @@ const Router = {
         floatAvatar.innerHTML = `<img src="${user.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
       } else {
         floatAvatar.innerHTML = '';
-        floatAvatar.textContent = user.fullName.charAt(0).toUpperCase();
+        floatAvatar.textContent = displayName.charAt(0).toUpperCase();
       }
     }
 
     // Update Dropdown Details
     const ddName = document.getElementById('dropdown-user-name');
-    if (ddName) ddName.textContent = user.fullName;
+    if (ddName) ddName.textContent = displayName;
 
     const ddId = document.getElementById('dropdown-user-id');
     if (ddId) {
@@ -678,7 +681,7 @@ const Router = {
     if (ddPhone) ddPhone.textContent = user.phone;
 
     const ddLevel = document.getElementById('dropdown-level');
-    if (ddLevel) ddLevel.textContent = `CA ${user.examLevel}`;
+    if (ddLevel) ddLevel.textContent = `CA ${displayLevel}`;
 
     const ddAvatar = document.getElementById('dropdown-user-avatar');
     if (ddAvatar) {
@@ -686,7 +689,7 @@ const Router = {
         ddAvatar.innerHTML = `<img src="${user.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
       } else {
         ddAvatar.innerHTML = '';
-        ddAvatar.textContent = user.fullName.charAt(0).toUpperCase();
+        ddAvatar.textContent = displayName.charAt(0).toUpperCase();
       }
     }
 

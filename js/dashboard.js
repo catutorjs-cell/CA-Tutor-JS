@@ -14,7 +14,7 @@ export const Dashboard = {
     const checklistPercent = this.calculateChecklistProgress();
 
     // Calculate Revisions Breakdown for the checklist card
-    const subjectsList = SYLLABUS_DATA[State.user.examLevel] || [];
+    const subjectsList = SYLLABUS_DATA[State.user?.examLevel || 'Foundation'] || [];
     let r1Count = 0;
     let r2Count = 0;
     let r3Count = 0;
@@ -270,7 +270,7 @@ export const Dashboard = {
   },
 
   getActiveLevelCompletedCount() {
-    const subjects = SYLLABUS_DATA[State.user.examLevel] || [];
+    const subjects = SYLLABUS_DATA[State.user?.examLevel || 'Foundation'] || [];
     let done = 0;
     subjects.forEach(sub => {
       sub.chapters.forEach(ch => {
@@ -281,7 +281,7 @@ export const Dashboard = {
   },
 
   calculateSyllabusProgress() {
-    const subjects = SYLLABUS_DATA[State.user.examLevel] || [];
+    const subjects = SYLLABUS_DATA[State.user?.examLevel || 'Foundation'] || [];
     let totalChapters = 0;
     subjects.forEach(sub => totalChapters += sub.chapters.length);
 
@@ -323,7 +323,7 @@ export const Dashboard = {
   },
 
   calculateChecklistProgress() {
-    const subjects = SYLLABUS_DATA[State.user.examLevel] || [];
+    const subjects = SYLLABUS_DATA[State.user?.examLevel || 'Foundation'] || [];
     let totalChapters = 0;
     let checkedRevs = 0;
     
@@ -354,7 +354,7 @@ export const Dashboard = {
   },
 
   getChecklistTotalCount() {
-    const subjects = SYLLABUS_DATA[State.user.examLevel] || [];
+    const subjects = SYLLABUS_DATA[State.user?.examLevel || 'Foundation'] || [];
     let totalChapters = 0;
     subjects.forEach(sub => totalChapters += sub.chapters.length);
     return totalChapters * 3;

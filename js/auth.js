@@ -156,13 +156,16 @@ export const Auth = {
     });
 
     // Login Form Submit
-    loginForm.addEventListener('submit', (e) => {
+    loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value.trim();
       const pass = document.getElementById('login-password').value;
 
       try {
-        const user = State.loginUser(email, pass);
+        const user = await State.loginUser(email, pass);
+        if (!user || !State.user) {
+          throw new Error("Login failed. Please verify your credentials.");
+        }
         const landing = document.getElementById('landing-page');
         if (landing) landing.style.display = 'none';
 
@@ -203,35 +206,10 @@ export const Auth = {
       }
 
       try {
-        const newUser = State.registerUser(name, email, phone, level, pass);
+        State.registerUser(name, email, phone, level, pass);
 
         // ✅ Admin Notifications on New Registration
         Auth.notifyAdmin({ name, email, phone, level });
-
-        // ✅ Google Sheets Sync - Auto save new registration
-        const syncUrl = localStorage.getItem('cajs_database_sync_url');
-        if (syncUrl) {
-          fetch(syncUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              action: 'register',
-              user: {
-                fullName: name,
-                email: email,
-                phone: phone,
-                examLevel: level,
-                password: pass,
-                userId: newUser?.userId || 'CA-STUDENT',
-                registeredAt: new Date().toISOString()
-              }
-            })
-          }).then(() => {
-            console.log('✅ Registration synced to Google Sheets!');
-          }).catch(err => {
-            console.warn('⚠️ Google Sheets sync failed:', err);
-          });
-        }
 
         alert("Registration Successful! Please login with your credentials.");
 

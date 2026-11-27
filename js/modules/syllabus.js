@@ -1,6 +1,6 @@
 // CA JS Syllabus Explorer Module
 import { State } from '../state.js';
-import { SYLLABUS_DATA } from '../seedData.js';
+import { SYLLABUS_DATA, MOCK_PAPERS } from '../seedData.js';
 
 export const SyllabusModule = {
   activeSubjectIndex: 0,
@@ -9,13 +9,234 @@ export const SyllabusModule = {
   videoPlayInterval: null,
   videoCurrentTime: 0, // In seconds
   activeGroup: 'All', // Options: 'All', 'Group 1', 'Group 2'
-  activeScheme: 'May 2027', // Options for Foundation: 'May 2027', 'May 2026'
-  exemptionOnly: false, // Options: true (60+ Marks Exemption mode), false (Full syllabus)
+  activeScheme: 'May 2027', // Options: 'May 2027', 'May 2026'
+  activePriority: 'All', // Options: 'All', 'High', 'Medium', 'Low'
 
-  render(container) {
-    const level = State.user.examLevel;
+  getSubjectGroup(subName, level) {
+    if (level === 'Final') {
+      if (
+        subName.includes("Financial Reporting") ||
+        subName.includes("Advanced Financial Management") ||
+        subName.includes("Advanced Auditing")
+      ) {
+        return "Group 1";
+      }
+      return "Group 2";
+    }
+    if (
+      subName.includes("Advanced Accounting") ||
+      subName.includes("Corporate and Other Laws") ||
+      subName.includes("Income-tax") ||
+      subName.includes("Goods and Services Tax")
+    ) {
+      return "Group 1";
+    }
+    return "Group 2";
+  },
+
+  getPriorityMeta(weightage) {
+    const norm = (weightage || 'Medium').toLowerCase();
+    if (norm === 'high') {
+      return {
+        key: 'High',
+        emoji: '🟢',
+        label: 'High Weightage',
+        meaning: 'First priority',
+        badgeClass: 'priority-badge-high'
+      };
+    }
+    if (norm === 'low') {
+      return {
+        key: 'Low',
+        emoji: '🔴',
+        label: 'Low Weightage',
+        meaning: 'Complete after high-priority chapters',
+        badgeClass: 'priority-badge-low'
+      };
+    }
+    return {
+      key: 'Medium',
+      emoji: '🟡',
+      label: 'Medium Weightage',
+      meaning: 'Second priority',
+      badgeClass: 'priority-badge-medium'
+    };
+  },
+
+  getSubjectPyqMeta(subjectName, level) {
+    const pyqs = (MOCK_PAPERS && MOCK_PAPERS.PYQ) || [];
+    const paperMatch = (subjectName || '').match(/Paper-(\d+)/i);
+    const paperNum = paperMatch ? paperMatch[1] : null;
+    const norm = (s) => (s || '').toLowerCase().replace(/\(may \d{4} scheme\)/gi, '').replace(/[^a-z0-9]/g, '');
+    const targetNorm = norm(subjectName);
+
+    const matched = pyqs.filter(p => {
+      if (p.level !== level) return false;
+      if (paperNum) {
+        const pMatch = (p.subject || '').match(/Paper-(\d+)/i);
+        if (pMatch && pMatch[1] === paperNum) return true;
+      }
+      return norm(p.subject) === targetNorm;
+    });
+
+    return {
+      count: matched.length
+    };
+  },
+
+  getExpectedMarksRange(ch, subjectName, level) {
+    if (ch.notes && ch.notes.includes('EXAM WEIGHTAGE BREAKDOWN:')) {
+      const match = ch.notes.match(/EXAM WEIGHTAGE BREAKDOWN:<\/strong>\s*([^<]+)/i);
+      if (match && match[1]) return match[1].trim();
+    }
+    if (typeof this.getChapterWeightageNote === 'function') {
+      return this.getChapterWeightageNote(ch, subjectName, level);
+    }
+    return '';
+  },
+
+  getRevisionStatusMeta(chId) {
+    const rev = (State.revisions && State.revisions[chId]) || { r1: false, r2: false, r3: false };
+    const r1 = !!rev.r1;
+    const r2 = !!rev.r2;
+    const r3 = !!rev.r3;
+    const count = (r1 ? 1 : 0) + (r2 ? 1 : 0) + (r3 ? 1 : 0);
+    const label = count === 3 ? '3/3 Mastered' : `${count}/3 Done`;
+    return { r1, r2, r3, count, label };
+  },
+
+  renderRevisionPillsHtml(chId) {
+    const rev = this.getRevisionStatusMeta(chId);
+    const chips = [
+      { key: 'r1', label: 'R1', done: rev.r1 },
+      { key: 'r2', label: 'R2', done: rev.r2 },
+      { key: 'r3', label: 'R3', done: rev.r3 }
+    ].map(c => `
+      <button type="button" class="syllabus-rev-chip ${c.done ? 'done' : ''}" title="Toggle Revision ${c.label.slice(1)}" onclick="event.stopPropagation(); window.cajsToggleChapterRevision('${chId}', '${c.key}')">${c.label}${c.done ? ' ✓' : ''}</button>
+    `).join('');
+    return `
+      <span class="syllabus-rev-group" title="Revision status tracked with Revision Hub">
+        <span>🔄 Revision: <strong>${rev.label}</strong></span>
+        ${chips}
+      </span>
+    `;
+  },
+
+  renderHeaderControlsHtml(level) {
+    if (level !== 'Intermediate' && level !== 'Foundation' && level !== 'Final') return '';
+    const hasGroups = level === 'Intermediate' || level === 'Final';
+    const priorities = [
+      { val: 'All', label: 'All' },
+      { val: 'High', label: '🟢 High' },
+      { val: 'Medium', label: '🟡 Medium' },
+      { val: 'Low', label: '🔴 Low' }
+    ];
+
+    return `
+      <div class="header-controls-row" style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:4px;">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">EXAM:</span>
+          <div class="scheme-segment-control" style="display:flex; background:rgba(0,0,0,0.03); border-radius:20px; padding:3px; gap:4px; border: 1px solid rgba(0,0,0,0.05);">
+            <button class="scheme-btn ${this.activeScheme === 'May 2027' ? 'active' : ''}" data-scheme="May 2027" style="border:none; background:${this.activeScheme === 'May 2027' ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${this.activeScheme === 'May 2027' ? 'white' : 'var(--text-muted)'}; padding:5px 12px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">May 2027</button>
+            <button class="scheme-btn ${this.activeScheme === 'May 2026' ? 'active' : ''}" data-scheme="May 2026" style="border:none; background:${this.activeScheme === 'May 2026' ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${this.activeScheme === 'May 2026' ? 'white' : 'var(--text-muted)'}; padding:5px 12px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">May 2026</button>
+          </div>
+        </div>
+        ${hasGroups ? `
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">GROUP:</span>
+          <div class="group-segment-control" style="display:flex; background:rgba(0,0,0,0.03); border-radius:20px; padding:3px; gap:4px; border: 1px solid rgba(0,0,0,0.05);">
+            <button class="segment-btn ${this.activeGroup === 'Group 1' ? 'active' : ''}" data-group="Group 1" style="border:none; background:${this.activeGroup === 'Group 1' ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${this.activeGroup === 'Group 1' ? 'white' : 'var(--text-muted)'}; padding:5px 12px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">Group 1</button>
+            <button class="segment-btn ${this.activeGroup === 'Group 2' ? 'active' : ''}" data-group="Group 2" style="border:none; background:${this.activeGroup === 'Group 2' ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${this.activeGroup === 'Group 2' ? 'white' : 'var(--text-muted)'}; padding:5px 12px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">Group 2</button>
+            <button class="segment-btn ${this.activeGroup === 'All' ? 'active' : ''}" data-group="All" style="border:none; background:${this.activeGroup === 'All' ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${this.activeGroup === 'All' ? 'white' : 'var(--text-muted)'}; padding:5px 12px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">Both</button>
+          </div>
+        </div>
+        ` : ''}
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">PRIORITY:</span>
+          <div class="priority-segment-control" style="display:flex; background:rgba(0,0,0,0.03); border-radius:20px; padding:3px; gap:4px; border: 1px solid rgba(0,0,0,0.05);">
+            ${priorities.map(p => `
+              <button class="priority-filter-btn ${this.activePriority === p.val ? 'active' : ''}" data-priority="${p.val}" style="border:none; background:${this.activePriority === p.val ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${this.activePriority === p.val ? 'white' : 'var(--text-muted)'}; padding:5px 11px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">${p.label}</button>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  getSubjectSpecialBannerHtml(level, subjectName) {
+    let html = '';
+    if (level === 'Intermediate' && this.activeScheme === 'May 2027' && subjectName.includes('Income-tax')) {
+      html += `
+        <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 14px; padding: 12px 16px; margin-bottom: 16px; font-size: 12.5px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 18px;">📘</span>
+          <div><strong>May 2027 Syllabus Note:</strong> Paper 3A follows the <strong>Income-tax Act, 2025</strong> from May 2027 onwards. Use the applicable new study material.</div>
+        </div>
+      `;
+    }
+    if (level === 'Final' && subjectName.includes('Integrated Business Solutions')) {
+      const ibsAreas = [
+        'Indirect Tax Laws',
+        'Direct Tax Laws and International Taxation',
+        'Advanced Financial Management',
+        'Financial Reporting',
+        'Strategic Management',
+        'Corporate and Economic Laws',
+        'Auditing'
+      ];
+      html += `
+        <div class="glass-card" style="padding: 14px 18px; margin-bottom: 16px; border-left: 4px solid #10b981; border-radius: 14px;">
+          <div style="font-size: 13px; font-weight: 800; color: var(--text-main); margin-bottom: 6px;">🧩 Multidisciplinary Case-Study Subject Area Priority (Paper 6 – IBS)</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            ${ibsAreas.map(area => `<span class="badge priority-badge-high" style="font-size: 11px;">🟢 ${area} — High Weightage</span>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+    return html;
+  },
+
+  bindHeaderControls(container) {
+    container.querySelectorAll('.group-segment-control .segment-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        this.activeGroup = e.currentTarget.getAttribute('data-group');
+        this.activeSubjectIndex = 0;
+        this.render(container);
+      });
+    });
+
+    container.querySelectorAll('.scheme-segment-control .scheme-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        this.activeScheme = e.currentTarget.getAttribute('data-scheme');
+        this.activeSubjectIndex = 0;
+        this.render(container);
+      });
+    });
+
+    container.querySelectorAll('.priority-segment-control .priority-filter-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        this.activePriority = e.currentTarget.getAttribute('data-priority');
+        this.render(container);
+      });
+    });
+
+    window.cajsToggleChapterRevision = (chId, revKey) => {
+      State.toggleRevisionCheck(chId, revKey);
+      if (this.activeChapterId) {
+        const subjects = this.getFilteredSubjects(State.user?.examLevel || 'Foundation');
+        this.renderStudyArena(container, this.activeChapterId, subjects);
+      } else {
+        this.render(container);
+      }
+    };
+
+    window.cajsGoToSubjectPyqs = () => {
+      const pyqNav = document.querySelector('.nav-item[data-tab="pyq-mtp"]');
+      if (pyqNav) pyqNav.click();
+    };
+  },
+
+  getFilteredSubjects(level) {
     let subjects = [];
-
     if (level === 'Foundation') {
       const schemeKey = (this.activeScheme === 'May 2026') ? 'Foundation_May2026' : 'Foundation_May2027';
       subjects = SYLLABUS_DATA[schemeKey] || SYLLABUS_DATA['Foundation'] || [];
@@ -29,21 +250,15 @@ export const SyllabusModule = {
       subjects = SYLLABUS_DATA[level] || [];
     }
 
-    const getSubjectGroup = (subName) => {
-      if (
-        subName.includes("Advanced Accounting") ||
-        subName.includes("Corporate and Other Laws") ||
-        subName.includes("Income-tax") ||
-        subName.includes("Goods and Services Tax")
-      ) {
-        return "Group 1";
-      }
-      return "Group 2";
-    };
-
-    if (level === 'Intermediate' && this.activeGroup && this.activeGroup !== 'All') {
-      subjects = subjects.filter(sub => getSubjectGroup(sub.subject) === this.activeGroup);
+    if ((level === 'Intermediate' || level === 'Final') && this.activeGroup && this.activeGroup !== 'All') {
+      subjects = subjects.filter(sub => this.getSubjectGroup(sub.subject, level) === this.activeGroup);
     }
+    return subjects;
+  },
+
+  render(container) {
+    const level = State.user?.examLevel || 'Foundation';
+    const subjects = this.getFilteredSubjects(level);
 
     if (subjects.length === 0) {
       container.innerHTML = `
@@ -52,69 +267,11 @@ export const SyllabusModule = {
             <h1 class="header-branding">Syllabus Explorer</h1>
             <span class="header-subtitle">CA ${level} Syllabus & Immersive Study Arenas</span>
           </div>
-          ${(level === 'Intermediate' || level === 'Foundation' || level === 'Final') ? `
-          <div class="header-controls-row" style="display:flex; align-items:center; gap:20px; flex-wrap:wrap; margin-top:4px;">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">EXAM VERSION:</span>
-              <div class="scheme-segment-control" style="display:flex; background:rgba(0,0,0,0.03); border-radius:20px; padding:3px; gap:4px; border: 1px solid rgba(0,0,0,0.05);">
-                <button class="scheme-btn ${this.activeScheme === 'May 2027' ? 'active' : ''}" data-scheme="May 2027" style="border:none; background:${this.activeScheme === 'May 2027' ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${this.activeScheme === 'May 2027' ? 'white' : 'var(--text-muted)'}; padding:6px 16px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">May 2027 Exam</button>
-                <button class="scheme-btn ${this.activeScheme === 'May 2026' ? 'active' : ''}" data-scheme="May 2026" style="border:none; background:${this.activeScheme === 'May 2026' ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${this.activeScheme === 'May 2026' ? 'white' : 'var(--text-muted)'}; padding:6px 16px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">May 2026 Exam</button>
-              </div>
-            </div>
-            ${level === 'Intermediate' ? `
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">GROUP:</span>
-              <div class="group-segment-control" style="display:flex; background:rgba(0,0,0,0.03); border-radius:20px; padding:3px; gap:4px; border: 1px solid rgba(0,0,0,0.05);">
-                <button class="segment-btn ${this.activeGroup === 'Group 1' ? 'active' : ''}" data-group="Group 1" style="border:none; background:${this.activeGroup === 'Group 1' ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${this.activeGroup === 'Group 1' ? 'white' : 'var(--text-muted)'}; padding:6px 16px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">Group 1</button>
-                <button class="segment-btn ${this.activeGroup === 'Group 2' ? 'active' : ''}" data-group="Group 2" style="border:none; background:${this.activeGroup === 'Group 2' ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${this.activeGroup === 'Group 2' ? 'white' : 'var(--text-muted)'}; padding:6px 16px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">Group 2</button>
-                <button class="segment-btn ${this.activeGroup === 'All' ? 'active' : ''}" data-group="All" style="border:none; background:${this.activeGroup === 'All' ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${this.activeGroup === 'All' ? 'white' : 'var(--text-muted)'}; padding:6px 16px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">Both</button>
-              </div>
-            </div>
-            ` : ''}
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">PAPER:</span>
-              <div class="paper-quick-segment-control" style="display:flex; background:rgba(0,0,0,0.03); border-radius:20px; padding:3px; gap:4px; border: 1px solid rgba(0,0,0,0.05);">
-                <button class="paper-quick-btn" data-paper="Paper 1" style="border:none; background:${subjects[this.activeSubjectIndex] && subjects[this.activeSubjectIndex].subject.includes('Paper-1') ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${subjects[this.activeSubjectIndex] && subjects[this.activeSubjectIndex].subject.includes('Paper-1') ? 'white' : 'var(--text-muted)'}; padding:6px 12px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">Paper 1</button>
-                <button class="paper-quick-btn" data-paper="Paper 2" style="border:none; background:${subjects[this.activeSubjectIndex] && subjects[this.activeSubjectIndex].subject.includes('Paper-2') ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${subjects[this.activeSubjectIndex] && subjects[this.activeSubjectIndex].subject.includes('Paper-2') ? 'white' : 'var(--text-muted)'}; padding:6px 12px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">Paper 2</button>
-                <button class="paper-quick-btn" data-paper="Paper 3" style="border:none; background:${subjects[this.activeSubjectIndex] && subjects[this.activeSubjectIndex].subject.includes('Paper-3') ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${subjects[this.activeSubjectIndex] && subjects[this.activeSubjectIndex].subject.includes('Paper-3') ? 'white' : 'var(--text-muted)'}; padding:6px 12px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">Paper 3</button>
-                <button class="paper-quick-btn" data-paper="Paper 4" style="border:none; background:${subjects[this.activeSubjectIndex] && subjects[this.activeSubjectIndex].subject.includes('Paper-4') ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${subjects[this.activeSubjectIndex] && subjects[this.activeSubjectIndex].subject.includes('Paper-4') ? 'white' : 'var(--text-muted)'}; padding:6px 12px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">Paper 4</button>
-                ${(level === 'Intermediate' || level === 'Final') ? `
-                  <button class="paper-quick-btn" data-paper="Paper 5" style="border:none; background:${subjects[this.activeSubjectIndex] && subjects[this.activeSubjectIndex].subject.includes('Paper-5') ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${subjects[this.activeSubjectIndex] && subjects[this.activeSubjectIndex].subject.includes('Paper-5') ? 'white' : 'var(--text-muted)'}; padding:6px 12px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">Paper 5</button>
-                  <button class="paper-quick-btn" data-paper="Paper 6" style="border:none; background:${subjects[this.activeSubjectIndex] && subjects[this.activeSubjectIndex].subject.includes('Paper-6') ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${subjects[this.activeSubjectIndex] && subjects[this.activeSubjectIndex].subject.includes('Paper-6') ? 'white' : 'var(--text-muted)'}; padding:6px 12px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">Paper 6</button>
-                ` : ''}
-              </div>
-            </div>
-            ${(level === 'Intermediate' || level === 'Final') ? `
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">TARGET:</span>
-              <button id="syllabus-exemption-btn" class="btn" style="border:none; background:${this.exemptionOnly ? 'linear-gradient(135deg, #f59e0b, #ef4444)' : 'rgba(0,0,0,0.04)'}; color:${this.exemptionOnly ? 'white' : 'var(--text-main)'}; padding:6px 14px; border-radius:18px; font-size:12px; font-weight:700; cursor:pointer; transition: all 0.2s; display:inline-flex; align-items:center; gap:6px; border:1px solid ${this.exemptionOnly ? 'transparent' : 'rgba(0,0,0,0.08)'}; box-shadow:${this.exemptionOnly ? '0 4px 12px rgba(245, 158, 11, 0.35)' : 'none'};" onclick="window.cajsToggleSyllabusExemption()">
-                🎯 60+ Marks Exemption Only ${this.exemptionOnly ? '✓' : ''}
-              </button>
-            </div>
-            ` : ''}
-          </div>
-          ` : ''}
+          ${this.renderHeaderControlsHtml(level)}
         </header>
         <div class="glass-card" style="padding: 24px; text-align: center;"><p style="margin: 0; font-size: 14px; font-weight: 600; color: var(--text-muted);">No syllabus content found for level: ${level}</p></div>
       `;
-
-      // Bind Group Filter segment buttons even if empty
-      const segmentBtns = container.querySelectorAll('.group-segment-control .segment-btn');
-      segmentBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          this.activeGroup = e.currentTarget.getAttribute('data-group');
-          this.activeSubjectIndex = 0;
-          this.render(container);
-        });
-      });
-      const schemeBtns = container.querySelectorAll('.scheme-segment-control .scheme-btn');
-      schemeBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          this.activeScheme = e.currentTarget.getAttribute('data-scheme');
-          this.activeSubjectIndex = 0;
-          this.render(container);
-        });
-      });
+      this.bindHeaderControls(container);
       return;
     }
 
@@ -130,6 +287,7 @@ export const SyllabusModule = {
     }
 
     const currentSubject = subjects[this.activeSubjectIndex];
+    const pyqMeta = this.getSubjectPyqMeta(currentSubject.subject, level);
 
     // Build Subject sidebar tabs
     const sidebarTabs = subjects.map((sub, idx) => `
@@ -149,41 +307,29 @@ export const SyllabusModule = {
     // Build Chapter list cards in natural chapter sequence
     let sortedChapters = [...currentSubject.chapters];
 
-    if (this.exemptionOnly && level !== 'Foundation') {
-      sortedChapters = sortedChapters.filter(ch => ch.weightage === 'High' || ch.weightage === 'Medium');
+    if (this.activePriority && this.activePriority !== 'All') {
+      sortedChapters = sortedChapters.filter(ch => ch.weightage === this.activePriority);
     }
 
-    const chapterCards = sortedChapters.map(ch => {
-      const isDone = State.completedChapters[ch.id];
+    const chapterCards = sortedChapters.length > 0 ? sortedChapters.map(ch => {
+      const isDone = !!State.completedChapters[ch.id];
       const hasPDFs = ch.pdfUrls && ch.pdfUrls.length > 0;
-
-      // Determine click handler for the chapter card header info (opens study arena)
       const mainClickHandler = `window.cajsOpenNotes('${ch.id}')`;
+      const priority = this.getPriorityMeta(ch.weightage);
+      const expectedMarks = this.getExpectedMarksRange(ch, currentSubject.subject, level);
 
-      // Extract mark breakdown text if available in chapter notes or infer from guide
-      let markBadgeHtml = '';
-      let mText = '';
-      if (ch.notes && ch.notes.includes('EXAM WEIGHTAGE BREAKDOWN:')) {
-        const match = ch.notes.match(/EXAM WEIGHTAGE BREAKDOWN:<\/strong>\s*([^<]+)/i);
-        if (match && match[1]) mText = match[1].trim();
-      }
-      if (!mText && typeof this.getChapterWeightageNote === 'function') {
-        mText = this.getChapterWeightageNote(ch, currentSubject.subject, level);
-      }
-      if (mText) {
-        markBadgeHtml = `
-          <span class="badge" style="font-size: 11px; font-weight: 700; color: #b45309; background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(239, 68, 68, 0.08)); border: 1px solid rgba(245, 158, 11, 0.3); padding: 3px 10px; border-radius: 12px; display: inline-flex; align-items: center; gap: 4px;">
-            📊 ${mText}
-          </span>
-        `;
-      }
+      const markBadgeHtml = expectedMarks ? `
+        <span class="badge" style="font-size: 11px; font-weight: 700; color: #b45309; background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(239, 68, 68, 0.08)); border: 1px solid rgba(245, 158, 11, 0.3); padding: 3px 10px; border-radius: 12px; display: inline-flex; align-items: center; gap: 4px;">
+          📊 Expected Marks: ${expectedMarks}
+        </span>
+      ` : '';
 
       // Build units pills HTML (only render unit pills when there are 2 or more distinct sub-unit PDFs)
       let unitsPillsHtml = '';
       const uniqueUnitUrls = new Set((ch.units || []).map(u => u.url));
       if (ch.units && ch.units.length > 1 && uniqueUnitUrls.size > 1) {
         unitsPillsHtml = `
-          <div class="chapter-units-container" style="margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px;">
+          <div class="chapter-units-container" style="margin-top: 4px; display: flex; flex-wrap: wrap; gap: 8px;">
             ${ch.units.map(unit => `
               <div class="unit-pill-group" style="display: inline-flex; align-items: center; background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(0, 0, 0, 0.06); border-radius: 20px; padding: 4px 12px; transition: var(--transition-smooth);">
                 <a href="${unit.url}" target="_blank" class="unit-pill-btn" style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--text-main); text-decoration: none;" onclick="event.stopPropagation();">
@@ -196,15 +342,14 @@ export const SyllabusModule = {
       }
 
       return `
-        <div class="glass-card chapter-card" style="animation: fadeIn 0.3s ease-out; display: flex; flex-direction: column; align-items: stretch; gap: 14px; padding: 20px;">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;">
+        <div class="glass-card chapter-card" style="animation: fadeIn 0.3s ease-out; display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap;">
             <div class="chapter-info" style="cursor: pointer; flex-grow: 1;" onclick="${mainClickHandler}">
               <span class="chapter-title" style="font-size: 16px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                 ${ch.name}
-                ${hasPDFs ? '<span style="font-size: 11px; font-weight: 600; color: var(--pastel-purple-dark); background: rgba(217, 179, 255, 0.3); padding: 2px 8px; border-radius: 10px; border: 1px solid rgba(217, 179, 255, 0.45);">PDFs Attached</span>' : ''}
               </span>
               <div class="chapter-meta" style="margin-top: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                <span class="badge badge-${ch.weightage.toLowerCase()}">${ch.weightage} Weightage</span>
+                <span class="badge ${priority.badgeClass}" title="${priority.meaning}">${priority.emoji} ${priority.label}</span>
                 ${markBadgeHtml}
               </div>
             </div>
@@ -222,16 +367,31 @@ export const SyllabusModule = {
               </button>
             </div>
           </div>
+
+          <div class="syllabus-chapter-status-row">
+            <button type="button" class="syllabus-meta-pill syllabus-meta-pill-btn" title="Open PYQ, RTP & MTP papers" onclick="event.stopPropagation(); window.cajsGoToSubjectPyqs()">
+              📝 Subject PYQs: <strong>${pyqMeta.count} Available</strong>
+            </button>
+            <span class="syllabus-meta-pill" style="color: ${isDone ? '#059669' : 'var(--text-muted)'};">
+              ${isDone ? '✅ Study: <strong>Completed</strong>' : '📖 Study: <strong>Pending</strong>'}
+            </span>
+            ${this.renderRevisionPillsHtml(ch.id)}
+          </div>
+
           ${unitsPillsHtml}
         </div>
       `;
-    }).join('');
+    }).join('') : `
+      <div class="glass-card" style="padding: 24px; text-align: center;">
+        <p style="margin: 0; font-size: 13.5px; font-weight: 600; color: var(--text-muted);">No chapters match the selected priority filter in ${currentSubject.subject}.</p>
+      </div>
+    `;
 
     const levelWeightageOverview = this.getLevelWeightageGuideHtml(level);
 
     // Build Marks Distribution Summary Card for current subject
     const marksGuideHtml = `
-      <div class="glass-card" style="margin-bottom: 20px; padding: 16px 20px; border-left: 5px solid var(--pastel-purple-dark); background: linear-gradient(135deg, rgba(217, 179, 255, 0.15), rgba(179, 209, 255, 0.1)); border-radius: 16px; animation: fadeIn 0.3s ease-out;">
+      <div class="glass-card" style="margin-bottom: 16px; padding: 16px 20px; border-left: 5px solid var(--pastel-purple-dark); background: linear-gradient(135deg, rgba(217, 179, 255, 0.15), rgba(179, 209, 255, 0.1)); border-radius: 16px; animation: fadeIn 0.3s ease-out;">
         <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="const b = document.getElementById('syllabus-marks-dist-body'); b.style.display = b.style.display === 'none' ? 'block' : 'none';">
           <div style="display: flex; align-items: center; gap: 10px;">
             <span style="font-size: 20px;">📊</span>
@@ -246,6 +406,11 @@ export const SyllabusModule = {
         </div>
         
         <div id="syllabus-marks-dist-body" style="display: none; margin-top: 14px; border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 14px;">
+          <div class="syllabus-priority-legend" style="margin-bottom: 12px;">
+            <span><span class="badge priority-badge-high" style="font-size:11px;">🟢 High Weightage</span> First priority</span>
+            <span><span class="badge priority-badge-medium" style="font-size:11px;">🟡 Medium Weightage</span> Second priority</span>
+            <span><span class="badge priority-badge-low" style="font-size:11px;">🔴 Low Weightage</span> Complete after high-priority chapters</span>
+          </div>
           ${levelWeightageOverview}
 
           <div style="font-size: 12px; font-weight: 800; color: var(--pastel-purple-dark); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
@@ -253,21 +418,15 @@ export const SyllabusModule = {
           </div>
           <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px;">
             ${currentSubject.chapters.map(ch => {
-              let mText = '';
-              if (ch.notes && ch.notes.includes('EXAM WEIGHTAGE BREAKDOWN:')) {
-                const match = ch.notes.match(/EXAM WEIGHTAGE BREAKDOWN:<\/strong>\s*([^<]+)/i);
-                if (match && match[1]) mText = match[1].trim();
-              }
-              if (!mText && typeof this.getChapterWeightageNote === 'function') {
-                mText = this.getChapterWeightageNote(ch, currentSubject.subject, level);
-              }
+              const pMeta = this.getPriorityMeta(ch.weightage);
+              const mText = this.getExpectedMarksRange(ch, currentSubject.subject, level);
               return `
                 <div style="background: rgba(255,255,255,0.75); padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; gap: 12px;">
                   <div style="display:flex; flex-direction:column; gap:2px; flex-grow:1;">
                     <span style="font-size: 12px; font-weight: 700; color: var(--text-main); line-height: 1.3;">${ch.name}</span>
                     ${mText ? `<span style="font-size: 11px; font-weight: 600; color: #b45309;">🎯 ${mText}</span>` : ''}
                   </div>
-                  <span class="badge badge-${ch.weightage.toLowerCase()}" style="font-size: 10px; flex-shrink: 0;">${ch.weightage}</span>
+                  <span class="badge ${pMeta.badgeClass}" style="font-size: 10px; flex-shrink: 0;">${pMeta.emoji} ${pMeta.label}</span>
                 </div>
               `;
             }).join('')}
@@ -282,36 +441,7 @@ export const SyllabusModule = {
           <h1 class="header-branding">Syllabus Explorer</h1>
           <span class="header-subtitle">CA ${level} Syllabus & Immersive Study Arenas</span>
         </div>
-        
-        ${(level === 'Intermediate' || level === 'Foundation' || level === 'Final') ? `
-        <div class="header-controls-row" style="display:flex; align-items:center; gap:20px; flex-wrap:wrap; margin-top:4px;">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">EXAM VERSION:</span>
-            <div class="scheme-segment-control" style="display:flex; background:rgba(0,0,0,0.03); border-radius:20px; padding:3px; gap:4px; border: 1px solid rgba(0,0,0,0.05);">
-              <button class="scheme-btn ${this.activeScheme === 'May 2027' ? 'active' : ''}" data-scheme="May 2027" style="border:none; background:${this.activeScheme === 'May 2027' ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${this.activeScheme === 'May 2027' ? 'white' : 'var(--text-muted)'}; padding:6px 16px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">May 2027 Exam</button>
-              <button class="scheme-btn ${this.activeScheme === 'May 2026' ? 'active' : ''}" data-scheme="May 2026" style="border:none; background:${this.activeScheme === 'May 2026' ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${this.activeScheme === 'May 2026' ? 'white' : 'var(--text-muted)'}; padding:6px 16px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">May 2026 Exam</button>
-            </div>
-          </div>
-          ${level === 'Intermediate' ? `
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">GROUP:</span>
-            <div class="group-segment-control" style="display:flex; background:rgba(0,0,0,0.03); border-radius:20px; padding:3px; gap:4px; border: 1px solid rgba(0,0,0,0.05);">
-              <button class="segment-btn ${this.activeGroup === 'Group 1' ? 'active' : ''}" data-group="Group 1" style="border:none; background:${this.activeGroup === 'Group 1' ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${this.activeGroup === 'Group 1' ? 'white' : 'var(--text-muted)'}; padding:6px 16px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">Group 1</button>
-              <button class="segment-btn ${this.activeGroup === 'Group 2' ? 'active' : ''}" data-group="Group 2" style="border:none; background:${this.activeGroup === 'Group 2' ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${this.activeGroup === 'Group 2' ? 'white' : 'var(--text-muted)'}; padding:6px 16px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">Group 2</button>
-              <button class="segment-btn ${this.activeGroup === 'All' ? 'active' : ''}" data-group="All" style="border:none; background:${this.activeGroup === 'All' ? 'var(--pastel-purple-dark)' : 'transparent'}; color:${this.activeGroup === 'All' ? 'white' : 'var(--text-muted)'}; padding:6px 16px; border-radius:18px; font-size:12px; font-weight:600; cursor:pointer; transition: all 0.2s;">Both</button>
-            </div>
-          </div>
-          ` : ''}
-          ${(level === 'Intermediate' || level === 'Final') ? `
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">TARGET:</span>
-            <button id="syllabus-exemption-btn" class="btn" style="border:none; background:${this.exemptionOnly ? 'linear-gradient(135deg, #f59e0b, #ef4444)' : 'rgba(0,0,0,0.04)'}; color:${this.exemptionOnly ? 'white' : 'var(--text-main)'}; padding:6px 14px; border-radius:18px; font-size:12px; font-weight:700; cursor:pointer; transition: all 0.2s; display:inline-flex; align-items:center; gap:6px; border:1px solid ${this.exemptionOnly ? 'transparent' : 'rgba(0,0,0,0.08)'}; box-shadow:${this.exemptionOnly ? '0 4px 12px rgba(245, 158, 11, 0.35)' : 'none'};" onclick="window.cajsToggleSyllabusExemption()">
-              🎯 60+ Marks Exemption Only ${this.exemptionOnly ? '✓' : ''}
-            </button>
-          </div>
-          ` : ''}
-        </div>
-        ` : ''}
+        ${this.renderHeaderControlsHtml(level)}
       </header>
 
       <div class="syllabus-container" style="animation: fadeIn 0.3s ease-out;">
@@ -323,22 +453,12 @@ export const SyllabusModule = {
 
         <!-- Chapters content list -->
         <div class="chapters-list">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
             <h3 style="font-size: 18px; margin: 0;" class="header-branding">${currentSubject.subject}</h3>
             ${portalButton}
           </div>
 
-          ${(this.exemptionOnly && level !== 'Foundation') ? `
-            <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(239, 68, 68, 0.08)); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 14px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; font-weight: 600; color: #b45309;">
-              <div style="display:flex; align-items:center; gap:10px;">
-                <span style="font-size:18px;">🎯</span>
-                <div>
-                  <strong>60+ Marks Exemption Target Mode:</strong> Showing High & Medium Weightage chapters (~65+ Marks coverage). Low weightage chapters are hidden.
-                </div>
-              </div>
-              <span style="font-size:11px; background:white; padding:4px 10px; border-radius:12px; font-weight:700; color:#b45309; border:1px solid rgba(245,158,11,0.3); flex-shrink:0;">${sortedChapters.length} / ${currentSubject.chapters.length} Chapters</span>
-            </div>
-          ` : ''}
+          ${this.getSubjectSpecialBannerHtml(level, currentSubject.subject)}
 
           ${marksGuideHtml}
 
@@ -369,54 +489,15 @@ export const SyllabusModule = {
     `;
 
     // Bind subject sidebar switches
-    const tabs = container.querySelectorAll('.subject-tab');
-    tabs.forEach(tab => {
+    container.querySelectorAll('.subject-tab').forEach(tab => {
       tab.addEventListener('click', (e) => {
-        const idx = parseInt(e.target.getAttribute('data-index'));
+        const idx = parseInt(e.target.getAttribute('data-index'), 10);
         this.activeSubjectIndex = idx;
         this.render(container);
       });
     });
 
-    // Bind Group Filter segment buttons
-    const segmentBtns = container.querySelectorAll('.group-segment-control .segment-btn');
-    segmentBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        this.activeGroup = e.currentTarget.getAttribute('data-group');
-        this.activeSubjectIndex = 0; // Reset index when filter changes
-        this.render(container);
-      });
-    });
-
-    // Bind Quick Paper filter buttons
-    const paperQuickBtns = container.querySelectorAll('.paper-quick-btn[data-paper]');
-    paperQuickBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const paperStr = e.currentTarget.getAttribute('data-paper');
-        const paperNum = paperStr.replace('Paper ', '');
-        const foundIdx = subjects.findIndex(s => s.subject.includes(`Paper-${paperNum}`) || s.subject.includes(`Paper ${paperNum}`));
-        if (foundIdx !== -1) {
-          this.activeSubjectIndex = foundIdx;
-          this.render(container);
-        }
-      });
-    });
-
-    // Bind Scheme Filter segment buttons
-    const schemeBtns = container.querySelectorAll('.scheme-segment-control .scheme-btn');
-    schemeBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        this.activeScheme = e.currentTarget.getAttribute('data-scheme');
-        this.activeSubjectIndex = 0; // Reset index when scheme changes
-        this.render(container);
-      });
-    });
-
-    // Make functions globally available for inline onclick handlers
-    window.cajsToggleSyllabusExemption = () => {
-      this.exemptionOnly = !this.exemptionOnly;
-      this.render(container);
-    };
+    this.bindHeaderControls(container);
 
     window.cajsToggleChapter = (chId) => {
       State.toggleChapter(chId);
@@ -512,6 +593,9 @@ export const SyllabusModule = {
               </ul>
             </div>
           </div>
+          <div style="margin-top: 8px; font-size: 11px; color: var(--text-muted);">
+            Reference: <a href="https://capapers.com/guides/ca-foundation-chapter-wise-weightage/" target="_blank" rel="noopener noreferrer" style="color: #7c3aed; font-weight: 700;">CA Papers Foundation Chapter-wise Weightage</a>
+          </div>
         </div>
       `;
     }
@@ -578,6 +662,9 @@ export const SyllabusModule = {
                 </ul>
               </div>
             </div>
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted);">
+            Reference: <a href="https://gradehunt.com/blogs/ca-inter-chapter-wise-weightage" target="_blank" rel="noopener noreferrer" style="color: #7c3aed; font-weight: 700;">Gradehunt CA Inter Chapter-wise Weightage</a>
           </div>
         </div>
       `;
@@ -646,6 +733,9 @@ export const SyllabusModule = {
               </div>
             </div>
           </div>
+          <div style="font-size: 11px; color: var(--text-muted);">
+            Reference: <a href="https://examweightage.com/ca-final-chapter-wise-weightage" target="_blank" rel="noopener noreferrer" style="color: #7c3aed; font-weight: 700;">Exam Weightage CA Final Chapter-wise Analysis (May 2024–May 2026)</a>
+          </div>
         </div>
       `;
     }
@@ -659,71 +749,68 @@ export const SyllabusModule = {
 
     if (level === 'Intermediate') {
       if (sName.includes('accounting')) {
-        if (cName.includes('amalgamation') || cName.includes('reconstruction')) return '20–25% Weightage (Major Numerical)';
-        if (cName.includes('consolidated') || cName.includes('holding')) return '10–15% Weightage (Group Accounts)';
-        return '55–65% Accounting Standards Block';
+        if (cName.includes('amalgamation') || cName.includes('reconstruction')) return '20–25% Weightage';
+        if (cName.includes('consolidated') || cName.includes('holding')) return '10–15% Weightage';
+        if (cName.includes('accounting standards')) return '55–65% AS Block';
+        return '';
       }
       if (sName.includes('laws')) {
-        if (cName.includes('management') || cName.includes('administration')) return '15–20% Weightage (Company Law)';
+        if (cName.includes('management') || cName.includes('administration')) return '15–20% (Company Law)';
         if (cName.includes('accounts of companies')) return '10–12% Weightage';
         if (cName.includes('audit')) return '10–12% Weightage';
-        if (cName.includes('fema') || cName.includes('general clauses')) return '30 Marks Other Laws Block';
-        return 'Company Law Core Section';
+        if (cName.includes('fema') || cName.includes('general clauses') || cName.includes('interpretation')) return '30 Marks Other Laws Block';
+        return '';
       }
       if (sName.includes('tax') || sName.includes('gst')) {
-        if (cName.includes('pgbp') || cName.includes('salar')) return '14-Mark Total Income Question';
+        if (cName.includes('pgbp') || cName.includes('salar')) return '14-Mark Total Income Block';
         if (cName.includes('tds') || cName.includes('tcs') || cName.includes('advance tax')) return '15–20% Weightage';
         if (cName.includes('input tax credit') || cName.includes('itc') || cName.includes('supply')) return '50–80% GST Marks Block';
-        return 'Core Tax Module';
+        return '';
       }
       if (sName.includes('cost')) {
-        if (cName.includes('standard') || cName.includes('marginal') || cName.includes('budget')) return '25–30% Formula Scoring Zone';
-        if (cName.includes('material') || cName.includes('labour') || cName.includes('overhead')) return '35–40% Elements of Cost';
-        return 'Cost Accounting Module';
+        if (cName.includes('standard') || cName.includes('marginal') || cName.includes('budget')) return '25–30% Weightage';
+        if (cName.includes('material') || cName.includes('employee') || cName.includes('labour') || cName.includes('overhead')) return '35–40% Elements of Cost';
+        return '';
       }
       if (sName.includes('audit')) {
-        if (cName.includes('company audit') || cName.includes('report')) return '20–25% Weightage (Predictable Area)';
-        if (cName.includes('evidence') || cName.includes('documentation') || cName.includes('standard')) return '15–20% SAs Block';
-        return 'Auditing Standard Module';
+        if (cName.includes('company audit') || cName.includes('report')) return '20–25% Weightage';
+        if (cName.includes('evidence') || cName.includes('documentation')) return '15–20% SAs Block';
+        return '';
       }
       if (sName.includes('financial management') || sName.includes('strategic management') || sName.includes('fm')) {
-        if (cName.includes('capital budgeting') || cName.includes('investment')) return '10-Mark Practical Sums (High Prob)';
-        if (cName.includes('ratio') || cName.includes('leverage')) return 'High-Scoring Practical Area';
+        if (cName.includes('capital budgeting') || cName.includes('investment')) return '10-Mark Practical Sums';
         if (cName.includes('strategic') || cName.includes('choice') || cName.includes('analysis')) return '30–40% SM Section';
-        return 'FM / SM Core Module';
+        return '';
       }
     }
 
     if (level === 'Final') {
       if (sName.includes('reporting') || sName.includes('fr')) {
-        if (cName.includes('103') || cName.includes('110') || cName.includes('109') || cName.includes('115') || cName.includes('116') || cName.includes('business combination') || cName.includes('consolidated')) return '65–70% Ind AS Block (Compulsory 20M)';
-        return 'Ind AS Core Standards';
+        if (cName.includes('103') || cName.includes('110') || cName.includes('109') || cName.includes('115') || cName.includes('116') || cName.includes('business combination') || cName.includes('consolidated')) return '65–70% Ind AS Block';
+        return '';
       }
       if (sName.includes('advanced financial management') || sName.includes('afm')) {
-        if (cName.includes('capital budgeting') || cName.includes('investment')) return '15–20 Marks (Advanced Budgeting)';
-        if (cName.includes('merger') || cName.includes('acquisition') || cName.includes('restructur')) return '12–15 Marks (Mergers)';
-        if (cName.includes('portfolio') || cName.includes('derivative')) return '20–25 Marks (Portfolio & Derivatives)';
-        return 'AFM Practical Module';
+        if (cName.includes('capital budgeting') || cName.includes('investment')) return '15–20 Marks';
+        if (cName.includes('merger') || cName.includes('acquisition') || cName.includes('restructur')) return '12–15 Marks';
+        if (cName.includes('portfolio') || cName.includes('derivative')) return '20–25 Marks';
+        return '';
       }
       if (sName.includes('audit')) {
-        if (cName.includes('ethics') || cName.includes('professional')) return 'Guaranteed 15–20 Marks (Ethics)';
-        if (cName.includes('caro') || cName.includes('company audit')) return '10–12 Marks (CARO 2020)';
-        if (cName.includes('standard') || cName.includes('evidence') || cName.includes('sa')) return '40–45% SAs Weightage Block';
-        return 'Core Audit Framework';
+        if (cName.includes('ethics') || cName.includes('professional')) return '15–20 Marks';
+        if (cName.includes('caro') || cName.includes('company audit')) return '10–12 Marks';
+        if (cName.includes('evidence') || cName.includes('planning') || cName.includes('reporting')) return '40–45% SAs Block';
+        return '';
       }
       if (sName.includes('direct tax') || sName.includes('dt')) {
-        if (cName.includes('pgbp') || cName.includes('business')) return '14–16 Marks Assessment Question';
+        if (cName.includes('pgbp') || cName.includes('business')) return '14–16 Marks';
         if (cName.includes('transfer pricing') || cName.includes('non-resident') || cName.includes('international')) return '30 Marks Dedicated Block';
-        if (cName.includes('procedure') || cName.includes('appeal') || cName.includes('revision')) return '12–15 Marks Procedural Law';
-        return 'Direct Tax Module';
+        if (cName.includes('procedure') || cName.includes('appeal') || cName.includes('revision')) return '12–15 Marks';
+        return '';
       }
       if (sName.includes('indirect tax') || sName.includes('idt')) {
         if (cName.includes('input tax credit') || cName.includes('itc') || cName.includes('supply')) return '40–50% Core GST Block';
-        if (cName.includes('custom') || cName.includes('ftp') || cName.includes('foreign trade')) return '20 Marks Fixed (Customs & FTP)';
-        return 'Indirect Tax Module';
-      }
-      if (sName.includes('integrated') || sName.includes('ibs')) {
-        return 'Multidisciplinary Open-Book Case Study';
+        if (cName.includes('custom') || cName.includes('ftp') || cName.includes('foreign trade')) return '20 Marks (Customs & FTP)';
+        return '';
       }
     }
 
@@ -941,6 +1028,10 @@ export const SyllabusModule = {
       <div style="font-size:12px; color:var(--text-muted); font-style:italic; padding:8px; text-align:center;">No reference manuals uploaded yet.</div>
     `;
 
+    const arenaPriority = this.getPriorityMeta(chapter.weightage);
+    const arenaExpectedMarks = this.getExpectedMarksRange(chapter, subjectName, level);
+    const arenaPyqMeta = this.getSubjectPyqMeta(subjectName, level);
+
     container.innerHTML = `
       <div class="syllabus-study-arena" style="animation: fadeIn 0.3s ease-out;">
         <!-- TOP NAVIGATION & STATUS HEADER -->
@@ -949,19 +1040,14 @@ export const SyllabusModule = {
             <button class="btn btn-secondary" style="padding:6px 12px; font-size:12px; display:inline-flex; align-items:center; gap:4px;" onclick="window.cajsCloseStudyArena()">
               ← Back to Syllabus
             </button>
-            <div style="display:flex; flex-direction:column; gap:2px;">
+            <div style="display:flex; flex-direction:column; gap:4px;">
               <h2 style="font-size:16px; margin:0;" class="header-branding">${chapter.name}</h2>
-              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:3px;">
-                <span style="font-size:11px; color:var(--text-muted); font-weight:600;">
-                  Level: ${level} | Exam Weightage: ${chapter.weightage || 'High'}
-                  ${(() => {
-                    if (chapter.notes && chapter.notes.includes('EXAM WEIGHTAGE BREAKDOWN:')) {
-                      const m = chapter.notes.match(/EXAM WEIGHTAGE BREAKDOWN:<\/strong>\s*([^<]+)/i);
-                      if (m && m[1]) return `<span style="margin-left: 6px; font-weight: 700; color: #b45309; background: rgba(245, 158, 11, 0.15); padding: 2px 8px; border-radius: 8px; border: 1px solid rgba(245, 158, 11, 0.3);">📊 ${m[1].trim()}</span>`;
-                    }
-                    return '';
-                  })()}
-                </span>
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:3px;">
+                <span class="badge ${arenaPriority.badgeClass}" style="font-size:11px;" title="${arenaPriority.meaning}">${arenaPriority.emoji} ${arenaPriority.label} (${arenaPriority.meaning})</span>
+                ${arenaExpectedMarks ? `<span style="font-size:11px; font-weight: 700; color: #b45309; background: rgba(245, 158, 11, 0.15); padding: 2px 8px; border-radius: 8px; border: 1px solid rgba(245, 158, 11, 0.3);">📊 Expected Marks: ${arenaExpectedMarks}</span>` : ''}
+                <button type="button" class="syllabus-meta-pill syllabus-meta-pill-btn" onclick="window.cajsGoToSubjectPyqs()">📝 ${arenaPyqMeta.count} Subject PYQs</button>
+                <span class="syllabus-meta-pill" style="color: ${isCompleted ? '#059669' : 'var(--text-muted)'};">${isCompleted ? '✅ Study: <strong>Completed</strong>' : '📖 Study: <strong>Pending</strong>'}</span>
+                ${this.renderRevisionPillsHtml(chId)}
                 ${availableUnits.length > 0 ? `
                   <div style="display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.6); padding:2px 8px; border-radius:10px; border:1px solid rgba(0,0,0,0.05);">
                     <span style="font-size:11px; font-weight:700; color:var(--pastel-purple-dark);">Unit Select:</span>
@@ -1286,7 +1372,7 @@ export const SyllabusModule = {
       }
     };
 
-    window.cajsHandleNotesUpload = (inputEl) => {
+    window.cajsHandleNotesUpload = async (inputEl) => {
       if (inputEl.files && inputEl.files[0]) {
         const file = inputEl.files[0];
 
@@ -1312,16 +1398,40 @@ export const SyllabusModule = {
           // Fallback if browser audio context blocked
         }
 
-        setTimeout(() => {
-          if (!this.activeChapterId) return;
-          const szMb = (file.size / 1024 / 1024).toFixed(2) + " MB";
+        let extractedText = '';
+        try {
+          const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+          const isText = file.type.startsWith('text/') || /\.(txt|md|csv|json)$/i.test(file.name);
+          if (isPdf && window.pdfjsLib) {
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            const buf = await file.arrayBuffer();
+            const pdf = await window.pdfjsLib.getDocument({ data: buf }).promise;
+            const maxPages = Math.min(pdf.numPages, 25);
+            const pageTexts = [];
+            for (let i = 1; i <= maxPages; i++) {
+              const page = await pdf.getPage(i);
+              const content = await page.getTextContent();
+              pageTexts.push(content.items.map(it => it.str).join(' '));
+            }
+            extractedText = pageTexts.join('\n').replace(/\s+/g, ' ').trim();
+          } else if (isText) {
+            extractedText = (await file.text()).replace(/\s+/g, ' ').trim();
+          }
+        } catch (err) {
+          console.warn('Could not extract text from uploaded study material:', err);
+        }
 
-          State.addUploadedMaterial(chId, file.name, szMb);
+        if (!this.activeChapterId) return;
+        const szMb = (file.size / 1024 / 1024).toFixed(2) + " MB";
 
-          // Re-render
-          this.renderStudyArena(container, chId, subjects);
-          alert(`Reference guide "${file.name}" uploaded and synchronized successfully. Earned +15 points!`);
-        }, 1200);
+        State.addUploadedMaterial(chId, file.name, szMb, extractedText);
+
+        // Re-render
+        this.renderStudyArena(container, chId, subjects);
+        const indexNote = extractedText
+          ? ' Extracted text is now searchable in Doubt Decoder!'
+          : '';
+        alert(`Reference guide "${file.name}" uploaded and synchronized successfully.${indexNote} Earned +15 points!`);
       }
     };
   }

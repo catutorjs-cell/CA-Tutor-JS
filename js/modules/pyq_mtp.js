@@ -900,7 +900,7 @@ export const PyqMtpModule = {
         { id: 'preprocess', icon: '🔧', title: 'Preprocessing Images', status: '', detail: '' },
         { id: 'ocr', icon: '👁️', title: 'Extracting Text (Handwriting OCR)', status: '', detail: '' },
         { id: 'split', icon: '✂️', title: 'Splitting Answers Question-wise', status: '', detail: '' },
-        { id: 'grade', icon: '🤖', title: 'AI Grading with Gemini', status: '', detail: '' }
+        { id: 'grade', icon: '🔍', title: 'Evaluating with Fuse.js Rubric', status: '', detail: '' }
       ];
 
       renderProgress(steps);
@@ -1065,7 +1065,7 @@ export const PyqMtpModule = {
       <header class="app-header">
         <div class="header-title-container">
           <h1 class="header-branding">AI Grading Report</h1>
-          <span class="header-subtitle">${paper.title} &bull; OCR + Gemini AI Evaluated</span>
+          <span class="header-subtitle">${paper.title} &bull; OCR + Fuse.js Evaluated</span>
         </div>
         <button class="btn btn-primary" onclick="window.cajsExitTestReport()">
           Exit Report

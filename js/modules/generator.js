@@ -128,7 +128,7 @@ export const GeneratorModule = {
         <div class="glass-card" style="padding:40px;text-align:center;min-height:420px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;">
           <div style="font-size:52px;animation:pulse 1s infinite alternate;">🤖</div>
           <h3 class="header-branding" style="font-size:20px;">AI is generating your paper...</h3>
-          <p style="font-size:12px;color:var(--text-muted);max-width:300px;line-height:1.6;">Creating MCQ, Numerical & Descriptive questions based on your settings.</p>
+          <p style="font-size:12px;color:var(--text-muted);max-width:300px;line-height:1.6;">Creating Numerical & Descriptive questions based on your settings.</p>
           <div style="width:260px;height:6px;background:rgba(0,0,0,0.06);border-radius:4px;overflow:hidden;">
             <div style="width:100%;height:100%;background:var(--pastel-purple-dark);border-radius:4px;animation:loadingBar 2s infinite ease-in-out;"></div>
           </div>
@@ -375,10 +375,9 @@ export const GeneratorModule = {
             <div class="form-group">
               <label class="form-label">Question Type</label>
               <select class="form-select" id="gen-type">
-                <option value="Mixed">Mixed (MCQ + Numerical + Descriptive)</option>
-                <option value="MCQ">Only MCQ</option>
-                <option value="Numerical">Only Numerical</option>
-                <option value="Descriptive">Only Descriptive</option>
+                <option value="Mixed" ${this.selectedQuestionType === 'Mixed' ? 'selected' : ''}>Mixed (Numerical + Descriptive)</option>
+                <option value="Numerical" ${this.selectedQuestionType === 'Numerical' ? 'selected' : ''}>Only Numerical</option>
+                <option value="Descriptive" ${this.selectedQuestionType === 'Descriptive' ? 'selected' : ''}>Only Descriptive</option>
               </select>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -595,22 +594,19 @@ export const GeneratorModule = {
         if (mistakes.length > 0) weakChapters = [...new Set(mistakes.map(m => m.chapter))].join(', ');
       }
 
-      let mcqCount = 0, numCount = 0, descCount = 0;
-      if (questionType === 'MCQ') {
-        mcqCount = targetMarks === 20 ? 4 : targetMarks === 50 ? 10 : 20;
-      } else if (questionType === 'Numerical') {
+      let numCount = 0, descCount = 0;
+      if (questionType === 'Numerical') {
         numCount = targetMarks === 20 ? 2 : targetMarks === 50 ? 4 : 8;
       } else if (questionType === 'Descriptive') {
         descCount = targetMarks === 20 ? 2 : targetMarks === 50 ? 5 : 10;
       } else {
-        if (targetMarks === 20) { mcqCount = 2; numCount = 1; descCount = 1; }
-        else if (targetMarks === 50) { mcqCount = 4; numCount = 2; descCount = 2; }
-        else { mcqCount = 8; numCount = 4; descCount = 4; }
+        if (targetMarks === 20) { numCount = 1; descCount = 2; }
+        else if (targetMarks === 50) { numCount = 3; descCount = 3; }
+        else { numCount = 5; descCount = 5; }
       }
 
-      const mcqMarks = mcqCount > 0 ? Math.round((targetMarks * 0.35) / mcqCount) || 2 : 0;
-      const numMarks = numCount > 0 ? Math.round((targetMarks * 0.40) / numCount) || 10 : 0;
-      const descMarks = descCount > 0 ? Math.round((targetMarks * 0.25) / descCount) || 8 : 0;
+      const numMarks = numCount > 0 ? Math.round((targetMarks * (questionType === 'Numerical' ? 1 : 0.55)) / numCount) || 10 : 0;
+      const descMarks = descCount > 0 ? Math.round((targetMarks * (questionType === 'Descriptive' ? 1 : 0.45)) / descCount) || 8 : 0;
 
       const prompt = `You are an expert CA (Chartered Accountancy) exam paper setter for ICAI India.
 
@@ -624,7 +620,6 @@ ${weakChapters ? `- Focus on weak areas: ${weakChapters}` : ''}
 ${studyText ? `\nSTUDY MATERIAL (use as primary source):\n"""\n${studyText}\n"""` : ''}
 
 Generate EXACTLY:
-${mcqCount > 0 ? `- ${mcqCount} MCQ questions (${mcqMarks} marks each) with 4 options and correct answer` : ''}
 ${numCount > 0 ? `- ${numCount} NUMERICAL questions (${numMarks} marks each) with real Indian ₹ figures, complete step-by-step working notes. Types: journal entries, ledger accounts, depreciation, partnership accounts, cash flow, ratio analysis, tax computation, costing problems, etc.` : ''}
 ${descCount > 0 ? `- ${descCount} DESCRIPTIVE questions (${descMarks} marks each) with detailed model answer` : ''}
 
@@ -637,15 +632,6 @@ RULES:
 Respond ONLY with valid JSON (no markdown, no backticks, no explanation):
 {
   "questions": [
-    {
-      "type": "MCQ",
-      "question": "Question text?",
-      "options": ["Option A", "Option B", "Option C", "Option D"],
-      "answer": "Option A",
-      "marks": ${mcqMarks},
-      "notes": "Brief explanation",
-      "difficulty": "Medium"
-    },
     {
       "type": "Numerical",
       "question": "Full numerical problem with all ₹ figures and data...",
@@ -739,34 +725,14 @@ Respond ONLY with valid JSON (no markdown, no backticks, no explanation):
     const chapterList = subObj ? subObj.chapters : [];
     
     const questions = [];
-    const mcqMarks = 2, numMarks = 10, descMarks = 8;
+    const numMarks = 10, descMarks = 8;
     const qCount = targetMarks === 20 ? 3 : targetMarks === 50 ? 6 : 10;
     
     for (let i = 0; i < qCount; i++) {
       const ch = chapterList[i % chapterList.length] || { name: chapter, illustrations: [] };
       const illus = (ch.illustrations && ch.illustrations.length > 0) ? ch.illustrations[i % ch.illustrations.length] : null;
       
-      if (questionType === 'MCQ' || (questionType === 'Mixed' && i % 3 === 0)) {
-        questions.push({
-          id: `local_q_${Date.now()}_${i}`,
-          subject,
-          chapter: ch.name,
-          difficulty: 'Medium',
-          question: illus ? `MCQ: ${illus.q}` : `Which of the following is true regarding ${ch.name}?`,
-          options: [
-            illus ? `Correct compliance under ${ch.name}` : `Recognized under Accrual & Prudence Principles`,
-            `Recorded strictly on Historical Cost Basis`,
-            `Recognized on Cash Basis only`,
-            `None of the above`
-          ],
-          answer: illus ? `Correct compliance under ${ch.name}` : `Recognized under Accrual & Prudence Principles`,
-          marks: mcqMarks,
-          notes: `Tests fundamental concepts of ${ch.name}.`,
-          isDescriptive: false,
-          isNumerical: false,
-          sourcePaper: { title: `Native Local ${sourceType} Paper`, year: new Date().getFullYear(), type: sourceType }
-        });
-      } else if (questionType === 'Numerical' || (questionType === 'Mixed' && i % 3 === 1)) {
+      if (questionType === 'Numerical' || (questionType === 'Mixed' && i % 2 === 0)) {
         questions.push({
           id: `local_q_${Date.now()}_${i}`,
           subject,
